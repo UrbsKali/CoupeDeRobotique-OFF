@@ -133,25 +133,29 @@ class Robot1Brain(Brain):
         elif result == 2:
             self.logger.log("Error moving: didn't reach destination")
 
-    def open_god_hand(self):
+    async def open_god_hand(self):
         for pin in CONFIG.GOD_HAND_GRAB_SERVO_PINS_LEFT:
             self.actuators.update_servo(pin, CONFIG.GOD_HAND_GRAB_SERVO_OPEN_ANGLE)
+            await asyncio.sleep(0.2)
         for pin in CONFIG.GOD_HAND_GRAB_SERVO_PINS_RIGHT:
             self.actuators.update_servo(pin, CONFIG.GOD_HAND_GRAB_SERVO_OPEN_ANGLE)
+            await asyncio.sleep(0.2)
 
-    def close_god_hand(self):
+    async def close_god_hand(self):
         for pin in CONFIG.GOD_HAND_GRAB_SERVO_PINS_LEFT:
             self.actuators.update_servo(
                 pin,
                 CONFIG.GOD_HAND_GRAB_SERVO_OPEN_ANGLE
                 + CONFIG.GOD_HAND_GRAB_SERVO_CLOSE_ANGLE_DIFF_LEFT,
             )
+            await asyncio.sleep(0.2)
         for pin in CONFIG.GOD_HAND_GRAB_SERVO_PINS_RIGHT:
             self.actuators.update_servo(
                 pin,
                 CONFIG.GOD_HAND_GRAB_SERVO_OPEN_ANGLE
                 + CONFIG.GOD_HAND_GRAB_SERVO_CLOSE_ANGLE_DIFF_RIGHT,
             )
+            await asyncio.sleep(0.2)
 
     async def go_best_zone(self, plant_zones: list[Plants_zone], delta=15):
         destination_point = None
