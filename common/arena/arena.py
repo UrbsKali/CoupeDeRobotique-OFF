@@ -185,7 +185,7 @@ class Arena:
         for i in range(len(distances_to_check)):
 
             # Check if the point is close enough to be a risk, and far enough to remove lidar aberrations (might be done in lidar code as well)
-            if 3 < distances_to_check[i] < self.safe_collision_distance:
+            if 5 < distances_to_check[i] < self.safe_collision_distance:
                 # Then check that it isn't outside the game zone (with a buffer)
                 if self.game_borders_buffered.intersects(
                     self.translate_relative_polar(

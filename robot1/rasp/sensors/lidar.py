@@ -103,5 +103,5 @@ class Lidar:
         return [
             self.lidar_obj.scan.distances[i]
             for i in range(int(start_angle / step_angle), int(end_angle / step_angle))
-            if self.lidar_obj.scan.distances[i] > 0.01
+            # if self.lidar_obj.scan.distances[i] > 0.01
         ]
