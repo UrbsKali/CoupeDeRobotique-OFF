@@ -26,7 +26,7 @@ for (let i = 0; i < 270 * 3; i++) {
     lidarData.push(5);
 }
 
-let lidar = new WebSocket(`ws://${host}:${port}/lidar?sender=${user}`);
+let lidar = ws_connect("lidar");
 lidar.onmessage = function (event) {
     if (event.data.startsWith("new$=$") || event.data.startsWith("current$=$")) {
         let data = event.data.split("$=$")[1].split(",");

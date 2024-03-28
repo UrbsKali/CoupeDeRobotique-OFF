@@ -1,1 +1,1 @@
-from frame_buffer import FrameBuffer
+from video.server import MJPEGHandler, spawn_video_server

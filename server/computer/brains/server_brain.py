@@ -4,6 +4,7 @@ from geometry import OrientedPoint, Point
 from arena import MarsArena
 from WS_comms import WSmsg, WServerRouteManager
 from brain import Brain
+from video.server import MJPEGHandler
 
 # Import from local path
 from sensors import Camera, ArucoRecognizer, ColorRecognizer, PlanTransposer, Frame
@@ -110,12 +111,11 @@ class ServerBrain(Brain):
         self.green_objects = []
         for green_object in green_objects:
             self.green_objects.append(green_object.centroid)
-
         frame = Frame(self.camera.get_capture(), [green_objects, arucos])
         frame.draw_markers()
         frame.write_labels()
         self.camera.update_monitor(frame.img)
-        self.camera.save(name="realtime")
+        MJPEGHandler.current_img = self.camera.get_capture() # Send image to the server
 
     @Brain.routine(refresh_rate=0.5)
     async def update_lidar(self):
