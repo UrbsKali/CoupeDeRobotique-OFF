@@ -81,7 +81,7 @@ if __name__ == "__main__":
     )  # must be declared from external calculus interface or switch on the robot
 
     start_pos = OrientedPoint.from_Point(arena.zones["home"].centroid)
-    rolling_basis.set_home(start_pos)
+    rolling_basis.set_odo(start_pos)
 
     # Brain
     brain = Robot1Brain(

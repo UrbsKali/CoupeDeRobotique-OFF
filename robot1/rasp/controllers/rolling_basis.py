@@ -128,7 +128,7 @@ class RollingBasis(Teensy):
     #####################
     def true_pos(self, position: OrientedPoint) -> OrientedPoint:
         """
-        _summary_
+        enables to correct the position using a fixed offset if required 
 
         :param position: _description_
         :type position: OrientedPoint
@@ -428,15 +428,20 @@ class RollingBasis(Teensy):
 
     @Logger
     def reset_odo(self, skip_queue=False):
+        """reset teensy's odo to (0,0,0)
+
+        Args:
+            skip_queue (bool, optional): wether to skip the queue or not. Defaults to False.
+        """
         msg = Command.RESET_POSITION.value
         if skip_queue:
             self.insert_in_queue(0, Instruction(Command.RESET_POSITION, msg), True)
         else:
             self.append_to_queue(Instruction(Command.RESET_POSITION, msg))
 
-    def set_home(self, new_home: OrientedPoint, *, skip_queue=False):
+    def set_odo(self, new_odo: OrientedPoint, *, skip_queue=False):
         msg = Command.SET_HOME.value + struct.pack(
-            "<fff", new_home.x, new_home.y, new_home.theta
+            "<fff", new_odo.x, new_odo.y, new_odo.theta
         )
         if skip_queue:
             self.insert_in_queue(0, Instruction(Command.SET_HOME, msg), True)

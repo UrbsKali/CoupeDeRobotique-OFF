@@ -1,4 +1,3 @@
-#include <servo_motor.h>
 #include <Servo.h>
 #include <com.h>
 #include <message.h>

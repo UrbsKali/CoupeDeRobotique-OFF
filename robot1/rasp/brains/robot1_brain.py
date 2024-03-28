@@ -224,6 +224,9 @@ class Robot1Brain(Brain):
 
     @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
     async def zombie_mode(self):
+        """executes requests received by the server. Use Postman to send request to the server
+        Use eval and await eval to run the code you want. Code must be sent as a string 
+        """
         # Check cmd
         cmd = await self.ws_cmd.receiver.get()
 
@@ -261,6 +264,7 @@ class Robot1Brain(Brain):
                     tolerance=cmd.data[3],
                 )
             elif cmd.msg == "eval":
+
                 instructions = []
                 if isinstance(cmd.data, str):
                     instructions.append(cmd.data)

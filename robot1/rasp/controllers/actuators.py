@@ -8,7 +8,6 @@ import struct
 
 
 class Actuators(Teensy):
-    name = "actuators"
 
     def __init__(
         self,
@@ -40,6 +39,14 @@ class Actuators(Teensy):
     def update_servo(
         self, pin: int, angle: int, min_angle: int = 0, max_angle: int = 180
     ):
+        """set angle to the servo at the given pin  
+
+        Args:
+            pin (int): servo's pin
+            angle (int): the angle to set
+            min_angle (int, optional): angle lower -> angle won't be set. Defaults to 0.
+            max_angle (int, optional): angle higher -> angle won't be set. Defaults to 180.
+        """
         if angle >= min_angle and angle <= max_angle:
             msg = (
                 self.Command.ServoGoTo
