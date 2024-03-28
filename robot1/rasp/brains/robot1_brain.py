@@ -42,6 +42,7 @@ class Robot1Brain(Brain):
         # self.rolling_basis:  RollingBasis
         # self.actuators : Actuators
         # self.arena: MarsArena
+        self.lidar:  Lidar
 
     """
         Routines
@@ -63,16 +64,13 @@ class Robot1Brain(Brain):
         else:
             self.logger.log("ACS not triggered", LogLevels.DEBUG)
 
-    @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
+    @Brain.task(process=False, run_on_start=False, refresh_rate=0.5)
     async def lidar_scan_distances(self):
         # Warning, currently hard-coded for 3 values/degree
-        self.lidar_values_in_distances = [
-            val * 100  # Measures are in meters, we want cm
-            for val in self.lidar.scan_distances(
-                start_angle=self.lidar_angles[0],
-                end_angle=self.lidar_angles[1],
-            )
-        ]
+        self.lidar_values_in_distances = self.lidar.scan_distances(
+            start_angle=self.lidar_angles[0],
+            end_angle=self.lidar_angles[1],
+        )
 
         self.ACS_by_distances()
 
@@ -133,29 +131,25 @@ class Robot1Brain(Brain):
         elif result == 2:
             self.logger.log("Error moving: didn't reach destination")
 
-    async def open_god_hand(self):
+    def open_god_hand(self):
         for pin in CONFIG.GOD_HAND_GRAB_SERVO_PINS_LEFT:
             self.actuators.update_servo(pin, CONFIG.GOD_HAND_GRAB_SERVO_OPEN_ANGLE)
-            await asyncio.sleep(0.2)
         for pin in CONFIG.GOD_HAND_GRAB_SERVO_PINS_RIGHT:
             self.actuators.update_servo(pin, CONFIG.GOD_HAND_GRAB_SERVO_OPEN_ANGLE)
-            await asyncio.sleep(0.2)
 
-    async def close_god_hand(self):
+    def close_god_hand(self):
         for pin in CONFIG.GOD_HAND_GRAB_SERVO_PINS_LEFT:
             self.actuators.update_servo(
                 pin,
                 CONFIG.GOD_HAND_GRAB_SERVO_OPEN_ANGLE
                 + CONFIG.GOD_HAND_GRAB_SERVO_CLOSE_ANGLE_DIFF_LEFT,
             )
-            await asyncio.sleep(0.2)
         for pin in CONFIG.GOD_HAND_GRAB_SERVO_PINS_RIGHT:
             self.actuators.update_servo(
                 pin,
                 CONFIG.GOD_HAND_GRAB_SERVO_OPEN_ANGLE
                 + CONFIG.GOD_HAND_GRAB_SERVO_CLOSE_ANGLE_DIFF_RIGHT,
             )
-            await asyncio.sleep(0.2)
 
     async def go_best_zone(self, plant_zones: list[Plants_zone], delta=15):
         destination_point = None
@@ -285,7 +279,6 @@ class Robot1Brain(Brain):
 
                 for instruction in instructions:
                     await eval(instruction)
-
             else:
                 self.logger.log(
                     f"Command not implemented: {cmd.msg} / {cmd.data}",
