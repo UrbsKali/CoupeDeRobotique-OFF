@@ -49,10 +49,9 @@ class Logger:
 
         # Normal init
         # Init attributes
-        identifier_width = 12
+        self.identifier_width = 12
         self.log_level_width = max([len(loglvl.name) for loglvl in LogLevels]) + 2
         self.identifier = identifier
-        self.identifier_str = center_and_limit(self.identifier, identifier_width)
         self.print_log_level = print_log_level
         self.file_log_level = file_log_level
         self.print_log = print_log
@@ -70,13 +69,29 @@ class Logger:
         )
 
     def message_factory(
-        self, date_str: str, level: LogLevels, message: str, styles: bool = True
+        self,
+        date_str: str,
+        level: LogLevels,
+        message: str,
+        styles: bool = True,
+        identifier_override: str | None = None,
     ) -> str:
 
         return (
             (style(date_str, STYLES.DATE))
             + " -> ["
-            + (style(self.identifier_str, STYLES.IDENTIFIER))
+            + (
+                style(
+                    (
+                        center_and_limit(self.identifier, self.identifier_width)
+                        if identifier_override is None
+                        else center_and_limit(
+                            identifier_override, self.identifier_width
+                        )
+                    ),
+                    STYLES.IDENTIFIER,
+                )
+            )
             + "] "
             + (
                 style(
@@ -88,7 +103,12 @@ class Logger:
             + (style(message, STYLES.MESSAGE))
         )
 
-    def log(self, message: str, level: LogLevels = LogLevels.WARNING) -> None:
+    def log(
+        self,
+        message: str,
+        level: LogLevels = LogLevels.WARNING,
+        identifier_override: str | None = None,
+    ) -> None:
         """
         Log un message dans le fichier de log et dans la sortie standard
         :param message: message à logger
@@ -96,35 +116,29 @@ class Logger:
         :param level: 0: INFO, 1: WARNING, 2: ERROR, 3: CRITICAL, defaults to 0
         :type level: int, optional
         """
-        if level >= self.log_level:
-            # Evaluate the str value now to make sure no weird operators happen
-            message = str(message)
-            date_str = Utils.get_str_date()
-            level_text_color = COLORS.NO_FORMAT
-            match level:
-                case LogLevels.DEBUG:
-                    level_text_color = COLORS.NO_FORMAT
-                case LogLevels.INFO:
-                    level_text_color = COLORS.C_CHARTREUSE3
-                case LogLevels.WARNING:
-                    level_text_color = COLORS.ORANGE
-                case LogLevels.ERROR:
-                    level_text_color = COLORS.C_RED1
-                case LogLevels.CRITICAL:
-                    level_text_color = COLORS.CRITICAL
 
-            message = (
-                f"{COLORS.DATE}{date_str}{COLORS.NO_FORMAT} -> "
-                + f"[{COLORS.C_SILVER}{self.identifier}{COLORS.NO_FORMAT}] "
-                + f"{level_text_color}{level.name}{COLORS.NO_FORMAT} | "
-                + f"{COLORS.NO_FORMAT}{message}{COLORS.NO_FORMAT}"
-            )
-            if self.print_log:
-                print(message)
+        date_str = Utils.get_str_date()
 
-            if self.log_file:
-                with open(f"logs/{self.log_file}", "a") as f:
-                    f.write(message + "\n")
+        # Evaluate the str(message) value manually to make sure no weird operators happen
+        message_str = self.message_factory(
+            date_str=date_str,
+            level=level,
+            message=str(message),
+            styles=False,
+            identifier_override=identifier_override,
+        )
+
+        if self.print_log and level >= self.print_log_level:
+            print(message_str)
+
+        if self.log_file and level >= self.file_log_level:
+            with open(f"logs/{self.log_file}", "a") as f:
+                f.write(
+                    strip_ANSI(
+                        message_str
+                    )  # Remove ANSI escape sequences from the string to save to file, or it will not display properly no most interfaces (could keep them if displayed through cat for example)
+                    + "\n"
+                )
 
         # Sync logs to server (deprecated for now)
         # try:
@@ -136,19 +150,20 @@ class Logger:
         """
         Décorateur, log l'appel de la fonction et ses paramètres
         """
-        msg = f"{self.func.__qualname__.split('.')[0]} : {self.func.__name__}("
         # get positional parameters
         params = [
             f"{param}={value}"
             for param, value in zip(self.func.__code__.co_varnames, args)
+            if param != "self"
         ]
         # get keyword parmeters
         params += [f"{key}={value}," for key, value in kwargs.items()]
-        for e in params:
-            if "self" in str(e):
-                continue
-            msg += str(e) + ", "
-        self.log(msg[:-2] + ")", self.dec_level)
+        msg = f"{self.func.__name__}(" + ", ".join(params) + ")"
+        self.log(
+            msg,
+            self.dec_level,
+            identifier_override=self.func.__qualname__.split(".")[0],
+        )
         return self.func(*args, **kwargs)
 
     def __get__(self, obj, objtype=None):

@@ -20,15 +20,15 @@ class ServerBrain(Brain):
     """
 
     def __init__(
-            self,
-            logger: Logger,
-            ws_cmd: WServerRouteManager,
-            ws_log: WServerRouteManager,
-            ws_lidar: WServerRouteManager,
-            ws_odometer: WServerRouteManager,
-            ws_camera: WServerRouteManager,
-            arena: MarsArena,
-            config
+        self,
+        logger: Logger,
+        ws_cmd: WServerRouteManager,
+        ws_log: WServerRouteManager,
+        ws_lidar: WServerRouteManager,
+        ws_odometer: WServerRouteManager,
+        ws_camera: WServerRouteManager,
+        arena: MarsArena,
+        config,
     ) -> None:
         self.shared = 0
         self.arucos = []
@@ -62,12 +62,7 @@ class ServerBrain(Brain):
             print(f"New cmd received ! [{cmd_state}]")
             if self.ws_cmd.get_client("robot1") is not None:
                 result = await self.ws_cmd.sender.send(
-                    WSmsg(
-                        sender="server",
-                        msg=cmd_state.msg,
-                        data=cmd_state.data
-                    ),
-                    clients=self.ws_cmd.get_client("robot1")
+                    WSmsg(sender="server", msg=cmd_state.msg, data=cmd_state.data),
+                    clients=self.ws_cmd.get_client("robot1"),
                 )
                 print("Result of sending cmd to robot1:", result)
-
