@@ -44,7 +44,7 @@ class Actuators(Teensy):
             msg = (
                 self.Command.ServoGoTo
                 + struct.pack("<B", pin)
-                + struct.pack("B", angle)
+                + struct.pack("<B", angle)
             )
             # https://docs.python.org/3/library/struct.html#format-characters
             self.send_bytes(msg)

@@ -42,6 +42,7 @@ class Robot1Brain(Brain):
         # self.rolling_basis:  RollingBasis
         # self.actuators : Actuators
         # self.arena: MarsArena
+        self.lidar:  Lidar
 
     """
         Routines
@@ -278,7 +279,6 @@ class Robot1Brain(Brain):
 
                 for instruction in instructions:
                     await eval(instruction)
-
             else:
                 self.logger.log(
                     f"Command not implemented: {cmd.msg} / {cmd.data}",
