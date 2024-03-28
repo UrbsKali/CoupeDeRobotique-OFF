@@ -14,6 +14,7 @@ import asyncio
 from geometry import Polygon
 from config_loader import CONFIG
 import time
+import math
 
 
 class Robot1Brain(Brain):
@@ -25,8 +26,8 @@ class Robot1Brain(Brain):
         ws_lidar: WSclientRouteManager,
         ws_odometer: WSclientRouteManager,
         ws_camera: WSclientRouteManager,
-        actuators: Actuators,
-        rolling_basis: RollingBasis,
+        #actuators: Actuators,
+        #rolling_basis: RollingBasis,
         lidar: Lidar,
         arena: MarsArena,
     ) -> None:
@@ -36,6 +37,7 @@ class Robot1Brain(Brain):
         self.lidar_values_in_distances = []
         self.lidar_angles = (90, 180)
         self.odometer = None
+        self.ennemi_position: Point = None
         self.camera = {}
 
         # to delete, only use for completion
@@ -76,13 +78,6 @@ class Robot1Brain(Brain):
 
         self.ACS_by_distances()
 
-    # @Brain.task(refresh_rate=0.5)
-    # async def lidar_scan(self):
-    #     scan = self.lidar.scan_to_absolute_cartesian(
-    #         robot_pos=self.rolling_basis.odometrie
-    #     )
-
-    #     self.lidar_scan = [[p.x, p.y] for p in scan]
 
     @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
     async def odometer_update(self):
