@@ -6,7 +6,7 @@ img_path = "test.jpg"
 
 
 class MJPEGHandler(BaseHTTPRequestHandler):
-    current_img = None        
+    current_img = None
 
     def send_index(self):
         self.send_response(200)
@@ -35,7 +35,7 @@ class MJPEGHandler(BaseHTTPRequestHandler):
                     if self.current_img is None:
                         print("No image to send")
                         continue
-                    dat = cv2.imencode('.jpg', self.current_img)[1].tobytes()
+                    dat = cv2.imencode(".jpg", self.current_img)[1].tobytes()
                     self.wfile.write(b"--jpgboundary")
                     self.send_header("Content-type", "image/jpeg")
                     self.send_header("Content-length", str(dat.__len__()))
@@ -52,17 +52,15 @@ class MJPEGHandler(BaseHTTPRequestHandler):
             self.send_index()
             return
 
+
 # I want to pass an object to the handler, but I can't figure out how to do it
-
-
-        
 
 
 def start_video_server():
     print("Starting video server")
     MJPEGHandler.current_img = None
     httpd = HTTPServer(("0.0.0.0", 8001), MJPEGHandler)
-    
+
     # make the server ctrl+c-able
     try:
         httpd.serve_forever()

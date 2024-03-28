@@ -115,7 +115,7 @@ class ServerBrain(Brain):
         frame.draw_markers()
         frame.write_labels()
         self.camera.update_monitor(frame.img)
-        MJPEGHandler.current_img = self.camera.get_capture() # Send image to the server
+        MJPEGHandler.current_img = self.camera.get_capture()  # Send image to the server
 
     @Brain.routine(refresh_rate=0.5)
     async def update_lidar(self):
