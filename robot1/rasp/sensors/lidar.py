@@ -173,5 +173,4 @@ class Lidar:
         :return: the polars array
         """
         self.__scan()
-        self.__polars[:, 1] = self.distances
-        return self.__polars
+        return self.polars
