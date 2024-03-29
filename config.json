@@ -72,6 +72,12 @@
       "god_hand_grab_servo_open_angle": 90,
       "god_hand_grab_servo_close_angle_diff_left": 22,
       "god_hand_grab_servo_close_angle_diff_right": -22
+    },
+    "lidar": {
+      "distances_unit": "cm",
+      "angles_unit": "deg",
+      "min_angle": -135,
+      "max_angle": 135
     }
   }
 }

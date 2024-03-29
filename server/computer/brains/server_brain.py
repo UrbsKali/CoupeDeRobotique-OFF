@@ -40,17 +40,15 @@ class ServerBrain(Brain):
         Tasks
     """
 
-    @Brain.task(process=True, run_on_start=True, refresh_rate=1)
+    @Brain.task(process=True, run_on_start=True, refresh_rate=0.9)
     def test_0(self):
         self.shared += 1
-        print("test_0:", self.shared)
 
-    @Brain.task(process=True, run_on_start=True, refresh_rate=1, timeout=10)
+    @Brain.task(process=True, run_on_start=True, refresh_rate=1.1, timeout=10)
     def test_1(self):
         self.shared += 1
-        print("test_1:", self.shared)
 
-    @Brain.task(process=False, run_on_start=True, refresh_rate=0.9)
+    @Brain.task(process=False, run_on_start=True, refresh_rate=1)
     async def test_2(self):
         print("test_2:", self.shared)
 

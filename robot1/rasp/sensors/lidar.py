@@ -1,107 +1,177 @@
-from config_loader import CONFIG
-
 # Import from common
-from geometry import OrientedPoint, Point
+from logger import Logger, LogLevels
 
+# External imports
+from typing import TypeVar
+import numpy as np
 import math
+
+TLidar = TypeVar("TLidar", bound="pysicktim")
 
 
 class Lidar:
     """
-    Classe permettant de rÃ©cupÃ©rer les donnÃ©es du lidar, et de les traiter, la rÃ©sultion angulaire est de 1/3 de degrÃ©
+    This class is a wrapper for the lidar sensor.
+    * The angles are in degrees (considering the sense in the trigonometric way).
+            -> 0° is the front of the robot
+            -> 90° is the left of the robot
+            -> -90° is the right of the robot
+    * The distances are in centimeters.
+    * the unities of angles and distances can be changed by changing the default values of the _init_ parameters.
+    * The lidar is a SICK TIM 571.
+    * The angle and distance are stored in a numpy array (type float32).
     """
 
-    def __init__(self, min_angle: float = -math.pi, max_angle: float = math.pi):
+    def __init__(self, logger: Logger, min_angle: float, max_angle: float, unity_angle: str = "deg",
+                 unity_distance: str = "cm") -> None:
         """
-        Initialise la connection au lidar
+        Initialize the lidar object and the polars angles.
+        It also tests the lidar connection.
 
-        :param min_angle: l'angle de lecture minimal, defaults to -math.pi
-        :type min_angle: float, optional
-        :param max_angle: l'angle de lecture maximal, defaults to math.pi
-        :type max_angle: float, optional
+        WARNING: The min & max angle have to be given in the trigonometric way and in degrees !
+
+        :param logger: logger to log the lidar's events
+        :param min_angle: the minimum angle of the lidar (max angle at left)
+        :param max_angle: the maximum angle of the lidar (min angle at right)
+        :param unity_angle: the unity of the angles (default: "deg")
+        :param unity_distance: the unity of the distances (default: "cm")
+        :return:
         """
-        import pysicktim as lidar
+        self._logger = logger
+        self.__distance_unity = self.__init_distances_unity(unity_distance)
+        self.__angle_unity = self.__init_angles_unity(unity_angle)
 
-        # TODO: mise en place d'un erreur si le lidar n'est pas trouvé !
-        self.min_angle = min_angle
-        self.max_angle = max_angle
-        self.lidar_obj = lidar
+        self.__lidar_obj = self.__init_lidar()
+        self.__polars_angles = self.__init_polars_angle(min_angle, max_angle)
+
+    """
+        Private methods
+    """
+
+    def __init_lidar(self) -> TLidar:
+        """
+        Initialize the lidar object and test the connection.
+        :return: the lidar object
+        """
+        try:
+            import pysicktim as lidar
+
+            if lidar is None:
+                self.logger.log("Lidar is not connected !", LogLevels.CRITICAL)
+                raise ConnectionError("Lidar is not connected !")
+            else:
+                self.logger.log("Lidar is connected !", LogLevels.INFO)
+
+            # Test lidar connection by testing scan function
+            lidar.scan()
+            if lidar.scan.distances is None or lidar.scan.distances == []:
+                self.logger.log("Lidar doesn't work correctly", LogLevels.CRITICAL)
+                raise ConnectionError("Lidar doesn't work correctly !")
+
+            return lidar
+
+        except ImportError as error:
+            self.logger.log(f"Error while importing lidar [{error}]", LogLevels.CRITICAL)
+            raise ImportError(f"Error while importing lidar [{error}] !")
+
+    def __init_polars_angle(self, min_angle: float, max_angle: float) -> np.ndarray:
+        """
+        Initialize the polars angles array
+        :param min_angle: the minimum angle of the lidar (max angle at left)
+        :param max_angle: the maximum angle of the lidar (min angle at right)
+        :return:
+        """
+        n = len(self.distances)  # Number of distances
+        if n == 0:
+            self.__scan()
+
+        angle_step = abs(max_angle - min_angle) / n
+
+        # Init the polars array with zeros, then fill it with angles
+        polars = np.zeros(n, dtype=np.float32)
+        for i in range(n):
+            polars[i] = i * angle_step
+
+        if polars.size == 0:
+            self.logger.log("Error while initializing polars", LogLevels.CRITICAL)
+            raise ValueError("Error while initializing polars !")
+
+        return polars
+
+    def __init_distances_unity(self, unity: str) -> float:
+        """
+        Initialize the unity of the distances
+        :param unity_distance: the unity of the distances
+        :return:
+        """
+        if unity == "mm":
+            return 0.001
+        if unity == "cm":
+            return 0.01
+        if unity == "m":
+            return 1
+        if unity == "inch":
+            return 0.0254
+
+        self.logger.log(f"Unity of distances not recognized [{unity}] !", LogLevels.CRITICAL)
+        raise ValueError(f"Unity of distances not recognized [{unity}] !")
+
+    def __init_angles_unity(self, unity: str) -> float:
+        """
+        Initialize the unity of the angles
+        :param unity_angle: the unity of the angles
+        :return:
+        """
+        if unity == "deg":
+            return 1
+        if unity == "rad":
+            return 180 / math.pi
+
+        self.logger.log(f"Unity of angles not recognized [{unity}] !", LogLevels.CRITICAL)
+        raise ValueError(f"Unity of angles not recognized [{unity}] !")
 
     def __scan(self):
+        """
+        Scan the environment with the lidar and store the distances.
+        in the lidar object.
+        """
         self.lidar_obj.scan()
 
-    def __get_scan_distances(self) -> list[float]:
-        return self.lidar_obj.scan.distances
+    """
+        Public methods and properties
+    """
 
-    def __get_polar(self) -> list[tuple[float, float]]:
-        angle_step = (self.max_angle - self.min_angle) / len(
-            self.__get_scan_distances()
-        )
-        polar_coordinates = []
-        for i in range(len(self.__get_scan_distances())):
-            polar_coordinates.append(
-                (self.min_angle + (i * angle_step), self.__get_scan_distances()[i])
-            )
-        return polar_coordinates
-
-    def __get_cartesian(self) -> list[tuple[float, float]]:
-        cartesian_coordinates = []
-        for coordinate in self.__get_polar():
-            cartesian_coordinates.append(
-                (
-                    coordinate[1] * math.cos(coordinate[0]),
-                    coordinate[1] * math.sin(coordinate[0]),
-                )
-            )
-        return cartesian_coordinates
-
-    def __get_absolute_cartesian(self, robot_pos: OrientedPoint) -> list[Point]:
+    @property
+    def distances(self) -> np.ndarray:
         """
-        Convertit des coordonnÃ©es cartÃ©siennes relatives Ã  un robot en coordonnÃ©es absolues de la table
-
-        :param cartesian_coordinates: les coordonnÃ©es cartÃ©siennes relatives au robot
-        :type cartesian_coordinates: list[float]
-        :param robot_pos: la position du robot sur la table (x, y, theta), theta est l'angle de rotation du robot
-        :type robot_pos: tuple[float, float, float]
-        :return: les coordonnÃ©es cartÃ©siennes absolues
-        :rtype: list[float]
+        Get the distances from the last scan.
+        It automatically converts the distances to the right unity.
+        :return: the distances array
         """
-        res = []
-        for coordinate in self.__get_cartesian():
-            res.append(
-                Point(
-                    robot_pos.x + coordinate[0] * math.cos(robot_pos.theta),
-                    robot_pos.y + coordinate[1] * math.sin(robot_pos.theta),
-                )
-            )
-        return res
+        return np.array(self.__lidar_obj.scan.distances, dtype=np.float32) * self.__distance_unity
 
-    def scan_to_polar(self) -> list[tuple[float, float]]:
-        self.__scan()
-        return self.__get_polar()
+    @property
+    def polars(self) -> np.ndarray:
+        """
+        Get the polars array.
+        It automatically converts the angles to the right unity.
+        :return: the polars array
+        """
+        return np.concatenate((self.__polars_angles, self.distances), axis=1) * self.__angle_unity
 
-    def scan_to_cartesian(self) -> list[tuple[float, float]]:
-        self.__scan()
-        return self.__get_cartesian()
-
-    def scan_to_absolute_cartesian(self, robot_pos: OrientedPoint) -> list[Point]:
-        self.__scan()
-        return self.__get_absolute_cartesian(robot_pos)
-
-    def scan_distances(self, start_angle, end_angle, step_angle=1 / 3):
-        """return a list of distances between start_angle and end engle
-
-        Args:
-            start_angle (float): the angle from were to start mesuring
-            end_angle (float): the last angle of the mesure
-            step_angle (float): every mesure from the lidar is separeted from a given angle
-
-        Returns:
-            _type_: a list of float representing the distance between the lidar and detected points at each angle between the required ones
+    def scan_to_distances(self) -> np.ndarray:
+        """
+        Scan the environment with the lidar and return the distances.
+        :return: the distances array
         """
         self.__scan()
-        return [
-            self.lidar_obj.scan.distances[i]
-            for i in range(int(start_angle / step_angle), int(end_angle / step_angle))
-            # if self.lidar_obj.scan.distances[i] > 0.01
-        ]
+        return self.distances
+
+    def scan_to_polars(self) -> np.ndarray:
+        """
+        Scan the environment with the lidar and return the polars array.
+        :return: the polars array
+        """
+        self.__scan()
+        self.__polars[:, 1] = self.distances
+        return self.__polars

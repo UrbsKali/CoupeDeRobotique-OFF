@@ -1,7 +1,9 @@
 from aiohttp import web
 import asyncio
+import time
 
 from WS_comms.server.server_route import WServerRouteManager
+from logger import Logger, LogLevels
 
 
 class WServer:
@@ -14,9 +16,11 @@ class WServer:
     * It can  run background tasks in parallel with route listening.
     """
 
-    def __init__(self, host: str, port: int) -> None:
+    def __init__(self, host: str, port: int, logger: Logger) -> None:
         self.__host = host
         self.__port = port
+
+        self.logger = logger
 
         self.app = web.Application(debug=True)
 
@@ -30,6 +34,10 @@ class WServer:
         :param route_manager:
         :return:
         """
+        self.logger.log(
+            f"New route handler added [{route}], route url: [ws://{self.__host}:{self.__port}{route}]",
+            LogLevels.DEBUG,
+        )
         self.app.router.add_get(route, route_manager.routine)
 
     def add_background_task(
@@ -52,7 +60,23 @@ class WServer:
         async def background_task(app):
             app[name] = asyncio.create_task(task(*args, **kwargs))
 
+        self.logger.log(
+            f"New background task added [{name}]",
+            LogLevels.DEBUG,
+        )
         self.app.on_startup.append(background_task)
 
     def run(self) -> None:
-        web.run_app(self.app, host=self.__host, port=self.__port)
+        while True:
+            try:
+                self.logger.log(
+                    f"WServer started, url: [ws://{self.__host}:{self.__port}]",
+                    LogLevels.INFO,
+                )
+                web.run_app(self.app, host=self.__host, port=self.__port)
+            except Exception as error:
+                self.logger.log(
+                    f"WServer error: ({error}), try to restart...",
+                    LogLevels.ERROR,
+                )
+                time.sleep(5)

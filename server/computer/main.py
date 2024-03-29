@@ -15,16 +15,22 @@ if __name__ == "__main__":
     """
     ###--- Initialization ---###
     """
-    # Logger
-    logger = Logger(
-        identifier="computer",
+    # Loggers
+    logger_ws_server = Logger(
+        identifier="ws_server",
         decorator_level=LogLevels.INFO,
         print_log_level=LogLevels.INFO,
-        file_log_level=LogLevels.INFO,
+        file_log_level=LogLevels.DEBUG,
+    )
+    logger_brain = Logger(
+        identifier="brain",
+        decorator_level=LogLevels.INFO,
+        print_log_level=LogLevels.INFO,
+        file_log_level=LogLevels.DEBUG,
     )
 
     # Websocket server
-    ws_server = WServer(CONFIG.WS_HOSTNAME, CONFIG.WS_PORT)
+    ws_server = WServer(host=CONFIG.WS_HOSTNAME, port=CONFIG.WS_PORT, logger=logger_ws_server)
     ws_cmd = WServerRouteManager(
         WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME)
     )
@@ -76,13 +82,13 @@ if __name__ == "__main__":
 
     # Brain
     brain = ServerBrain(
-        logger=Logger(identifier="ServerBrain", print_log_level=LogLevels.INFO),
-        ws_cmd=ws_cmd,
-        ws_log=ws_log,
-        ws_lidar=ws_lidar,
-        ws_odometer=ws_odometer,
-        ws_camera=ws_camera,
-        arena=arena,
+        logger=logger_brain,
+        #ws_cmd=ws_cmd,
+        #ws_log=ws_log,
+        #ws_lidar=ws_lidar,
+        #ws_odometer=ws_odometer,
+        #ws_camera=ws_camera,
+        #arena=arena,
         config=CONFIG,
     )
 
