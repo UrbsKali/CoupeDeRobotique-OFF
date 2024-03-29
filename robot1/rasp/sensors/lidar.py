@@ -20,6 +20,8 @@ class Lidar:
     * the unities of angles and distances can be changed by changing the default values of the _init_ parameters.
     * The lidar is a SICK TIM 571.
     * The angle and distance are stored in a numpy array (type float32).
+
+    -> The default lidar distance unity is m.
     """
 
     def __init__(self, logger: Logger, min_angle: float, max_angle: float, unity_angle: str = "deg",
@@ -105,9 +107,9 @@ class Lidar:
         :return:
         """
         if unity == "mm":
-            return 0.001
+            return 1000
         if unity == "cm":
-            return 0.01
+            return 100
         if unity == "m":
             return 1
         if unity == "inch":
@@ -157,8 +159,8 @@ class Lidar:
         It automatically converts the angles to the right unity.
         :return: the polars array
         """
-        print("__polars_angles", self.__polars_angles)
-        print("distances", self.distances)
+        print("__polars_angles", self.__polars_angles.size, self.__polars_angles.shape)
+        print("distances", self.distances.size, self.distances.shape)
         return np.concatenate((self.__polars_angles, self.distances), axis=1)
 
     def scan_to_distances(self) -> np.ndarray:
