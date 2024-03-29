@@ -44,7 +44,7 @@ class Robot1Brain(Brain):
         # self.rolling_basis:  RollingBasis
         # self.actuators : Actuators
         # self.arena: MarsArena
-        self.lidar:  Lidar
+        # self.lidar:  Lidar
 
     """
         Routines
