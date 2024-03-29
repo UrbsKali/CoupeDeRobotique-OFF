@@ -43,7 +43,7 @@ class ServerBrain(Brain):
 
     @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
     async def pami_com(self):
-        pami_state = await self.pami_state.receiver.get()
+        pami_state = await self.ws_pami.receiver.get()
         if pami_state != WSmsg():
             print(f"Pami state received ! [{pami_state}]")
             await self.ws_cmd.sender.send(
