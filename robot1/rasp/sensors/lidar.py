@@ -90,7 +90,7 @@ class Lidar:
         # Init the polars array with zeros, then fill it with angles
         polars = np.zeros(n, dtype=np.float32)
         for i in range(n):
-            polars[i] = i * angle_step
+            polars[i] = i * angle_step * self.__angle_unity
 
         if polars.size == 0:
             self._logger.log("Error while initializing polars", LogLevels.CRITICAL)
@@ -157,7 +157,9 @@ class Lidar:
         It automatically converts the angles to the right unity.
         :return: the polars array
         """
-        return np.concatenate((self.__polars_angles, self.distances), axis=1) * self.__angle_unity
+        print("__polars_angles", self.__polars_angles)
+        print("distances", self.distances)
+        return np.concatenate((self.__polars_angles, self.distances), axis=1)
 
     def scan_to_distances(self) -> np.ndarray:
         """
