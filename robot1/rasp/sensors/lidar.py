@@ -92,7 +92,7 @@ class Lidar:
         # Init the polars array with zeros, then fill it with angles
         polars = np.zeros(n, dtype=np.float32)
         for i in range(n):
-            polars[i] = i * angle_step * self.__angle_unity
+            polars[i] = min_angle + i * angle_step * self.__angle_unity
 
         if polars.size == 0:
             self._logger.log("Error while initializing polars", LogLevels.CRITICAL)
