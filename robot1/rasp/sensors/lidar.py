@@ -57,21 +57,21 @@ class Lidar:
             import pysicktim as lidar
 
             if lidar is None:
-                self.logger.log("Lidar is not connected !", LogLevels.CRITICAL)
+                self._logger.log("Lidar is not connected !", LogLevels.CRITICAL)
                 raise ConnectionError("Lidar is not connected !")
             else:
-                self.logger.log("Lidar is connected !", LogLevels.INFO)
+                self._logger.log("Lidar is connected !", LogLevels.INFO)
 
             # Test lidar connection by testing scan function
             lidar.scan()
             if lidar.scan.distances is None or lidar.scan.distances == []:
-                self.logger.log("Lidar doesn't work correctly", LogLevels.CRITICAL)
+                self._logger.log("Lidar doesn't work correctly", LogLevels.CRITICAL)
                 raise ConnectionError("Lidar doesn't work correctly !")
 
             return lidar
 
         except ImportError as error:
-            self.logger.log(f"Error while importing lidar [{error}]", LogLevels.CRITICAL)
+            self._logger.log(f"Error while importing lidar [{error}]", LogLevels.CRITICAL)
             raise ImportError(f"Error while importing lidar [{error}] !")
 
     def __init_polars_angle(self, min_angle: float, max_angle: float) -> np.ndarray:
@@ -93,7 +93,7 @@ class Lidar:
             polars[i] = i * angle_step
 
         if polars.size == 0:
-            self.logger.log("Error while initializing polars", LogLevels.CRITICAL)
+            self._logger.log("Error while initializing polars", LogLevels.CRITICAL)
             raise ValueError("Error while initializing polars !")
 
         return polars
@@ -113,7 +113,7 @@ class Lidar:
         if unity == "inch":
             return 0.0254
 
-        self.logger.log(f"Unity of distances not recognized [{unity}] !", LogLevels.CRITICAL)
+        self._logger.log(f"Unity of distances not recognized [{unity}] !", LogLevels.CRITICAL)
         raise ValueError(f"Unity of distances not recognized [{unity}] !")
 
     def __init_angles_unity(self, unity: str) -> float:
@@ -127,7 +127,7 @@ class Lidar:
         if unity == "rad":
             return 180 / math.pi
 
-        self.logger.log(f"Unity of angles not recognized [{unity}] !", LogLevels.CRITICAL)
+        self._logger.log(f"Unity of angles not recognized [{unity}] !", LogLevels.CRITICAL)
         raise ValueError(f"Unity of angles not recognized [{unity}] !")
 
     def __scan(self):
