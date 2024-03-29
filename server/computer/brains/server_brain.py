@@ -46,7 +46,7 @@ class ServerBrain(Brain):
         pami_state = await self.ws_pami.receiver.get()
         if pami_state != WSmsg():
             print(f"Pami state received ! [{pami_state}]")
-            await self.ws_cmd.sender.send(
+            await self.ws_pami.sender.send(
                 WSmsg(sender="server", msg=pami_state.msg, data=pami_state.data),
             )
 

@@ -76,8 +76,8 @@
     "lidar": {
       "distances_unit": "cm",
       "angles_unit": "deg",
-      "min_angle": -135,
-      "max_angle": 135
+      "min_angle": -134.8335,
+      "max_angle": 134.8335
     }
   }
 }
