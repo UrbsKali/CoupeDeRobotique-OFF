@@ -70,9 +70,9 @@ if __name__ == "__main__":
     ws_client.add_route_handler(CONFIG.WS_CAMERA_ROUTE, ws_camera)
 
     # Robot
-    #rolling_basis = RollingBasis(logger=logger_rolling_basis)
+    rolling_basis = RollingBasis(logger=logger_rolling_basis)
 
-    #actuators = Actuators(logger=logger_actuators)
+    actuators = Actuators(logger=logger_actuators)
 
     # Lidar
     lidar = Lidar(
@@ -92,14 +92,14 @@ if __name__ == "__main__":
 
     # Brain
     brain = Robot1Brain(
-        #actuators=actuators,
+        actuators=actuators,
         logger=logger_brain,
         ws_cmd=ws_cmd,
         ws_log=ws_log,
         ws_lidar=ws_lidar,
         ws_odometer=ws_odometer,
         ws_camera=ws_camera,
-        #rolling_basis=rolling_basis,
+        rolling_basis=rolling_basis,
         lidar=lidar,
         arena=arena,
     )
