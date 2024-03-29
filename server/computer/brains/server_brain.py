@@ -2,11 +2,14 @@
 import asyncio
 import time
 
+import cv2
+
 from logger import Logger, LogLevels
 from geometry import OrientedPoint, Point
 from arena import MarsArena
 from WS_comms import WSmsg, WServerRouteManager
 from brain import Brain
+from video.server import MJPEGHandler
 
 # Import from local path
 from sensors import Camera, ArucoRecognizer, ColorRecognizer, PlanTransposer, Frame
@@ -34,7 +37,6 @@ class ServerBrain(Brain):
         self.shared = 0
         self.arucos = []
         self.green_objects = []
-
         super().__init__(logger, self)
 
     """
@@ -62,3 +64,10 @@ class ServerBrain(Brain):
                     clients=self.ws_cmd.get_client("robot1"),
                 )
                 print("Result of sending cmd to robot1:", result)
+
+    @Brain.task(process=False, run_on_start=True, refresh_rate=0.1)
+    async def webui_cam(self):
+        self.camera = Camera(skip_warmup=True)
+        self.camera.capture()
+        # do wathever you want with the frame
+        MJPEGHandler.current_img = self.camera.get_capture()   # Send image to the server

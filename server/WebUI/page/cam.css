@@ -3,6 +3,14 @@
     background: url("../assets/no_signal.png")  center;
     background-size: cover;
     animation: no_signal 10s linear infinite;
+    /*hide overflowing child*/
+    overflow: hidden;
+}
+
+#VideoStream{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 @keyframes no_signal {

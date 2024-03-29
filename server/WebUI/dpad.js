@@ -1,4 +1,4 @@
-let cmd_ws = new WebSocket(`ws://${host}:${port}/cmd?sender=${user}`);
+let cmd_ws = ws_connect("cmd");
 
 let up = document.querySelector(".up");
 let down = document.querySelector(".down");

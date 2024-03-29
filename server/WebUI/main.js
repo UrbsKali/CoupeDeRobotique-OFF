@@ -1,6 +1,6 @@
 let console_div = document.querySelector('.log')
 
-let log = new WebSocket(`ws://${host}:${port}/log?sender=${user}`);
+let log = ws_connect("log");
 log.onmessage = function (event) {
     // parse JSON then display it
     let data = JSON.parse(event.data);

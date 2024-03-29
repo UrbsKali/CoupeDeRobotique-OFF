@@ -12,7 +12,8 @@ from utils import Utils
 
 class Camera:
     def __init__(
-        self, res_w=800, res_h=800, captures_path="./", undistorted_coefficients_path=""
+        self, res_w=800, res_h=800, captures_path="./", undistorted_coefficients_path="",
+        skip_warmup=False
     ):
         self.resolution = [res_h, res_w]
         self.camera = VideoStream(src=0).start()
@@ -21,7 +22,8 @@ class Camera:
         self.undistorted_coefficients_path = undistorted_coefficients_path
 
         # Wait for the camera to warm up
-        time.sleep(2.0)
+        if not skip_warmup:
+            time.sleep(2.0)
 
         # Use later
         self.last_record_image = None
