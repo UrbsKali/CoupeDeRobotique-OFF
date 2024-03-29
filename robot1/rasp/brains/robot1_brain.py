@@ -91,6 +91,11 @@ class Robot1Brain(Brain):
         if msg != WSmsg():
             self.camera = msg.data
 
+    @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
+    async def compute_ennemi_position(self):
+        polars = self.lidar.scan_to_polars()
+        print(polars)
+
     """
         Send controllers / sensors feedback (odometer / lidar)
     """
