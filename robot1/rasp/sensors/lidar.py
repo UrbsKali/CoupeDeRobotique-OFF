@@ -28,6 +28,8 @@ class Lidar:
         Initialize the lidar object and the polars angles.
         It also tests the lidar connection.
 
+        WARNING: The min & max angle have to be given in the trigonometric way and in degrees !
+
         :param logger: logger to log the lidar's events
         :param min_angle: the minimum angle of the lidar (max angle at left)
         :param max_angle: the maximum angle of the lidar (min angle at right)
