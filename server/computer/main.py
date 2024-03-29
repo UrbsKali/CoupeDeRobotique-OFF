@@ -4,10 +4,13 @@ from config_loader import CONFIG
 from WS_comms import WServer, WServerRouteManager, WSender, WSreceiver, WSmsg
 from logger import Logger, LogLevels
 from arena import MarsArena
+from video import spawn_video_server
 
 # Import from local path
 from brains import ServerBrain
 from sensors import Camera, ArucoRecognizer, ColorRecognizer, PlanTransposer, Frame
+
+
 
 import asyncio
 
@@ -80,6 +83,8 @@ if __name__ == "__main__":
     # Arena
     arena = MarsArena(2, Logger(identifier="arena", print_log_level=LogLevels.INFO))
 
+    spawn_video_server()
+    
     # Brain
     brain = ServerBrain(
         logger=logger_brain,
