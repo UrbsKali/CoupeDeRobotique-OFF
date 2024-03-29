@@ -26,8 +26,8 @@ class Robot1Brain(Brain):
         ws_lidar: WSclientRouteManager,
         ws_odometer: WSclientRouteManager,
         ws_camera: WSclientRouteManager,
-        #actuators: Actuators,
-        #rolling_basis: RollingBasis,
+        actuators: Actuators,
+        rolling_basis: RollingBasis,
         lidar: Lidar,
         arena: MarsArena,
     ) -> None:
