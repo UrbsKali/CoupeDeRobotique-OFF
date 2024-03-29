@@ -22,12 +22,12 @@ class ServerBrain(Brain):
     def __init__(
             self,
             logger: Logger,
-            ws_cmd: WServerRouteManager,
-            ws_log: WServerRouteManager,
-            ws_lidar: WServerRouteManager,
-            ws_odometer: WServerRouteManager,
-            ws_camera: WServerRouteManager,
-            arena: MarsArena,
+            #ws_cmd: WServerRouteManager,
+            #ws_log: WServerRouteManager,
+            #ws_lidar: WServerRouteManager,
+            #ws_odometer: WServerRouteManager,
+            #ws_camera: WServerRouteManager,
+            #arena: MarsArena,
             config
     ) -> None:
         self.shared = 0
