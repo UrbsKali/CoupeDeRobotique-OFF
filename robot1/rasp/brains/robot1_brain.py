@@ -39,6 +39,7 @@ class Robot1Brain(Brain):
         self.odometer = None
         self.ennemi_position: Point = None
         self.camera = {}
+        self.debug = None
 
         # to delete, only use for completion
         # self.rolling_basis:  RollingBasis
@@ -94,7 +95,8 @@ class Robot1Brain(Brain):
     @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
     async def compute_ennemi_position(self):
         polars = self.lidar.scan_to_polars()
-        print(polars)
+        self.debug = polars
+
 
     """
         Send controllers / sensors feedback (odometer / lidar)
