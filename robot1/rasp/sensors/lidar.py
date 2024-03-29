@@ -159,9 +159,7 @@ class Lidar:
         It automatically converts the angles to the right unity.
         :return: the polars array
         """
-        print("__polars_angles", self.__polars_angles.size, self.__polars_angles.shape)
-        print("distances", self.distances.size, self.distances.shape)
-        return np.concatenate((self.__polars_angles, self.distances), axis=1)
+        return np.column_stack((self.__polars_angles, self.distances))
 
     def scan_to_distances(self) -> np.ndarray:
         """
