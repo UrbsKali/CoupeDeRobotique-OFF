@@ -135,7 +135,7 @@ class Lidar:
         Scan the environment with the lidar and store the distances.
         in the lidar object.
         """
-        self.lidar_obj.scan()
+        self.__lidar_obj.scan()
 
     """
         Public methods and properties
