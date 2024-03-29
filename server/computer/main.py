@@ -83,12 +83,12 @@ if __name__ == "__main__":
     # Brain
     brain = ServerBrain(
         logger=logger_brain,
-        #ws_cmd=ws_cmd,
-        #ws_log=ws_log,
-        #ws_lidar=ws_lidar,
-        #ws_odometer=ws_odometer,
-        #ws_camera=ws_camera,
-        #arena=arena,
+        ws_cmd=ws_cmd,
+        ws_log=ws_log,
+        ws_lidar=ws_lidar,
+        ws_odometer=ws_odometer,
+        ws_camera=ws_camera,
+        arena=arena,
         config=CONFIG,
     )
 
