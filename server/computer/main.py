@@ -88,6 +88,7 @@ if __name__ == "__main__":
         ws_lidar=ws_lidar,
         ws_odometer=ws_odometer,
         ws_camera=ws_camera,
+        ws_pami=ws_pami,
         arena=arena,
         config=CONFIG,
     )

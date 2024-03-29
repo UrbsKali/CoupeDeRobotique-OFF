@@ -20,15 +20,16 @@ class ServerBrain(Brain):
     """
 
     def __init__(
-        self,
-        logger: Logger,
-        ws_cmd: WServerRouteManager,
-        ws_log: WServerRouteManager,
-        ws_lidar: WServerRouteManager,
-        ws_odometer: WServerRouteManager,
-        ws_camera: WServerRouteManager,
-        arena: MarsArena,
-        config,
+            self,
+            logger: Logger,
+            ws_cmd: WServerRouteManager,
+            ws_log: WServerRouteManager,
+            ws_lidar: WServerRouteManager,
+            ws_odometer: WServerRouteManager,
+            ws_camera: WServerRouteManager,
+            ws_pami: WServerRouteManager,
+            arena: MarsArena,
+            config,
     ) -> None:
         self.shared = 0
         self.arucos = []
@@ -40,17 +41,14 @@ class ServerBrain(Brain):
         Tasks
     """
 
-    @Brain.task(process=True, run_on_start=True, refresh_rate=0.9)
-    def test_0(self):
-        self.shared += 1
-
-    @Brain.task(process=True, run_on_start=True, refresh_rate=1.1, timeout=10)
-    def test_1(self):
-        self.shared += 1
-
-    @Brain.task(process=False, run_on_start=True, refresh_rate=1)
-    async def test_2(self):
-        print("test_2:", self.shared)
+    @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
+    async def pami_com(self):
+        pami_state = await self.pami_state.receiver.get()
+        if pami_state != WSmsg():
+            print(f"Pami state received ! [{pami_state}]")
+            await self.ws_cmd.sender.send(
+                WSmsg(sender="server", msg=pami_state.msg, data=pami_state.data),
+            )
 
     @Brain.task(process=False, run_on_start=True, refresh_rate=0.1)
     async def main(self):
