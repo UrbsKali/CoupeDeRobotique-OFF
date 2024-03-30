@@ -87,6 +87,7 @@ if __name__ == "__main__":
     # Brain
     brain = ServerBrain(
         logger=logger_brain,
+        camera=camera,
         ws_cmd=ws_cmd,
         ws_log=ws_log,
         ws_lidar=ws_lidar,
