@@ -15,6 +15,17 @@
     width: min-content;
 }
 
+.button_div{
+    display: flex;    
+    flex-direction: row-reverse;
+}
+.button{
+    border-radius: 15px;
+    padding: 1em;
+    margin-left: 1em;
+    background-color: var(--secondary);
+}
+
 .up div, .down div, .left div, .right div{
     padding-top: calc(9px * var(--scale));
     background-color: var(--secondary);
