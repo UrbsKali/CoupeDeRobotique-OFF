@@ -23,16 +23,16 @@ class ServerBrain(Brain):
     """
 
     def __init__(
-            self,
-            logger: Logger,
-            ws_cmd: WServerRouteManager,
-            ws_log: WServerRouteManager,
-            ws_lidar: WServerRouteManager,
-            ws_odometer: WServerRouteManager,
-            ws_camera: WServerRouteManager,
-            ws_pami: WServerRouteManager,
-            arena: MarsArena,
-            config,
+        self,
+        logger: Logger,
+        ws_cmd: WServerRouteManager,
+        ws_log: WServerRouteManager,
+        ws_lidar: WServerRouteManager,
+        ws_odometer: WServerRouteManager,
+        ws_camera: WServerRouteManager,
+        ws_pami: WServerRouteManager,
+        arena: MarsArena,
+        config,
     ) -> None:
         self.shared = 0
         self.arucos = []
@@ -64,10 +64,3 @@ class ServerBrain(Brain):
                     clients=self.ws_cmd.get_client("robot1"),
                 )
                 print("Result of sending cmd to robot1:", result)
-
-    @Brain.task(process=False, run_on_start=True, refresh_rate=0.1)
-    async def webui_cam(self):
-        self.camera = Camera(skip_warmup=True)
-        self.camera.capture()
-        # do wathever you want with the frame
-        MJPEGHandler.current_img = self.camera.get_capture()   # Send image to the server
