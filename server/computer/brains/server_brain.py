@@ -25,6 +25,7 @@ class ServerBrain(Brain):
     def __init__(
         self,
         logger: Logger,
+        camera: Camera,
         ws_cmd: WServerRouteManager,
         ws_log: WServerRouteManager,
         ws_lidar: WServerRouteManager,
@@ -34,6 +35,7 @@ class ServerBrain(Brain):
         arena: MarsArena,
         config,
     ) -> None:
+        self.camera = camera
         self.shared = 0
         self.arucos = []
         self.green_objects = []
@@ -42,6 +44,10 @@ class ServerBrain(Brain):
     """
         Tasks
     """
+
+    @Brain.task(process=False, run_on_start=True, refresh_rate=1)
+    def camera_capture(self):
+        self.camera.capture()
 
     @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
     async def pami_com(self):
