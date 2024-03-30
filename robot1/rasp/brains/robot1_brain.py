@@ -77,7 +77,6 @@ class Robot1Brain(Brain):
 
         self.ACS_by_distances()
 
-
     @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
     async def odometer_update(self):
         self.odometer = OrientedPoint(
@@ -96,7 +95,6 @@ class Robot1Brain(Brain):
     async def compute_ennemi_position(self):
         polars = self.lidar.scan_to_polars()
         self.debug = polars
-
 
     """
         Send controllers / sensors feedback (odometer / lidar)
@@ -227,7 +225,7 @@ class Robot1Brain(Brain):
     @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
     async def zombie_mode(self):
         """executes requests received by the server. Use Postman to send request to the server
-        Use eval and await eval to run the code you want. Code must be sent as a string 
+        Use eval and await eval to run the code you want. Code must be sent as a string
         """
         # Check cmd
         cmd = await self.ws_cmd.receiver.get()

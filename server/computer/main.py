@@ -11,7 +11,6 @@ from brains import ServerBrain
 from sensors import Camera, ArucoRecognizer, ColorRecognizer, PlanTransposer, Frame
 
 
-
 import asyncio
 
 if __name__ == "__main__":
@@ -33,7 +32,9 @@ if __name__ == "__main__":
     )
 
     # Websocket server
-    ws_server = WServer(host=CONFIG.WS_HOSTNAME, port=CONFIG.WS_PORT, logger=logger_ws_server)
+    ws_server = WServer(
+        host=CONFIG.WS_HOSTNAME, port=CONFIG.WS_PORT, logger=logger_ws_server
+    )
     ws_cmd = WServerRouteManager(
         WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME)
     )
@@ -55,7 +56,6 @@ if __name__ == "__main__":
     ws_server.add_route_handler(CONFIG.WS_PAMI_ROUTE, ws_pami)
 
     # Camera
-    """
     camera = Camera(
         res_w=CONFIG.CAMERA_RESOLUTION[0],
         res_h=CONFIG.CAMERA_RESOLUTION[1],
@@ -64,7 +64,6 @@ if __name__ == "__main__":
     )
 
     aruco_recognizer = ArucoRecognizer(aruco_type=CONFIG.CAMERA_ARUCO_DICT_TYPE)
-
 
     color_recognizer = ColorRecognizer(
         detection_range=CONFIG.CAMERA_COLOR_FILTER_RANGE,
@@ -79,12 +78,12 @@ if __name__ == "__main__":
         beta=CONFIG.CAMERA_CAM_OBJ_FUNCTION_B,
     )
     camera.load_undistor_coefficients()
-    """
+
     # Arena
     arena = MarsArena(2, Logger(identifier="arena", print_log_level=LogLevels.INFO))
 
     spawn_video_server()
-    
+
     # Brain
     brain = ServerBrain(
         logger=logger_brain,

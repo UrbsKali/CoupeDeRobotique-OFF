@@ -128,7 +128,7 @@ class RollingBasis(Teensy):
     #####################
     def true_pos(self, position: OrientedPoint) -> OrientedPoint:
         """
-        enables to correct the position using a fixed offset if required 
+        enables to correct the position using a fixed offset if required
 
         :param position: _description_
         :type position: OrientedPoint
@@ -234,6 +234,61 @@ class RollingBasis(Teensy):
         """
         pos = Point(
             position.x + self.position_offset.x, position.y + self.position_offset.y
+        )
+        msg = (
+            Command.GO_TO_POINT.value
+            + struct.pack("<f", pos.x)
+            + struct.pack("<f", pos.y)
+            + struct.pack("<?", is_forward)
+            + struct.pack("<B", max_speed)
+            + struct.pack("<H", next_position_delay)
+            + struct.pack("<H", action_error_auth)
+            + struct.pack("<H", traj_precision)
+            + struct.pack("<B", correction_trajectory_speed)
+            + struct.pack("<B", acceleration_start_speed)
+            + struct.pack("<f", acceleration_distance)
+            + struct.pack("<B", deceleration_end_speed)
+            + struct.pack("<f", deceleration_distance)
+        )
+        # https://docs.python.org/3/library/struct.html#format-characters
+
+        return self.append_to_queue(Instruction(Command.GO_TO_POINT, msg))
+
+    @Logger
+    def go_to_relative(
+        self,
+        position: Point,
+        *,  # force keyword arguments
+        is_forward: bool = True,
+        max_speed: int = 150,
+        next_position_delay: int = 100,
+        action_error_auth: int = 50,
+        traj_precision: int = 50,
+        correction_trajectory_speed: int = 80,
+        acceleration_start_speed: int = 80,
+        acceleration_distance: float = 10,
+        deceleration_end_speed: int = 80,
+        deceleration_distance: float = 10,
+    ) -> int:
+        """
+        Va à la position donnée en paramètre, return l'id dans la queue de l'action
+
+        :param position: la position en X et Y (et theta)
+        :type position: Point
+        :param is_forward: en avant (false) ou en arrière (true), defaults to False
+        :type direction: bool, optional
+        :param speed: Vitesse du déplacement, defaults to b'\x64'
+        :type speed: bytes, optional
+        :param next_position_delay: delay avant la prochaine position, defaults to 100
+        :type next_position_delay: int, optional
+        :param action_error_auth: l'erreur autorisé dans le déplacement, defaults to 20
+        :type action_error_auth: int, optional
+        :param traj_precision: la précision du déplacement, defaults to 50
+        :type traj_precision: int, optional
+        """
+        pos = Point(
+            position.x + self.position_offset.x + self.odometrie.x,
+            position.y + self.position_offset.y + self.odometrie.y,
         )
         msg = (
             Command.GO_TO_POINT.value
