@@ -36,6 +36,8 @@ class ServerBrain(Brain):
         config,
     ) -> None:
         self.camera = camera
+        print(self.camera)
+        self.camera.capture()
         self.shared = 0
         self.arucos = []
         self.green_objects = []
