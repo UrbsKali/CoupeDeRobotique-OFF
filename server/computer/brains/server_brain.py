@@ -48,7 +48,7 @@ class ServerBrain(Brain):
     """
 
     @Brain.task(process=False, run_on_start=True, refresh_rate=1)
-    def camera_capture(self):
+    async def camera_capture(self):
         self.camera.capture()
 
     @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
