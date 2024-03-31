@@ -14,7 +14,8 @@
   "computer": {
     "ws": {
       "sender_name": "computer",
-      "hostname": "0.0.0.0"
+      "hostname": "0.0.0.0",
+      "ping_pong_interval": 1
     },
     "camera": {
       "resolution": [

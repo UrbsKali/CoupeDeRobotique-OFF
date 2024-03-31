@@ -66,6 +66,7 @@ class CONFIG:
 
     WS_SENDER_NAME = SPECIFIC_WS_CONFIG["sender_name"]
     WS_HOSTNAME = SPECIFIC_WS_CONFIG["hostname"]
+    WS_PING_PONG_INTERVAL = int(SPECIFIC_WS_CONFIG["ping_pong_interval"])
 
     # Specific camera config
     SPECIFIC_CAMERA_CONFIG = SPECIFIC_CONFIG["camera"]

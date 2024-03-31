@@ -33,7 +33,7 @@ if __name__ == "__main__":
 
     # Websocket server
     ws_server = WServer(
-        host=CONFIG.WS_HOSTNAME, port=CONFIG.WS_PORT, logger=logger_ws_server
+        logger=logger_ws_server, host=CONFIG.WS_HOSTNAME, port=CONFIG.WS_PORT, ping_pong_clients_interval=CONFIG.WS_PING_PONG_INTERVAL
     )
     ws_cmd = WServerRouteManager(
         WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME)

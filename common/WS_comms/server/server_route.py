@@ -15,7 +15,7 @@ class WServerRouteManager:
         self.receiver = receiver
         self.sender = sender
 
-        self.clients = dict()
+        self.clients = {}
 
     def add_client(
         self,
@@ -36,7 +36,7 @@ class WServerRouteManager:
         # Check source validity
         if client_name is None:
             raise ValueError(
-                "New client does not have a source value in the header. CONNECTION REFUSED."
+                "New client does not have a sender value in url parameter. CONNECTION REFUSED."
             )
         if self.clients.get(client_name) is not None:
             raise ValueError(
