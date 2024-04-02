@@ -93,10 +93,10 @@ class Robot1Brain(Brain):
     def absolute_cartesians(self, polars: np.ndarray) -> MultiPoint:
         return MultiPoint(
             (
-                self.rolling_basis.x
+                self.rolling_basis.odometrie.x
                 + np.cos(self.rolling_basis.odometrie.theta + polars[:, 0])
                 * polars[:, 1],
-                self.rolling_basis.y
+                self.rolling_basis.odometrie.y
                 + np.sin(self.rolling_basis.odometrie.theta + polars[:, 0])
                 * polars[:, 1],
             )
