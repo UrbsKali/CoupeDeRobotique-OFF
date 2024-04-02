@@ -112,7 +112,7 @@ class Robot1Brain(Brain):
             y_abs = y_robot + (x_local * np.sin(theta_robot_rad) + y_local * np.cos(theta_robot_rad))
 
             absolute_positions.append(Point(x_abs, y_abs))
-
+        print(absolute_positions)
         self.debug = absolute_positions
 
     """
