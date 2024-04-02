@@ -58,7 +58,7 @@ class CONFIG:
         "god_hand_deployment_servo_deploye_angle"
     ]
     GOD_HAND_DEPLOYMENT_SERVO_UNDEPLOY_ANGLE = ACTUATORS_CONFIG[
-        "god_hand_deployment_servo_undeploye_angle"
+        "god_hand_deployment_servo_undeploy_angle"
     ]
     GOD_HAND_GRAB_SERVO_CLOSE_ANGLE_DIFF_LEFT = ACTUATORS_CONFIG[
         "god_hand_grab_servo_close_angle_diff_left"
