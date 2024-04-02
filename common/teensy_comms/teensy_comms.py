@@ -79,7 +79,7 @@ class Teensy:
         :raises TeensyException: _description_
         """
         self.logger = logger
-        self._teensy = DummySerial()
+        self._teensy = None
         self.crc = crc
         self._crc8 = crc8.crc8()
         self.last_message = None
