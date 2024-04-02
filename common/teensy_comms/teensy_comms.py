@@ -96,10 +96,10 @@ class Teensy:
                 break
         if self._teensy is None:
             if dummy:
-                self.logger.log("Dummy mode", self.logger.log_level.INFO)
+                self.logger.log("Dummy mode", LogLevels.INFO)
                 self._teensy = DummySerial()
             else:
-                self.logger.log("No Teensy found !", self.logger.log_level.CRITICAL)
+                self.logger.log("No Teensy found !", LogLevels.CRITICAL)
                 raise TeensyException("No Device !")
         self.messagetype = {}
         if not dummy:
