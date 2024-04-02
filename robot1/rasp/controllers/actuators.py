@@ -8,7 +8,6 @@ import struct
 
 
 class Actuators(Teensy):
-
     def __init__(
         self,
         logger: Logger,
