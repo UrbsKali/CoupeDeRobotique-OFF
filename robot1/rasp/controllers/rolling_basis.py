@@ -181,7 +181,9 @@ class RollingBasis(Teensy):
             self.send_bytes(self.queue[0].msg)
 
     def rcv_unknown_msg(self, msg: bytes):
-        self.logger.log(f"Teensy does not know the command {msg.hex()}", LogLevels.WARNING)
+        self.logger.log(
+            f"Teensy does not know the command {msg.hex()}", LogLevels.WARNING
+        )
 
     def append_to_queue(self, instruction: Instruction) -> int:
         new_id = self.queue._append(instruction)
@@ -494,9 +496,12 @@ class RollingBasis(Teensy):
         else:
             self.append_to_queue(Instruction(Command.RESET_POSITION, msg))
 
-    def set_odo(self, new_odo: OrientedPoint, *, skip_queue=False):
+    def set_odo(self, new_odo: OrientedPoint | Point, *, skip_queue=False):
         msg = Command.SET_HOME.value + struct.pack(
-            "<fff", new_odo.x, new_odo.y, new_odo.theta
+            "<fff",
+            new_odo.x,
+            new_odo.y,
+            new_odo.theta if isinstance(new_odo, OrientedPoint) else 0.0,
         )
         if skip_queue:
             self.insert_in_queue(0, Instruction(Command.SET_HOME, msg), True)
