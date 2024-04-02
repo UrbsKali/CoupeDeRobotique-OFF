@@ -6,13 +6,13 @@ from arena import MarsArena, Plants_zone
 from WS_comms import WSclientRouteManager, WSmsg
 from brain import Brain
 from utils import Utils
-
+import numpy as np
 
 # Import from local path
 from sensors import Lidar
 from controllers import RollingBasis, Actuators
 import asyncio
-from geometry import Polygon
+from geometry import Polygon, MultiPoint, nearest_points
 from config_loader import CONFIG
 import time
 import math
@@ -34,17 +34,13 @@ class Robot1Brain(Brain):
     ) -> None:
         super().__init__(logger, self)
 
-        # self.lidar_scan = []
-        self.lidar_values_in_distances = []
         self.lidar_angles = (90, 180)
-        self.odometer = None
-        self.ennemi_position: Point = None
         self.camera = {}
-        self.debug = None
+        self.lidar_points: MultiPoint | None = None
 
         # to delete, only use for completion
         # self.rolling_basis:  RollingBasis
-        self.actuators : Actuators
+        self.actuators: Actuators
         # self.arena: MarsArena
         # self.lidar:  Lidar
 
@@ -56,35 +52,17 @@ class Robot1Brain(Brain):
         Get controllers / sensors feedback (odometer / lidar + extern (camera))
     """
 
-    def ACS_by_distances(self):
-        if self.arena.check_collision_by_distances(
-            self.lidar_values_in_distances, self.odometer
-        ):
-            self.logger.log(
-                "ACS triggered, performing emergency stop", LogLevels.WARNING
-            )
-            self.rolling_basis.stop_and_clear_queue()
-            # It is the currently running action's responsibility to detect the stop if it needs to
-        else:
-            self.logger.log("ACS not triggered", LogLevels.DEBUG)
-
-    @Brain.task(process=False, run_on_start=False, refresh_rate=0.5)
-    async def lidar_scan_distances(self):
-        # Warning, currently hard-coded for 3 values/degree
-        self.lidar_values_in_distances = self.lidar.scan_distances(
-            start_angle=self.lidar_angles[0],
-            end_angle=self.lidar_angles[1],
-        )
-
-        self.ACS_by_distances()
-
-    @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
-    async def odometer_update(self):
-        self.odometer = OrientedPoint(
-            self.rolling_basis.odometrie.x,
-            self.rolling_basis.odometrie.y,
-            self.rolling_basis.odometrie.theta,
-        )
+    # def ACS_by_distances(self):
+    #     if self.arena.check_collision_by_distances(
+    #         self.lidar_values_in_distances, self.rolling_basis.odometrie
+    #     ):
+    #         self.logger.log(
+    #             "ACS triggered, performing emergency stop", LogLevels.WARNING
+    #         )
+    #         self.rolling_basis.stop_and_clear_queue()
+    #         # It is the currently running action's responsibility to detect the stop if it needs to
+    #     else:
+    #         self.logger.log("ACS not triggered", LogLevels.DEBUG)
 
     @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
     async def get_camera(self):
@@ -92,28 +70,37 @@ class Robot1Brain(Brain):
         if msg != WSmsg():
             self.camera = msg.data
 
-    @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
-    async def compute_ennemi_position(self):
-        polars = self.lidar.scan_to_polars()
+    @Brain.task(process=False, run_on_start=True, refresh_rate=0.25)
+    async def compute_ennemy_position(self):
+        self.lidar_points = self.arena.remove_outside(
+            self.absolute_cartesians(self.lidar.scan_to_polars())
+        )
 
-        x_robot = self.odometer.x
-        y_robot = self.odometer.y
-        theta_robot_rad = self.odometer.theta
+        # For now, the closest will be the ennemy position
+        self.arena.ennemy_position = nearest_points(
+            self.rolling_basis.odometrie, self.lidar_points
+        )[1]
 
-        absolute_positions = np.zeros(polars.shape[0], dtype=Point)
+        # For now, just stop if close, when updating, consider self.arena.check_collision_by_distances
+        if self.arena.ennemy_position.distance(self.rolling_basis.odometrie) < 40:
+            self.logger.log(
+                "ACS triggered, performing emergency stop", LogLevels.WARNING
+            )
+            self.rolling_basis.stop_and_clear_queue()
+        else:
+            self.logger.log("ACS not triggered", LogLevels.DEBUG)
 
-        for r, phi_rad in polars:
-            # Convert from polar to local coordinates
-            x_local = r * np.cos(phi_rad)
-            y_local = r * np.sin(phi_rad)
-
-            # Convert from local to absolute coordinates
-            x_abs = x_robot + (x_local * np.cos(theta_robot_rad) - y_local * np.sin(theta_robot_rad))
-            y_abs = y_robot + (x_local * np.sin(theta_robot_rad) + y_local * np.cos(theta_robot_rad))
-
-            absolute_positions.append(Point(x_abs, y_abs))
-        print(absolute_positions)
-        self.debug = absolute_positions
+    def absolute_cartesians(self, polars: np.ndarray) -> MultiPoint:
+        return MultiPoint(
+            (
+                self.rolling_basis.x
+                + np.cos(self.rolling_basis.odometrie.theta + polars[:, 0])
+                * polars[:, 1],
+                self.rolling_basis.y
+                + np.sin(self.rolling_basis.odometrie.theta + polars[:, 0])
+                * polars[:, 1],
+            )
+        )
 
     """
         Send controllers / sensors feedback (odometer / lidar)
@@ -128,11 +115,15 @@ class Robot1Brain(Brain):
 
     @Brain.task(process=False, run_on_start=True, refresh_rate=1)
     async def send_odometer_to_server(self):
-        if self.odometer is not None:
+        if self.rolling_basis.odometrie is not None:
             await self.ws_odometer.sender.send(
                 WSmsg(
                     msg="odometer",
-                    data=[self.odometer.x, self.odometer.y, self.odometer.theta],
+                    data=[
+                        self.rolling_basis.odometrie.x,
+                        self.rolling_basis.odometrie.y,
+                        self.rolling_basis.odometrie.theta,
+                    ],
                 )
             )
 
@@ -150,20 +141,27 @@ class Robot1Brain(Brain):
         elif result == 2:
             self.logger.log("Error moving: didn't reach destination")
 
-    @Logger         
+    @Logger
     def deploy_god_hand(self):
-        self.actuators.update_servo(CONFIG.GOD_HAND_DEPLOYMENT_SERVO_PIN,CONFIG.GOD_HAND_DEPLOYMENT_SERVO_DEPLOY_ANGLE)
-        
-    @Logger         
+        self.actuators.update_servo(
+            CONFIG.GOD_HAND_DEPLOYMENT_SERVO_PIN,
+            CONFIG.GOD_HAND_DEPLOYMENT_SERVO_DEPLOY_ANGLE,
+        )
+
+    @Logger
     def undeploy_god_hand(self):
-        self.actuators.update_servo(CONFIG.GOD_HAND_DEPLOYMENT_SERVO_PIN,CONFIG.GOD_HAND_DEPLOYMENT_SERVO_UNDEPLOY_ANGLE)
-    
-    @Logger  
+        self.actuators.update_servo(
+            CONFIG.GOD_HAND_DEPLOYMENT_SERVO_PIN,
+            CONFIG.GOD_HAND_DEPLOYMENT_SERVO_UNDEPLOY_ANGLE,
+        )
+
+    @Logger
     def open_god_hand(self):
         for pin in CONFIG.GOD_HAND_GRAB_SERVO_PINS_LEFT:
             self.actuators.update_servo(pin, CONFIG.GOD_HAND_GRAB_SERVO_OPEN_ANGLE)
         for pin in CONFIG.GOD_HAND_GRAB_SERVO_PINS_RIGHT:
             self.actuators.update_servo(pin, CONFIG.GOD_HAND_GRAB_SERVO_OPEN_ANGLE)
+
     @Logger
     def close_god_hand(self):
         for pin in CONFIG.GOD_HAND_GRAB_SERVO_PINS_LEFT:
@@ -184,12 +182,15 @@ class Robot1Brain(Brain):
         destination_plant_zone = None
         for plant_zone in plant_zones:
             target = self.arena.compute_go_to_destination(
-                start_point=Point(self.odometer.x, self.odometer.y),
+                start_point=Point(
+                    self.rolling_basis.odometrie.x, self.rolling_basis.odometrie.y
+                ),
                 zone=plant_zone.zone,
                 delta=delta,
             )
             if self.arena.enable_go_to_point(
-                Point(self.odometer.x, self.odometer.y), target
+                Point(self.rolling_basis.odometrie.x, self.rolling_basis.odometrie.y),
+                target,
             ):
                 destination_point = target
                 destination_plant_zone = plant_zone
@@ -212,7 +213,7 @@ class Robot1Brain(Brain):
             self.open_god_hand()
             while not is_arrived:
                 self.logger.log("Sorting pickup zones...", LogLevels.INFO)
-                plant_zones = self.arena.sort_pickup_zone(self.odometer)
+                plant_zones = self.arena.sort_pickup_zone(self.rolling_basis.odometrie)
                 self.logger.log("Going to best pickup zone...", LogLevels.INFO)
                 is_arrived, destination_plant_zone = await self.go_best_zone(
                     plant_zones
@@ -233,7 +234,7 @@ class Robot1Brain(Brain):
             is_arrived = False
             while not is_arrived:
                 self.logger.log("Sorting drop zones...", LogLevels.INFO)
-                plant_zones = self.arena.sort_drop_zone(self.odometer)
+                plant_zones = self.arena.sort_drop_zone(self.rolling_basis.odometrie)
                 self.logger.log("Going to best drop zone...", LogLevels.INFO)
                 is_arrived, destination_plant_zone = await self.go_best_zone(
                     plant_zones
