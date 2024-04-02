@@ -49,7 +49,7 @@ class RB_Queue:
     def __is_tracked_command_at_index(self, __index: int) -> bool:
         return RB_Queue.__is_tracked_command(self.__queue[__index].cmd)
 
-    def _append(self, __object: Instruction) -> int:
+    def append(self, __object: Instruction) -> int:
         self.__queue.append(__object)
         if RB_Queue.__is_tracked_command(__object.cmd):
             self.id_counter += 1
@@ -108,7 +108,7 @@ class RollingBasis(Teensy):
     ):
         super().__init__(logger, ser, vid, pid, baudrate, crc, dummy)
         # All position are in the form tuple(X, Y, THETA)
-        self.odometrie = OrientedPoint(0.0, 0.0, 0.0)
+        self.odometrie: OrientedPoint = OrientedPoint(0.0, 0.0, 0.0)
         self.position_offset = OrientedPoint(0.0, 0.0, 0.0)
         """
         This is used to match a handling function to a message type.
@@ -186,7 +186,7 @@ class RollingBasis(Teensy):
         )
 
     def append_to_queue(self, instruction: Instruction) -> int:
-        new_id = self.queue._append(instruction)
+        new_id = self.queue.append(instruction)
 
         if len(self.queue) == 1:
             self.send_bytes(self.queue[0].msg)
@@ -473,7 +473,7 @@ class RollingBasis(Teensy):
         if skip_queue:
             self.insert_in_queue(0, Instruction(Command.DISABLE_PID, msg), True)
         else:
-            self.queue._append(Instruction(Command.DISABLE_PID, msg))
+            self.queue.append(Instruction(Command.DISABLE_PID, msg))
 
     @Logger
     def enable_pid(self, skip_queue=False):
@@ -511,6 +511,6 @@ class RollingBasis(Teensy):
     def set_pid(self, Kp: float, Ki: float, Kd: float, skip_queue=False):
         msg = Command.SET_PID.value + struct.pack("<fff", Kp, Ki, Kd)
         if skip_queue:
-            self.queue.insert_in_queue(0, {Command.SET_PID: msg}, True)
+            self.queue.insert(0, Instruction(Command.SET_PID, msg))
         else:
             self.append_to_queue(Instruction(Command.SET_PID, msg))
