@@ -1,6 +1,5 @@
-from typing import Union
 from math import cos, sin
-from shapely import GeometryCollection
+
 
 from geometry import (
     Point,
@@ -19,6 +18,7 @@ from geometry import (
     rad,
 )
 from logger import Logger, LogLevels
+import numpy as np
 
 
 class Arena:
@@ -29,12 +29,13 @@ class Arena:
         logger: Logger,
         safe_collision_distance: float = 30,
         game_borders: Polygon = create_straight_rectangle(Point(0, 0), Point(200, 300)),
-        zones: Union[dict[str, MultiPolygon], None] = None,
+        zones: dict[str, MultiPolygon] | None = None,
     ):
-        self.l = logger
-        self.game_borders = game_borders
-        self.game_borders_buffered = self.game_borders.buffer(-10)
-        self.safe_collision_distance = safe_collision_distance
+        self.l: Logger = logger
+        self.game_borders: Polygon = game_borders
+        self.game_borders_buffered: Polygon = self.game_borders.buffer(-10)
+        self.safe_collision_distance: float = safe_collision_distance
+        self.ennemy_position: Point | None = None
 
         if zones is not None:
             self.zones = zones
@@ -204,3 +205,6 @@ class Arena:
             pos_robot.x + distance * cos(rad(pos_robot.theta - 45 + relative_angle)),
             pos_robot.y + distance * sin(rad(pos_robot.theta - 45 + relative_angle)),
         )
+
+    def remove_outside(self, points: MultiPoint):
+        return self.game_borders_buffered.intersection(points)
