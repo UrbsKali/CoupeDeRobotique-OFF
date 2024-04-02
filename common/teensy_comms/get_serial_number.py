@@ -12,10 +12,9 @@ def get_serial_number(port):
     try:
         with serial.Serial(port) as ser:
             ser.write(b's')  # Envoyer une commande pour demander le numéro de série
-            serial_number = ser.readline().strip().decode()
-            return serial_number
+            return ser.readline().strip().decode()
     except serial.SerialException as e:
-        print("Erreur lors de la communication avec le périphérique:", str(e))
+        print("Erreur lors de la communication avec le périphérique:", e)
         return None
 
 if __name__ == "__main__":

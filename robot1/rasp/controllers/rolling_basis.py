@@ -37,7 +37,7 @@ class RB_Queue:
 
     tracked_commands = (Command.GO_TO_POINT, Command.CURVE_GO_TO)
 
-    def __init__(self, l: Logger) -> None:
+    def __init__(self, logger: Logger) -> None:
         self.id_counter = 0
         self.last_deleted_id = -1
         self.__queue: list[Instruction] = []
@@ -121,7 +121,7 @@ class RollingBasis(Teensy):
             255: self.rcv_unknown_msg,
         }
 
-        self.queue = RB_Queue(self.l)
+        self.queue = RB_Queue(self.logger)
 
     #####################
     # Position handling #
@@ -145,7 +145,7 @@ class RollingBasis(Teensy):
     # Received message handling #
     #############################
     def rcv_print(self, msg: bytes):
-        self.l.log(
+        self.logger.log(
             "Teensy says : " + msg.decode("ascii", errors="ignore"), LogLevels.INFO
         )
 
@@ -157,16 +157,16 @@ class RollingBasis(Teensy):
         )
 
     def rcv_action_finish(self, cmd_finished: bytes):
-        self.l.log("Action finished : " + cmd_finished.hex(), LogLevels.INFO)
+        self.logger.log("Action finished : " + cmd_finished.hex(), LogLevels.INFO)
         if not self.queue or len(self.queue) == 0:
-            self.l.log(
+            self.logger.log(
                 "Received action_finish but no action in queue", LogLevels.WARNING
             )
             return
         # remove actions up to the one that just finished
         for i in range(len(self.queue)):
             if self.queue[i].cmd.value == cmd_finished:
-                self.l.log(
+                self.logger.log(
                     f"Removing actions up to {i} from queue : "
                     + str(self.queue[: i + 1]),
                     LogLevels.INFO,
@@ -175,13 +175,13 @@ class RollingBasis(Teensy):
                 break
 
         if len(self.queue) == 0:
-            self.l.log("Queue is empty, not sending anything")
+            self.logger.log("Queue is empty, not sending anything")
         else:
-            self.l.log("Sending next action in queue")
+            self.logger.log("Sending next action in queue")
             self.send_bytes(self.queue[0].msg)
 
     def rcv_unknown_msg(self, msg: bytes):
-        self.l.log(f"Teensy does not know the command {msg.hex()}", LogLevels.WARNING)
+        self.logger.log(f"Teensy does not know the command {msg.hex()}", LogLevels.WARNING)
 
     def append_to_queue(self, instruction: Instruction) -> int:
         new_id = self.queue._append(instruction)
@@ -370,20 +370,20 @@ class RollingBasis(Teensy):
             await asyncio.sleep(0.2)
 
         if Utils.time_since(start_time) >= timeout:
-            self.l.log(
+            self.logger.log(
                 f"Reached timeout in Go_To_And_Wait, clearing queue, at: {self.odometrie}",
                 LogLevels.WARNING,
             )
             self.stop_and_clear_queue()
             return 1
         elif distance(Point(self.odometrie.x, self.odometrie.y), position) <= tolerance:
-            self.l.log(
+            self.logger.log(
                 f"Reached target in go_to_and_wait, at: {self.odometrie}",
                 LogLevels.INFO,
             )
             return 0
         else:
-            self.l.log(
+            self.logger.log(
                 f"Unexpected: didn't timeout in Go_To_And_Wait but did not arrive, clearing queue, at: {self.odometrie}",
                 LogLevels.ERROR,
             )
@@ -438,9 +438,9 @@ class RollingBasis(Teensy):
             + struct.pack("<H", traj_precision)  # precision
         )
         if skip_queue or len(self.queue) == 0:
-            self.l.log("Skipping Queue ...")
+            self.logger.log("Skipping Queue ...")
             self.queue.insert(0, Instruction(Command.CURVE_GO_TO, curve_msg))
-            self.l.log(str(self.queue))
+            self.logger.log(str(self.queue))
             self.send_bytes(curve_msg)
         else:
             self.queue.append(Instruction(Command.CURVE_GO_TO, curve_msg))
