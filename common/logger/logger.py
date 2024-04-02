@@ -40,18 +40,21 @@ class Logger:
         """
         Logger init, ignore func and level param (for decorator)
         """
+
+        self.identifier = identifier  # Overriden if Decorator
+
         # Decorator only
         if func is not None:
             self.func = func
             self.dec_level = decorator_level
             functools.update_wrapper(self, self.func)
             self.__code__ = self.func.__code__
+            self.identifier = self.func.__qualname__.split(".")[1]
 
         # Normal init
         # Init attributes
         self.identifier_width = 12
         self.log_level_width = max([len(loglvl.name) for loglvl in LogLevels]) + 2
-        self.identifier = identifier
         self.print_log_level = print_log_level
         self.file_log_level = file_log_level
         self.print_log = print_log
@@ -61,12 +64,13 @@ class Logger:
         date = Utils.get_date()
         self.log_file = f"{date.strftime('%Y-%m-%d')}.log"
 
-        self.log(
-            f"Logger initialized, "
-            + f"print: {style(center_and_limit(self.print_log_level.name,self.log_level_width),STYLES.LogLevelsColorsDict[self.print_log_level]) if self.print_log else style(center_and_limit('NO',self.log_level_width),STYLES.RESET_ALL)}, "
-            + f"write to file: {style(center_and_limit(self.file_log_level.name,self.log_level_width),STYLES.LogLevelsColorsDict[self.file_log_level]) if self.log_file else style(center_and_limit('NO',self.log_level_width),STYLES.RESET_ALL)}",
-            level=LogLevels.INFO,
-        )
+        if func is None:
+            self.log(
+                f"Logger initialized, "
+                + f"print: {style(center_and_limit(self.print_log_level.name,self.log_level_width),STYLES.LogLevelsColorsDict[self.print_log_level]) if self.print_log else style(center_and_limit('NO',self.log_level_width),STYLES.RESET_ALL)}, "
+                + f"write to file: {style(center_and_limit(self.file_log_level.name,self.log_level_width),STYLES.LogLevelsColorsDict[self.file_log_level]) if self.log_file else style(center_and_limit('NO',self.log_level_width),STYLES.RESET_ALL)}",
+                level=LogLevels.INFO,
+            )
 
     def message_factory(
         self,
@@ -162,7 +166,6 @@ class Logger:
         self.log(
             msg,
             self.dec_level,
-            identifier_override=self.func.__qualname__.split(".")[0],
         )
         return self.func(*args, **kwargs)
 
