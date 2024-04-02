@@ -409,8 +409,10 @@ class RollingBasis(Teensy):
         """Go to a point with a curve"""
 
         middle_point = OrientedPoint(
-            (self.odometrie.x + destination.x) / 2,
-            (self.odometrie.y + destination.y) / 2,
+            (
+                (self.odometrie.x + destination.x) / 2,
+                (self.odometrie.y + destination.y) / 2,
+            )
         )
         # alpha est l'angle entre la droite (position, destination) et l'axe des ordonnées (y)
         alpha = math.atan2(
@@ -420,8 +422,10 @@ class RollingBasis(Teensy):
         theta = math.pi / 2 - alpha
 
         third_point = OrientedPoint(
-            middle_point.x + math.cos(theta) * corde,
-            middle_point.y + math.sin(theta) * corde,
+            (
+                middle_point.x + math.cos(theta) * corde,
+                middle_point.y + math.sin(theta) * corde,
+            )
         )
 
         center = calc_center(self.odometrie, third_point, destination)
