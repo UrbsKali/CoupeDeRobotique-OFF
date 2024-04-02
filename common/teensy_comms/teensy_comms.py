@@ -194,7 +194,7 @@ class Teensy:
                 self._crc8.reset()
                 self._crc8.update(msg)
                 if self._crc8.digest() != crc:
-                    self.logger.log("Invalid CRC8, sending NACK ... ", LogLevels.WARNING)
+                    self.logger.log(f"Invalid CRC8, sending NACK ... [{crc}]", LogLevels.WARNING)
                     self.send_bytes(b"\x7F")  # send NACK
                     self._crc8.reset()
                     continue
