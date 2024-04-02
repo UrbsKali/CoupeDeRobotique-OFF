@@ -1,4 +1,5 @@
 # Import from common
+import numpy as np
 from logger import Logger, LogLevels
 from geometry import OrientedPoint, Point
 from arena import MarsArena, Plants_zone
@@ -94,7 +95,25 @@ class Robot1Brain(Brain):
     @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
     async def compute_ennemi_position(self):
         polars = self.lidar.scan_to_polars()
-        self.debug = polars
+
+        x_robot = self.odometer.x
+        y_robot = self.odometer.y
+        theta_robot_rad = self.odometer.theta
+
+        absolute_positions = np.zeros(polars.shape[0], dtype=Point)
+
+        for r, phi_rad in polars:
+            # Convert from polar to local coordinates
+            x_local = r * np.cos(phi_rad)
+            y_local = r * np.sin(phi_rad)
+
+            # Convert from local to absolute coordinates
+            x_abs = x_robot + (x_local * np.cos(theta_robot_rad) - y_local * np.sin(theta_robot_rad))
+            y_abs = y_robot + (x_local * np.sin(theta_robot_rad) + y_local * np.cos(theta_robot_rad))
+
+            absolute_positions.append(Point(x_abs, y_abs))
+
+        self.debug = absolute_positions
 
     """
         Send controllers / sensors feedback (odometer / lidar)
