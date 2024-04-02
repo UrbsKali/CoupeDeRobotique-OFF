@@ -49,7 +49,7 @@ class Logger:
             self.dec_level = decorator_level
             functools.update_wrapper(self, self.func)
             self.__code__ = self.func.__code__
-            self.identifier = self.func.__qualname__.split(".")[1]
+            self.identifier = self.func.__qualname__.split(".")[0]
 
         # Normal init
         # Init attributes
