@@ -33,6 +33,7 @@ class CONFIG:
     # General config
     GENERAL_CONFIG = CONFIG_STORE[GENERAL_CONFIG_KEY]
     GENERAL_WS_CONFIG = GENERAL_CONFIG["ws"]
+    GENERAL_TEENSY_CONFIG = GENERAL_CONFIG["teensy"]
 
     WS_PORT = int(GENERAL_WS_CONFIG["port"])
     WS_LIDAR_ROUTE = GENERAL_WS_CONFIG["lidar_route"]
@@ -40,6 +41,12 @@ class CONFIG:
     WS_CAMERA_ROUTE = GENERAL_WS_CONFIG["camera_route"]
     WS_ODOMETER_ROUTE = GENERAL_WS_CONFIG["odometer_route"]
     WS_CMD_ROUTE = GENERAL_WS_CONFIG["cmd_route"]
+    
+    TEENSY_VID = GENERAL_TEENSY_CONFIG["vid"]
+    TEENSY_PID = GENERAL_TEENSY_CONFIG["pid"]
+    TEENSY_BAUDRATE = GENERAL_TEENSY_CONFIG["baudrate"]
+    TEENSY_CRC = GENERAL_TEENSY_CONFIG["crc"]
+    TEENSY_DUMMY = GENERAL_TEENSY_CONFIG["dummy"]
 
     # Specific config
     SPECIFIC_CONFIG = CONFIG_STORE[SPECIFIC_CONFIG_KEY]
@@ -47,9 +54,14 @@ class CONFIG:
 
     WS_SENDER_NAME = SPECIFIC_WS_CONFIG["sender_name"]
     WS_SERVER_IP = SPECIFIC_WS_CONFIG["server_ip"]
+    
+    # Rolling Basis
+    ROLLING_BASIS_CONFIG = SPECIFIC_CONFIG["rolling_basis"]
+    ROLLING_BASIS_TEENSY_SER = ROLLING_BASIS_CONFIG["rolling_basis_teensy_ser"]
 
-    ## Actuators
+    # Actuators
     ACTUATORS_CONFIG = SPECIFIC_CONFIG["actuators"]
+    ACTUATOR_TEENSY_SER = ACTUATORS_CONFIG["actuators_teensy_ser"]
     GOD_HAND_GRAB_SERVO_PINS_LEFT = ACTUATORS_CONFIG["god_hand_grab_servo_pins_left"]
     GOD_HAND_GRAB_SERVO_PINS_RIGHT = ACTUATORS_CONFIG["god_hand_grab_servo_pins_right"]
     GOD_HAND_DEPLOYMENT_SERVO_PIN = ACTUATORS_CONFIG["god_hand_deployment_servo_pin"]

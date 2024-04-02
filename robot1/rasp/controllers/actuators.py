@@ -11,18 +11,14 @@ class Actuators(Teensy):
     def __init__(
         self,
         logger: Logger,
-        ser=12678600,  # T1
-        vid: int = 5824,
-        pid: int = 1155,
-        baudrate: int = 115200,
-        crc: bool = True,
-        pin_servos_left: list[int] = CONFIG.GOD_HAND_GRAB_SERVO_PINS_LEFT,
-        pin_servos_right: list[int] = CONFIG.GOD_HAND_GRAB_SERVO_PINS_RIGHT,
-        pin_deployment: int = CONFIG.GOD_HAND_DEPLOYMENT_SERVO_PIN,
+        ser = CONFIG.ACTUATOR_TEENSY_SER,
+        vid = CONFIG.TEENSY_VID,
+        pid = CONFIG.TEENSY_PID,
+        crc = CONFIG.TEENSY_CRC,
+        baudrate = CONFIG.TEENSY_BAUDRATE,
+        dummy: bool = CONFIG.TEENSY_DUMMY
     ):
-        super().__init__(logger, ser, vid, pid, baudrate, crc)
-        self.pin_servos_left = pin_servos_left
-        self.pin_servos_right = pin_servos_right
+        super().__init__(logger, ser=ser, vid=vid, pid=pid, baudrate = baudrate, crc = crc, dummy=dummy)
 
     class Command:  # values must correspond to the one defined on the teensy
         ServoGoTo = b"\x01"

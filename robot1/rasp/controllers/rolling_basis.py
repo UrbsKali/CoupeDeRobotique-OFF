@@ -99,15 +99,14 @@ class RollingBasis(Teensy):
     def __init__(
         self,
         logger: Logger,
-        ser=12675800,
-        vid: int = 5824,
-        pid: int = 1155,
-        baudrate: int = 115200,
-        crc: bool = True,
-        dummy: bool = False,
+        ser:int = CONFIG.ROLLING_BASIS_TEENSY_SER,
+        crc: bool = CONFIG.TEENSY_CRC,
+        vid : int = CONFIG.TEENSY_VID,
+        pid : int = CONFIG.TEENSY_PID,
+        baudrate : int = CONFIG.TEENSY_BAUDRATE,
+        dummy: bool = CONFIG.TEENSY_DUMMY
     ):
-        super().__init__(logger, ser, vid, pid, baudrate, crc, dummy)
-        # All position are in the form tuple(X, Y, THETA)
+        super().__init__(logger, ser=ser, vid = vid, pid=pid, baudrate = baudrate, crc = crc, dummy=dummy)
         self.odometrie: OrientedPoint = OrientedPoint(0.0, 0.0, 0.0)
         self.position_offset = OrientedPoint(0.0, 0.0, 0.0)
         """
