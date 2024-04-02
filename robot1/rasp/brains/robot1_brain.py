@@ -44,7 +44,7 @@ class Robot1Brain(Brain):
 
         # to delete, only use for completion
         # self.rolling_basis:  RollingBasis
-        # self.actuators : Actuators
+        self.actuators : Actuators
         # self.arena: MarsArena
         # self.lidar:  Lidar
 
@@ -150,12 +150,21 @@ class Robot1Brain(Brain):
         elif result == 2:
             self.logger.log("Error moving: didn't reach destination")
 
+    @Logger         
+    def deploy_god_hand(self):
+        self.actuators.update_servo(CONFIG.GOD_HAND_DEPLOYMENT_SERVO_PIN,CONFIG.GOD_HAND_DEPLOYMENT_SERVO_DEPLOY_ANGLE)
+        
+    @Logger         
+    def undeploy_god_hand(self):
+        self.actuators.update_servo(CONFIG.GOD_HAND_DEPLOYMENT_SERVO_PIN,CONFIG.GOD_HAND_DEPLOYMENT_SERVO_UNDEPLOY_ANGLE)
+    
+    @Logger  
     def open_god_hand(self):
         for pin in CONFIG.GOD_HAND_GRAB_SERVO_PINS_LEFT:
             self.actuators.update_servo(pin, CONFIG.GOD_HAND_GRAB_SERVO_OPEN_ANGLE)
         for pin in CONFIG.GOD_HAND_GRAB_SERVO_PINS_RIGHT:
             self.actuators.update_servo(pin, CONFIG.GOD_HAND_GRAB_SERVO_OPEN_ANGLE)
-
+    @Logger
     def close_god_hand(self):
         for pin in CONFIG.GOD_HAND_GRAB_SERVO_PINS_LEFT:
             self.actuators.update_servo(
