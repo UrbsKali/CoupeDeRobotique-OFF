@@ -127,7 +127,7 @@ class Lidar:
         if unity == "deg":
             return 1
         if unity == "rad":
-            return 180 / math.pi
+            return math.pi / 180
 
         self._logger.log(f"Unity of angles not recognized [{unity}] !", LogLevels.CRITICAL)
         raise ValueError(f"Unity of angles not recognized [{unity}] !")
