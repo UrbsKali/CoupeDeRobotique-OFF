@@ -9,6 +9,14 @@
       "cmd_route": "/cmd",
       "frame_route": "/frame",
       "pami_route": "/pami"
+    },
+
+    "teensy":{
+      "vid" : 5824,
+      "pid" : 1155,
+      "baudrate" : 115200,
+      "crc" : true,
+      "dummy" : false
     }
   },
   "computer": {
@@ -60,7 +68,11 @@
       "sender_name": "robot1",
       "server_ip": "192.168.0.104"
     },
+    "rolling_basis" : {
+      "rolling_basis_teensy_ser" : 12675800
+    },
     "actuators": {
+      "actuators_teensy_ser" : 12678600,
       "god_hand_grab_servo_pins_left": [
         2,
         3
