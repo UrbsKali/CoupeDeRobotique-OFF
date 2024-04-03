@@ -99,16 +99,18 @@ class RollingBasis(Teensy):
     def __init__(
         self,
         logger: Logger,
-        ser:int = CONFIG.ROLLING_BASIS_TEENSY_SER,
+        ser: int = CONFIG.ROLLING_BASIS_TEENSY_SER,
         crc: bool = CONFIG.TEENSY_CRC,
-        vid : int = CONFIG.TEENSY_VID,
-        pid : int = CONFIG.TEENSY_PID,
-        baudrate : int = CONFIG.TEENSY_BAUDRATE,
-        dummy: bool = CONFIG.TEENSY_DUMMY
+        vid: int = CONFIG.TEENSY_VID,
+        pid: int = CONFIG.TEENSY_PID,
+        baudrate: int = CONFIG.TEENSY_BAUDRATE,
+        dummy: bool = CONFIG.TEENSY_DUMMY,
     ):
-        super().__init__(logger, ser=ser, vid = vid, pid=pid, baudrate = baudrate, crc = crc, dummy=dummy)
-        self.odometrie: OrientedPoint = OrientedPoint(0.0, 0.0, 0.0)
-        self.position_offset = OrientedPoint(0.0, 0.0, 0.0)
+        super().__init__(
+            logger, ser=ser, vid=vid, pid=pid, baudrate=baudrate, crc=crc, dummy=dummy
+        )
+        self.odometrie: OrientedPoint = OrientedPoint((0.0, 0.0), 0.0)
+        self.position_offset = OrientedPoint((0.0, 0.0), 0.0)
         """
         This is used to match a handling function to a message type.
         add_callback can also be used.
@@ -135,8 +137,7 @@ class RollingBasis(Teensy):
         :rtype: OrientedPoint
         """
         return OrientedPoint(
-            position.x + self.position_offset.x,
-            position.y + self.position_offset.y,
+            (position.x + self.position_offset.x, position.y + self.position_offset.y),
             position.theta + self.position_offset.theta,
         )
 
@@ -150,8 +151,7 @@ class RollingBasis(Teensy):
 
     def rcv_odometrie(self, msg: bytes):
         self.odometrie = OrientedPoint(
-            struct.unpack("<f", msg[0:4])[0],
-            struct.unpack("<f", msg[4:8])[0],
+            (struct.unpack("<f", msg[0:4])[0], struct.unpack("<f", msg[4:8])[0]),
             struct.unpack("<f", msg[8:12])[0],
         )
 
@@ -499,7 +499,7 @@ class RollingBasis(Teensy):
         else:
             self.append_to_queue(Instruction(Command.RESET_POSITION, msg))
 
-    def set_odo(self, new_odo: OrientedPoint | Point, *, skip_queue=False):
+    def set_odo(self, new_odo: Point, *, skip_queue=False):
         msg = Command.SET_HOME.value + struct.pack(
             "<fff",
             new_odo.x,
