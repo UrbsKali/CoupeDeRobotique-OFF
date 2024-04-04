@@ -17,7 +17,7 @@ class LogLevels(IntEnum):
 
 class STYLES:
     LogLevelsColorsDict: dict[LogLevels, str] = {
-        LogLevels.DEBUG: Style.RESET_ALL + Back.WHITE,
+        LogLevels.DEBUG: Style.RESET_ALL + Fore.BLUE,
         LogLevels.INFO: Style.RESET_ALL + Back.BLUE,
         LogLevels.WARNING: Style.RESET_ALL + Back.YELLOW,
         LogLevels.ERROR: Style.RESET_ALL + Back.RED,

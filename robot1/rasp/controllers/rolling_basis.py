@@ -388,10 +388,10 @@ class RollingBasis(Teensy):
             return 0
         else:
             self.logger.log(
-                f"Unexpected: didn't timeout in Go_To_And_Wait but did not arrive, clearing queue, at: {self.odometrie}",
-                LogLevels.ERROR,
+                f"Didn't timeout in Go_To_And_Wait but did not arrive, at: {self.odometrie}",
+                LogLevels.WARNING,
             )
-            self.stop_and_clear_queue()
+            # self.stop_and_clear_queue()
             return 2
 
     @Logger
