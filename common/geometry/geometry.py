@@ -31,6 +31,7 @@ from typing import Any, ClassVar, Dict, Tuple
 
 ### Point inheritance: cf https://github.com/shapely/shapely/issues/1233
 # Very weird but works; if not possible for some reason, maybe just migrate to a composition of Point and float instead
+# cf Jupyter notebook in common/arena for different versions tested, this is a version that supports both tuple, theta and x, y, theta initialization and has explicit str conversions for less ide warnings (combination of OrientedPoint2 and 3 as I am writing this). It's the slowest, but not by much, and allows the fullest compatibility with Point and shapely as a whole.
 
 
 class OrientedPoint(Point):
@@ -44,23 +45,31 @@ class OrientedPoint(Point):
     theta: float  # For documentation generation and static type checking
 
     def __init__(
-        self, coord: Tuple[float, float], theta: float = 0.0
+        self, x: float | Tuple[float, float], y: float | None = None, theta: float = 0.0
     ) -> (
         None
     ):  # if theta is not optional or if the structure of the arguments change (eg: self, x, y, theta) then MultiPoint becomes impossible with OrientedPoint
-        self._id_to_attrs[id(self)] = dict(theta=theta)
+        self._id_to_attrs[str(id(self))] = dict(
+            theta=(theta if not isinstance(x, Tuple) else y)
+        )
 
-    def __new__(cls, coord: Tuple[float, float], *args, **kwargs) -> "OrientedPoint":
-        point = super().__new__(cls, coord)
+    def __new__(
+        cls, x: float | Tuple[float, float], y: float | None = None, *args, **kwargs
+    ) -> "OrientedPoint":
+        if isinstance(x, Tuple):
+            point = super().__new__(cls, x)
+        else:
+            point = super().__new__(cls, x, y)
+
         point.__class__ = cls
         return point
 
     def __del__(self) -> None:
-        del self._id_to_attrs[id(self)]
+        del self._id_to_attrs[str(id(self))]
 
     def __getattr__(self, name: str) -> Any:
         try:
-            return OrientedPoint._id_to_attrs[id(self)][name]
+            return OrientedPoint._id_to_attrs[str(id(self))][name]
         except KeyError as e:
             raise AttributeError(str(e)) from None
 
