@@ -17,7 +17,33 @@ TBrain = TypeVar("TBrain", bound="Brain")
 
 
 class Brain:
+    """
+        The brain is a main controller of applications.
+        It manages tasks which can be routines or one-shot tasks.
+        It is also able to manage subprocesses.
+        How to use it ?
+        - Create a child class of Brain
+        - In the child's __init__ first define all attributes, who will use through the brain.
+        Then, at the END of the __init__ method, call super().__init__(logger, self).
+        Every child's __init__ parameters will be instantiated as attributes available in the brain.
+        - Transform your method into task by using the decorator @Brain.task()
+        - Classic task (executed in the main process), they have to be asynchronous
+            * Create a one-shot task by using the decorator @Brain.task() (it will be executed only once and in the
+            main process)
+            * Create a routine task by using the decorator @Brain.task(refresh_rate=<refresh rate you want>) (it will be
+            executed periodically according to the refresh rate and in the main process)
+        - Subprocess task (executed in a subprocess), they have to be synchronous
+            * Create a subprocess one-shot task by using the decorator @Brain.task(process=True) (it will be executed only
+            once in a subprocess)
+            * Create a routine subprocess task by using the decorator @Brain.task(
+            refresh_rate=<refresh rate you want>, process=True) (it will be executed periodically according to the refresh
+            and in a subprocess)
+        - Get the tasks by calling the method brain.get_tasks() and add them to the background tasks of the application
 
+        -> Be careful by using subprocesses, the shared data between the main process and the subprocesses is limited,
+        only serializable data can be shared. More over the data synchronization is not real-time, it is done by a routine.
+        Subprocesses are useful to execute heavy tasks or tasks that can block the main process.
+    """
     def __init__(self, logger: Logger, child: TBrain) -> None:
         """
         This constructor have to be called in the end of  __init__ method of the child class.
@@ -67,7 +93,7 @@ class Brain:
             ):
                 # Try to serialize the attribute
                 try:
-                    setattr(self.__shared_self, name, value)
+                    setattr(self.shared_self, name, value)
                 except Exception as error:
                     self.logger.log(
                         f"Brain [{self}]-[dynamic_init] cannot serialize attribute [{name}]. ({error})",

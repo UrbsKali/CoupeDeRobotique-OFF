@@ -23,52 +23,164 @@ class ServerBrain(Brain):
     """
 
     def __init__(
-        self,
-        logger: Logger,
-        camera: Camera,
-        ws_cmd: WServerRouteManager,
-        ws_log: WServerRouteManager,
-        ws_lidar: WServerRouteManager,
-        ws_odometer: WServerRouteManager,
-        ws_camera: WServerRouteManager,
-        ws_pami: WServerRouteManager,
-        arena: MarsArena,
-        config,
+            self,
+            logger: Logger,
+
+            ws_cmd: WServerRouteManager,
+            ws_pami: WServerRouteManager,
+            ws_lidar: WServerRouteManager,
+            ws_odometer: WServerRouteManager,
+            ws_camera: WServerRouteManager,
+
+            arena: MarsArena,
+
+            config
     ) -> None:
-        self.camera = camera
-        print(self.camera)
-        self.camera.capture()
-        self.shared = 0
+        # Camera data
         self.arucos = []
         self.green_objects = []
+
+        # ROB data
+        self.rob_pos: OrientedPoint | None = None
+        self.lidar_points: list[Point] | None = None
+
+        # Init the brain
         super().__init__(logger, self)
+
+    """
+        Secondary routines
+    """
+
+    """ Subprocess routines """
+
+    @Brain.task(process=True, run_on_start=True, refresh_rate=0.1, define_loop_later=True)
+    def camera_capture(self):
+        """
+        Capture the camera image and detect arucos and green objects.
+        """
+        camera = Camera(
+            res_w=self.config.CAMERA_RESOLUTION[0],
+            res_h=self.config.CAMERA_RESOLUTION[1],
+            captures_path=self.config.CAMERA_SAVE_PATH,
+            undistorted_coefficients_path=self.config.CAMERA_COEFFICIENTS_PATH,
+        )
+
+        aruco_recognizer = ArucoRecognizer(aruco_type=self.config.CAMERA_ARUCO_DICT_TYPE)
+
+        color_recognizer = ColorRecognizer(
+            detection_range=self.config.CAMERA_COLOR_FILTER_RANGE,
+            name=self.config.CAMERA_COLOR_FILTER_NAME,
+            clustering_eps=self.config.CAMERA_COLOR_CLUSTERING_EPS,
+            clustering_min_samples=self.config.CAMERA_COLOR_CLUSTERING_MIN_SAMPLES,
+        )
+
+        plan_transposer = PlanTransposer(
+            camera_table_distance=self.config.CAMERA_DISTANCE_CAM_TABLE,
+            alpha=self.config.CAMERA_CAM_OBJ_FUNCTION_A,
+            beta=self.config.CAMERA_CAM_OBJ_FUNCTION_B,
+        )
+        camera.load_undistor_coefficients()
+
+        # ---Loop--- #
+        camera.capture()
+        camera.undistor_image()
+
+        arucos = aruco_recognizer.detect(camera.get_capture())
+        green_objects = color_recognizer.detect(camera.get_capture())
+
+        arucos_tmp = []
+        arucos_tmp.extend(
+            (
+                aruco.encoded_number,
+                plan_transposer.image_to_relative_position(
+                    img=camera.get_capture(),
+                    segment=aruco.max_radius,
+                    center_point=aruco.centroid,
+                ),
+            )
+            for aruco in arucos
+        )
+        self.arucos = arucos_tmp
+
+        green_objects_tmp = []
+        green_objects_tmp.extend(
+            green_object.centroid for green_object in green_objects
+        )
+        self.green_objects = green_objects_tmp
+
+        frame = Frame(camera.get_capture(), [green_objects, arucos])
+        frame.draw_markers()
+        frame.write_labels()
+        camera.update_monitor(frame.img)
+
+    """ Main process routines """
+
+    @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
+    async def pami_com(self):
+        """
+        Send to pami all messages received from the websocket. (Essentially from ROB)
+        -> It is this routine that will be used to send to the PAMI the start trigger.
+        * This routine send the received message to everyone connected to the PAMI route.
+        """
+        message = await self.ws_pami.receiver.get()
+        if message != WSmsg():
+            self.logger.log(f"Message received on [PAMI]: {message}. Sending it to PAMIs.", LogLevels.DEBUG)
+            await self.ws_pami.sender.send(
+                WSmsg(sender="server", msg=pami_state.msg, data=pami_state.data),
+            )
+
+    @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
+    async def lidar_com(self):
+        """
+        Update the lidar points by listening to the LiDAR websocket (message from ROB).
+        """
+        message = await self.ws_lidar.receiver.get()
+        if message != WSmsg():
+            self.logger.log(f"Message received on [LiDAR]: {message}.", LogLevels.DEBUG)
+            self.lidar_points = [Point(x, y) for x, y in message.data]
+
+    @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
+    async def odometer_com(self):
+        """
+        Update ROB position by listening to the odometer websocket (message from ROB).
+        """
+        message = await self.ws_odometer.receiver.get()
+        if message != WSmsg():
+            self.logger.log(f"Message received on [Odometer]: {message}.", LogLevels.DEBUG)
+            self.rob_pos = OrientedPoint(message.data[0], message.data[1], message.data[2])
+
+    @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
+    async def camera_com(self):
+        """
+        Send to all clients connected to the camera route the data captured by the camera.
+        (Essentially the arucos and green objects detected)
+        """
+        # Send Arucos
+        await self.ws_camera.sender.send(
+            WSmsg(sender="server", msg="arucos", data=self.arucos)
+        )
+        # Send Green objects
+        await self.ws_camera.sender.send(
+            WSmsg(sender="server", msg="green_objects", data=self.green_objects)
+        )
 
     """
         Tasks
     """
 
-    @Brain.task(process=True, run_on_start=True, refresh_rate=1)
-    async def camera_capture(self):
-        self.camera.capture()
-
-    @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
-    async def pami_com(self):
-        pami_state = await self.ws_pami.receiver.get()
-        if pami_state != WSmsg():
-            print(f"Pami state received ! [{pami_state}]")
-            await self.ws_pami.sender.send(
-                WSmsg(sender="server", msg=pami_state.msg, data=pami_state.data),
-            )
-
     @Brain.task(process=False, run_on_start=True, refresh_rate=0.1)
     async def main(self):
+        """
+        Main routine of the server brain.
+        --> For the moment, it only sends the received command to ROB. (for zombie mode essentially)
+        """
         cmd_state = await self.ws_cmd.receiver.get()
         # New cmd received !
         if cmd_state != WSmsg():
-            print(f"New cmd received ! [{cmd_state}]")
-            if self.ws_cmd.get_client("robot1") is not None:
-                result = await self.ws_cmd.sender.send(
+            self.logger.log(f"Message received on [CMD]: {cmd_state}.", LogLevels.INFO)
+
+            if self.ws_cmd.get_client("rob") is not None:
+                await self.ws_cmd.sender.send(
                     WSmsg(sender="server", msg=cmd_state.msg, data=cmd_state.data),
-                    clients=self.ws_cmd.get_client("robot1"),
+                    clients=self.ws_cmd.get_client("rob"),
                 )
-                print("Result of sending cmd to robot1:", result)
