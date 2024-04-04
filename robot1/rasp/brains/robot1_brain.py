@@ -95,11 +95,13 @@ class Robot1Brain(Brain):
             [
                 (
                     (
-                        self.rolling_basis.x
-                        + np.cos(self.rolling_basis.theta + polars[i, 0]) * polars[i, 1]
+                        self.rolling_basis.odometrie.x
+                        + np.cos(self.rolling_basis.odometrie.theta + polars[i, 0])
+                        * polars[i, 1]
                     ),
-                    self.rolling_basis.y
-                    + np.sin(self.rolling_basis.theta + polars[i, 0]) * polars[i, 1],
+                    self.rolling_basis.odometrie.y
+                    + np.sin(self.rolling_basis.odometrie.theta + polars[i, 0])
+                    * polars[i, 1],
                 )
                 for i in range(len(polars))
             ]
