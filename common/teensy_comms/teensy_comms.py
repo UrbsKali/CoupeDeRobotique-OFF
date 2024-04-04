@@ -4,7 +4,6 @@ from logger import Logger, LogLevels
 from geometry import OrientedPoint
 from teensy_comms.dummy_serial import DummySerial
 
-
 # TODO: n'a pas trop ça place ici voir pour déplacer
 # Used for curve_go_to
 # DO NOT REMOVE
@@ -44,9 +43,10 @@ class Teensy:
     def __init__(
         self,
         logger: Logger,
+        *,
         ser: int,
-        vid: int = 0x16C0,
-        pid: int = 0x0483,
+        vid : int,
+        pid : int,
         baudrate: int = 115200,
         crc: bool = True,
         dummy: bool = False,

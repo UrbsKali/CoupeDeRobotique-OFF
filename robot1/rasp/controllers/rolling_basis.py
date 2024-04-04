@@ -32,6 +32,9 @@ class Instruction:
     cmd: Command
     msg: bytes  # msg is often the same as cmd, but can contain extra info
 
+    def __str__(self):
+        return f"cmd:{self.cmd}, msg:{self.msg}"
+
 
 class RB_Queue:
 
@@ -49,7 +52,7 @@ class RB_Queue:
     def __is_tracked_command_at_index(self, __index: int) -> bool:
         return RB_Queue.__is_tracked_command(self.__queue[__index].cmd)
 
-    def _append(self, __object: Instruction) -> int:
+    def append(self, __object: Instruction) -> int:
         self.__queue.append(__object)
         if RB_Queue.__is_tracked_command(__object.cmd):
             self.id_counter += 1
@@ -99,17 +102,18 @@ class RollingBasis(Teensy):
     def __init__(
         self,
         logger: Logger,
-        ser=12675800,
-        vid: int = 5824,
-        pid: int = 1155,
-        baudrate: int = 115200,
-        crc: bool = True,
-        dummy: bool = False,
+        ser: int = CONFIG.ROLLING_BASIS_TEENSY_SER,
+        crc: bool = CONFIG.TEENSY_CRC,
+        vid: int = CONFIG.TEENSY_VID,
+        pid: int = CONFIG.TEENSY_PID,
+        baudrate: int = CONFIG.TEENSY_BAUDRATE,
+        dummy: bool = CONFIG.TEENSY_DUMMY,
     ):
-        super().__init__(logger, ser, vid, pid, baudrate, crc, dummy)
-        # All position are in the form tuple(X, Y, THETA)
-        self.odometrie = OrientedPoint(0.0, 0.0, 0.0)
-        self.position_offset = OrientedPoint(0.0, 0.0, 0.0)
+        super().__init__(
+            logger, ser=ser, vid=vid, pid=pid, baudrate=baudrate, crc=crc, dummy=dummy
+        )
+        self.odometrie: OrientedPoint = OrientedPoint((0.0, 0.0), 0.0)
+        self.position_offset = OrientedPoint((0.0, 0.0), 0.0)
         """
         This is used to match a handling function to a message type.
         add_callback can also be used.
@@ -136,8 +140,7 @@ class RollingBasis(Teensy):
         :rtype: OrientedPoint
         """
         return OrientedPoint(
-            position.x + self.position_offset.x,
-            position.y + self.position_offset.y,
+            (position.x + self.position_offset.x, position.y + self.position_offset.y),
             position.theta + self.position_offset.theta,
         )
 
@@ -151,8 +154,7 @@ class RollingBasis(Teensy):
 
     def rcv_odometrie(self, msg: bytes):
         self.odometrie = OrientedPoint(
-            struct.unpack("<f", msg[0:4])[0],
-            struct.unpack("<f", msg[4:8])[0],
+            (struct.unpack("<f", msg[0:4])[0], struct.unpack("<f", msg[4:8])[0]),
             struct.unpack("<f", msg[8:12])[0],
         )
 
@@ -181,10 +183,12 @@ class RollingBasis(Teensy):
             self.send_bytes(self.queue[0].msg)
 
     def rcv_unknown_msg(self, msg: bytes):
-        self.logger.log(f"Teensy does not know the command {msg.hex()}", LogLevels.WARNING)
+        self.logger.log(
+            f"Teensy does not know the command {msg.hex()}", LogLevels.WARNING
+        )
 
     def append_to_queue(self, instruction: Instruction) -> int:
-        new_id = self.queue._append(instruction)
+        new_id = self.queue.append(instruction)
 
         if len(self.queue) == 1:
             self.send_bytes(self.queue[0].msg)
@@ -384,10 +388,10 @@ class RollingBasis(Teensy):
             return 0
         else:
             self.logger.log(
-                f"Unexpected: didn't timeout in Go_To_And_Wait but did not arrive, clearing queue, at: {self.odometrie}",
-                LogLevels.ERROR,
+                f"Didn't timeout in Go_To_And_Wait but did not arrive, at: {self.odometrie}",
+                LogLevels.WARNING,
             )
-            self.stop_and_clear_queue()
+            # self.stop_and_clear_queue()
             return 2
 
     @Logger
@@ -407,8 +411,10 @@ class RollingBasis(Teensy):
         """Go to a point with a curve"""
 
         middle_point = OrientedPoint(
-            (self.odometrie.x + destination.x) / 2,
-            (self.odometrie.y + destination.y) / 2,
+            (
+                (self.odometrie.x + destination.x) / 2,
+                (self.odometrie.y + destination.y) / 2,
+            )
         )
         # alpha est l'angle entre la droite (position, destination) et l'axe des ordonnées (y)
         alpha = math.atan2(
@@ -418,8 +424,10 @@ class RollingBasis(Teensy):
         theta = math.pi / 2 - alpha
 
         third_point = OrientedPoint(
-            middle_point.x + math.cos(theta) * corde,
-            middle_point.y + math.sin(theta) * corde,
+            (
+                middle_point.x + math.cos(theta) * corde,
+                middle_point.y + math.sin(theta) * corde,
+            )
         )
 
         center = calc_center(self.odometrie, third_point, destination)
@@ -471,7 +479,7 @@ class RollingBasis(Teensy):
         if skip_queue:
             self.insert_in_queue(0, Instruction(Command.DISABLE_PID, msg), True)
         else:
-            self.queue._append(Instruction(Command.DISABLE_PID, msg))
+            self.queue.append(Instruction(Command.DISABLE_PID, msg))
 
     @Logger
     def enable_pid(self, skip_queue=False):
@@ -494,9 +502,12 @@ class RollingBasis(Teensy):
         else:
             self.append_to_queue(Instruction(Command.RESET_POSITION, msg))
 
-    def set_odo(self, new_odo: OrientedPoint, *, skip_queue=False):
+    def set_odo(self, new_odo: Point, *, skip_queue=False):
         msg = Command.SET_HOME.value + struct.pack(
-            "<fff", new_odo.x, new_odo.y, new_odo.theta
+            "<fff",
+            new_odo.x,
+            new_odo.y,
+            new_odo.theta if isinstance(new_odo, OrientedPoint) else 0.0,
         )
         if skip_queue:
             self.insert_in_queue(0, Instruction(Command.SET_HOME, msg), True)
@@ -506,6 +517,6 @@ class RollingBasis(Teensy):
     def set_pid(self, Kp: float, Ki: float, Kd: float, skip_queue=False):
         msg = Command.SET_PID.value + struct.pack("<fff", Kp, Ki, Kd)
         if skip_queue:
-            self.queue.insert_in_queue(0, {Command.SET_PID: msg}, True)
+            self.queue.insert(0, Instruction(Command.SET_PID, msg))
         else:
             self.append_to_queue(Instruction(Command.SET_PID, msg))

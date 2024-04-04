@@ -82,7 +82,7 @@ class Robot1Brain(Brain):
         )[1]
 
         # For now, just stop if close, when updating, consider self.arena.check_collision_by_distances
-        if self.arena.ennemy_position.distance(self.rolling_basis.odometrie) < 40:
+        if self.rolling_basis.odometrie.distance(self.arena.ennemy_position) < 40:
             self.logger.log(
                 "ACS triggered, performing emergency stop", LogLevels.WARNING
             )
@@ -92,14 +92,19 @@ class Robot1Brain(Brain):
 
     def absolute_cartesians(self, polars: np.ndarray) -> MultiPoint:
         return MultiPoint(
-            (
-                self.rolling_basis.x
-                + np.cos(self.rolling_basis.odometrie.theta + polars[:, 0])
-                * polars[:, 1],
-                self.rolling_basis.y
-                + np.sin(self.rolling_basis.odometrie.theta + polars[:, 0])
-                * polars[:, 1],
-            )
+            [
+                (
+                    (
+                        self.rolling_basis.odometrie.x
+                        + np.cos(self.rolling_basis.odometrie.theta + polars[i, 0])
+                        * polars[i, 1]
+                    ),
+                    self.rolling_basis.odometrie.y
+                    + np.sin(self.rolling_basis.odometrie.theta + polars[i, 0])
+                    * polars[i, 1],
+                )
+                for i in range(len(polars))
+            ]
         )
 
     """
@@ -182,14 +187,12 @@ class Robot1Brain(Brain):
         destination_plant_zone = None
         for plant_zone in plant_zones:
             target = self.arena.compute_go_to_destination(
-                start_point=Point(
-                    self.rolling_basis.odometrie.x, self.rolling_basis.odometrie.y
-                ),
+                start_point=self.rolling_basis.odometrie,
                 zone=plant_zone.zone,
                 delta=delta,
             )
             if self.arena.enable_go_to_point(
-                Point(self.rolling_basis.odometrie.x, self.rolling_basis.odometrie.y),
+                self.rolling_basis.odometrie,
                 target,
             ):
                 destination_point = target
