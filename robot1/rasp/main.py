@@ -82,7 +82,7 @@ if __name__ == "__main__":
     )
 
     # Arena
-    start_zone_id = 2
+    start_zone_id = 0
     arena = MarsArena(
         start_zone_id, logger=logger_arena
     )  # must be declared from external calculus interface or switch on the robot
