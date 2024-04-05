@@ -16,3 +16,4 @@ from geometry.geometry import (
 )
 
 from shapely.ops import nearest_points
+from shapely import is_empty

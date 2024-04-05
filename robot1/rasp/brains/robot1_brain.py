@@ -12,7 +12,7 @@ import numpy as np
 from sensors import Lidar
 from controllers import RollingBasis, Actuators
 import asyncio
-from geometry import Polygon, MultiPoint, nearest_points
+from geometry import Polygon, MultiPoint, nearest_points, is_empty
 from config_loader import CONFIG
 import time
 import math
@@ -23,7 +23,6 @@ class Robot1Brain(Brain):
         self,
         logger: Logger,
         ws_cmd: WSclientRouteManager,
-        ws_log: WSclientRouteManager,
         ws_lidar: WSclientRouteManager,
         ws_odometer: WSclientRouteManager,
         ws_camera: WSclientRouteManager,
@@ -32,17 +31,22 @@ class Robot1Brain(Brain):
         lidar: Lidar,
         arena: MarsArena,
     ) -> None:
-        super().__init__(logger, self)
 
-        self.lidar_angles = (90, 180)
+        self.lidar_angle_extremums = (90, 180)
         self.camera = {}
-        self.lidar_points: MultiPoint | None = None
 
         # to delete, only use for completion
         # self.rolling_basis:  RollingBasis
         self.actuators: Actuators
         # self.arena: MarsArena
         # self.lidar:  Lidar
+
+        super().__init__(logger, self)
+
+        self.logger.log(
+            f"Robot1 Brain initialized, current position: {self.rolling_basis.odometrie}",
+            LogLevels.INFO,
+        )
 
     """
         Routines
@@ -72,16 +76,30 @@ class Robot1Brain(Brain):
 
     @Brain.task(process=False, run_on_start=True, refresh_rate=0.25)
     async def compute_ennemy_position(self):
-        self.lidar_points = self.arena.remove_outside(
-            self.absolute_cartesians(self.lidar.scan_to_polars())
+        obstacles: MultiPoint | Point = self.arena.remove_outside(
+            self.pol_to_abs_cart(self.lidar.scan_to_polars())
+        )
+
+        self.logger.log(f"obstacles: {obstacles}", LogLevels.DEBUG)
+
+        asyncio.create_task(
+            self.ws_lidar.sender.send(
+                WSmsg(msg="obstacles", data=[(geom.x, geom.y) for geom in obstacles])
+            )
         )
 
         # For now, the closest will be the ennemy position
-        self.arena.ennemy_position = nearest_points(
-            self.rolling_basis.odometrie, self.lidar_points
-        )[1]
+        self.arena.ennemy_position = (
+            None
+            if is_empty(obstacles)
+            else nearest_points(self.rolling_basis.odometrie, obstacles)[1]
+        )
 
-        # For now, just stop if close, when updating, consider self.arena.check_collision_by_distances
+        self.logger.log(
+            f"Ennemy position computed: {self.arena.ennemy_position}", LogLevels.INFO
+        )
+
+        # For now, just stop if close. When updating, consider self.arena.check_collision_by_distances
         if self.rolling_basis.odometrie.distance(self.arena.ennemy_position) < 40:
             self.logger.log(
                 "ACS triggered, performing emergency stop", LogLevels.WARNING
@@ -90,7 +108,7 @@ class Robot1Brain(Brain):
         else:
             self.logger.log("ACS not triggered", LogLevels.DEBUG)
 
-    def absolute_cartesians(self, polars: np.ndarray) -> MultiPoint:
+    def pol_to_abs_cart(self, polars: np.ndarray) -> MultiPoint:
         return MultiPoint(
             [
                 (

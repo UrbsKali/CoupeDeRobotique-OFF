@@ -58,13 +58,11 @@ if __name__ == "__main__":
     ws_cmd = WSclientRouteManager(
         WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME)
     )
-    ws_log = WSclientRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
     ws_lidar = WSclientRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
     ws_odometer = WSclientRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
     ws_camera = WSclientRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
 
     ws_client.add_route_handler(CONFIG.WS_CMD_ROUTE, ws_cmd)
-    ws_client.add_route_handler(CONFIG.WS_LOG_ROUTE, ws_log)
     ws_client.add_route_handler(CONFIG.WS_LIDAR_ROUTE, ws_lidar)
     ws_client.add_route_handler(CONFIG.WS_ODOMETER_ROUTE, ws_odometer)
     ws_client.add_route_handler(CONFIG.WS_CAMERA_ROUTE, ws_camera)
@@ -77,17 +75,20 @@ if __name__ == "__main__":
     # Lidar
     lidar = Lidar(
         logger=logger_lidar,
-        min_angle=CONFIG.LIDAR_MIN_ANGLE, max_angle=CONFIG.LIDAR_MAX_ANGLE,
-        unity_angle=CONFIG.LIDAR_ANGLES_UNIT, unity_distance=CONFIG.LIDAR_DISTANCES_UNIT
+        min_angle=CONFIG.LIDAR_MIN_ANGLE,
+        max_angle=CONFIG.LIDAR_MAX_ANGLE,
+        unity_angle=CONFIG.LIDAR_ANGLES_UNIT,
+        unity_distance=CONFIG.LIDAR_DISTANCES_UNIT,
     )
 
     # Arena
-    start_zone_id = 2
+    start_zone_id = 0
     arena = MarsArena(
         start_zone_id, logger=logger_arena
     )  # must be declared from external calculus interface or switch on the robot
 
     start_pos = OrientedPoint.from_Point(arena.zones["home"].centroid)
+
     rolling_basis.set_odo(start_pos)
 
     # Brain
@@ -95,7 +96,6 @@ if __name__ == "__main__":
         actuators=actuators,
         logger=logger_brain,
         ws_cmd=ws_cmd,
-        ws_log=ws_log,
         ws_lidar=ws_lidar,
         ws_odometer=ws_odometer,
         ws_camera=ws_camera,
