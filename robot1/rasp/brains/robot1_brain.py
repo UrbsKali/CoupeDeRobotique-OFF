@@ -12,7 +12,7 @@ import numpy as np
 from sensors import Lidar
 from controllers import RollingBasis, Actuators
 import asyncio
-from geometry import Polygon, MultiPoint, nearest_points
+from geometry import Polygon, MultiPoint, nearest_points, is_empty
 from config_loader import CONFIG
 import time
 import math
@@ -77,13 +77,15 @@ class Robot1Brain(Brain):
     @Brain.task(process=False, run_on_start=True, refresh_rate=0.25)
     async def compute_ennemy_position(self):
         self.lidar_points = self.arena.remove_outside(
-            self.absolute_cartesians(self.lidar.scan_to_polars())
+            self.pol_to_abs_cart(self.lidar.scan_to_polars())
         )
 
         # For now, the closest will be the ennemy position
-        self.arena.ennemy_position = nearest_points(
-            self.rolling_basis.odometrie, self.lidar_points
-        )[1]
+        self.arena.ennemy_position = (
+            None
+            if is_empty(self.lidar_points)
+            else nearest_points(self.rolling_basis.odometrie, self.lidar_points)[1]
+        )
 
         self.logger.log(
             f"Ennemy position computed: {self.arena.ennemy_position}", LogLevels.INFO
@@ -98,7 +100,7 @@ class Robot1Brain(Brain):
         else:
             self.logger.log("ACS not triggered", LogLevels.DEBUG)
 
-    def absolute_cartesians(self, polars: np.ndarray) -> MultiPoint:
+    def pol_to_abs_cart(self, polars: np.ndarray) -> MultiPoint:
         return MultiPoint(
             [
                 (
