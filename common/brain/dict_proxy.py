@@ -1,5 +1,8 @@
 from multiprocessing import Manager
 
+from geometry import OrientedPoint, Point
+from logger import Logger
+
 
 class DictProxyAccessor:
     """
@@ -12,43 +15,40 @@ class DictProxyAccessor:
         Initialize the DictProxyAccessor by creating a DictProxy object
         """
         self._dict_proxy = Manager().dict()
-        self.name = name
+        self._name = name
+        self._updated_attributes = set()
 
-    def __getattr__(self, key):
-        """
-        Intercept the call to an attribute of the object and redirect it to the DictProxy object
-        :param key: key to access in the DictProxy
-        :return: value of the key in the DictProxy
-        """
+    def __getattr__(self, item):
+        if item in ['_dict_proxy', '_name', '_updated_attributes']:
+            return object.__getattribute__(self, item)
+
         try:
-            return self._dict_proxy[key]
-        except Exception as e:
-            raise AttributeError(
-                f"'{type(self).__name__}' object has no attribute '{key}'"
-            ) from e
+            attr = object.__getattribute__(self, item)
+            if callable(attr):
+                return attr
+        except AttributeError:
+            pass  # Si l'attribut n'existe pas, on continue pour vérifier dans _dict_proxy
 
-    def __setattr__(self, key, value) -> None:
-        """
-        Intercept the call to set an attribute of the object and redirect it to the DictProxy object.
-        If the key is _dict_proxy, set the value in the object itself
-        :param key:
-        :return:
-        """
-        if key == "_dict_proxy":
-            super().__setattr__(key, value)
+            # Tentative d'accès à un élément dans _dict_proxy si ce n'est pas une méthode
+        try:
+            return self._dict_proxy[item]
+        except KeyError:
+            raise AttributeError(f"'{type(self).__name__}' object has no attribute '{item}'")
+
+    def __setattr__(self, key, value):
+        if key in ["_dict_proxy", "_name", "_updated_attributes"]:
+            object.__setattr__(self, key, value)
         else:
             self._dict_proxy[key] = value
+            if key not in self._updated_attributes:
+                self._updated_attributes.add(key)
 
-    def __delattr__(self, key) -> None:
-        """
-        Allow to delete an attribute of the object
-        :param key:
-        :return:
-        """
-        if key in self._dict_proxy:
-            del self._dict_proxy[key]
-        else:
-            raise AttributeError(f"'{type(self).__name__}' object has no attribute '{key}'")
+    def get_updated_attributes(self):
+        return self._updated_attributes
+
+    def remove_updated_attribute(self, key):
+        if key in self._updated_attributes:
+            self._updated_attributes.remove(key)
 
     def get_dict(self) -> dict:
         """
@@ -57,4 +57,22 @@ class DictProxyAccessor:
         return dict(self._dict_proxy.items())
 
     def __str__(self):
-        return self.name
+        return self._name
+
+    @staticmethod
+    def is_serialized(obj) -> bool:
+        # Tuple of all types that are considered serialized directly.
+        serialized_types = (
+            Logger, int, float, str, list, set, dict, tuple, OrientedPoint, Point, type(None)
+        )
+
+        if isinstance(obj, serialized_types):
+            return True
+
+        # Special case for an object with a __name__ attribute equal to "CONFIG".
+        try:
+            return obj.__name__ == "CONFIG"
+        except AttributeError:  # If the object doesn't have the __name__ attribute.
+            return False
+
+

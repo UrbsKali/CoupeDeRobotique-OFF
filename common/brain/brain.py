@@ -92,11 +92,11 @@ class Brain:
                 and name != "self"
             ):
                 # Try to serialize the attribute
-                try:
+                if DictProxyAccessor.is_serialized(value):
                     setattr(self.shared_self, name, value)
-                except Exception as error:
+                else:
                     self.logger.log(
-                        f"Brain [{self}]-[dynamic_init] cannot serialize attribute [{name}]. ({error})",
+                        f"Brain [{self}]-[dynamic_init] cannot serialize attribute [{name}].",
                         LogLevels.WARNING,
                     )
 
@@ -190,22 +190,18 @@ class Brain:
         * Need to be wrap by routine task wrapper.
         * Add this method in the async functions list only if a subprocess task is defined.
         """
-        self_shared_reference = self.__shared_self.get_dict()
-        # Iterate on each attribute of the self instance (there are the only ones that can be synchronized)
-        for key, value in self_shared_reference.items():
+        for key in self.shared_self.get_dict().keys():
+            self_attr_value = getattr(self, key)
+            self_shared_attr_value = eval(f'self.shared_self.{key}')
+
             # Verify if the value is different between the instance and the shared data
-            if key != "name" and getattr(self, key) != getattr(self.__shared_self, key):
-                # If different check the self_shared_reference value to know if it is the instance
-                # or self_shared which have been updated
-                if value != getattr(self.__shared_self, key):
-                    # If the value is the instance one, update the shared data
-                    setattr(self.__shared_self, key, getattr(self, key))
-                    self_shared_reference[key] = getattr(
-                        self, key
-                    )  # Update also the reference
+            if self_attr_value != self_shared_attr_value:
+                # The value has changed on the virtual self ?
+                if key in self.shared_self.get_updated_attributes():
+                    setattr(self, key, self_shared_attr_value)
+                    self.shared_self.remove_updated_attribute(key)
                 else:
-                    # If the value is the shared data one, update the instance
-                    setattr(self, key, getattr(self.__shared_self, key))
+                    setattr(self.shared_self, key, self_attr_value)
 
     """
         Get evaluated tasks which need to be added to the background tasks of the application
@@ -226,7 +222,8 @@ class Brain:
                 )
                 self.__async_functions.append(
                     lambda: AsynchronousWrapper.wrap_to_routine(
-                        self, self.__sync_self_and_shared_self, 0
+                        self, self.__sync_self_and_shared_self,
+                        0.01
                     )
                 )
 
