@@ -45,21 +45,32 @@ class OrientedPoint(Point):
     theta: float  # For documentation generation and static type checking
 
     def __init__(
-        self, x: float | Tuple[float, float], y: float | None = None, theta: float = 0.0
+        self,
+        x_or_coords: float | Tuple[float, float],
+        y: float | None = None,
+        theta: float = 0.0,
     ) -> (
         None
     ):  # if theta is not optional or if the structure of the arguments change (eg: self, x, y, theta) then MultiPoint becomes impossible with OrientedPoint
         self._id_to_attrs[str(id(self))] = dict(
-            theta=(theta if not isinstance(x, Tuple) else y)
+            theta=(
+                theta
+                if not isinstance(x_or_coords, Tuple)
+                else (0.0 if y is None else y)
+            )
         )
 
     def __new__(
-        cls, x: float | Tuple[float, float], y: float | None = None, *args, **kwargs
+        cls,
+        x_or_coords: float | Tuple[float, float],
+        y: float | None = None,
+        *args,
+        **kwargs,
     ) -> "OrientedPoint":
-        if isinstance(x, Tuple):
-            point = super().__new__(cls, x)
+        if isinstance(x_or_coords, Tuple):
+            point = super().__new__(cls, x_or_coords)
         else:
-            point = super().__new__(cls, x, y)
+            point = super().__new__(cls, x_or_coords, y)
 
         point.__class__ = cls
         return point
