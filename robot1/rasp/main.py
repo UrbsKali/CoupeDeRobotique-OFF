@@ -77,8 +77,10 @@ if __name__ == "__main__":
     # Lidar
     lidar = Lidar(
         logger=logger_lidar,
-        min_angle=CONFIG.LIDAR_MIN_ANGLE, max_angle=CONFIG.LIDAR_MAX_ANGLE,
-        unity_angle=CONFIG.LIDAR_ANGLES_UNIT, unity_distance=CONFIG.LIDAR_DISTANCES_UNIT
+        min_angle=CONFIG.LIDAR_MIN_ANGLE,
+        max_angle=CONFIG.LIDAR_MAX_ANGLE,
+        unity_angle=CONFIG.LIDAR_ANGLES_UNIT,
+        unity_distance=CONFIG.LIDAR_DISTANCES_UNIT,
     )
 
     # Arena
@@ -88,6 +90,7 @@ if __name__ == "__main__":
     )  # must be declared from external calculus interface or switch on the robot
 
     start_pos = OrientedPoint.from_Point(arena.zones["home"].centroid)
+
     rolling_basis.set_odo(start_pos)
 
     # Brain

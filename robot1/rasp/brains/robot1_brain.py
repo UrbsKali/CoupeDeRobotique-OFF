@@ -44,6 +44,11 @@ class Robot1Brain(Brain):
         # self.arena: MarsArena
         # self.lidar:  Lidar
 
+        self.logger.log(
+            f"Robot1 Brain initialized, current position: {self.rolling_basis.odometrie}",
+            LogLevels.INFO,
+        )
+
     """
         Routines
     """
