@@ -85,6 +85,10 @@ class Robot1Brain(Brain):
             self.rolling_basis.odometrie, self.lidar_points
         )[1]
 
+        self.logger.log(
+            f"Ennemy position computed: {self.arena.ennemy_position}", LogLevels.INFO
+        )
+
         # For now, just stop if close, when updating, consider self.arena.check_collision_by_distances
         if self.rolling_basis.odometrie.distance(self.arena.ennemy_position) < 40:
             self.logger.log(
