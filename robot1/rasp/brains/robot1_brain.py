@@ -23,7 +23,6 @@ class Robot1Brain(Brain):
         self,
         logger: Logger,
         ws_cmd: WSclientRouteManager,
-        ws_log: WSclientRouteManager,
         ws_lidar: WSclientRouteManager,
         ws_odometer: WSclientRouteManager,
         ws_camera: WSclientRouteManager,
