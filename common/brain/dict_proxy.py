@@ -19,7 +19,7 @@ class DictProxyAccessor:
         self._updated_attributes = set()
 
     def __getattr__(self, item):
-        if item in ['_dict_proxy', '_name', '_updated_attributes']:
+        if item in ["_dict_proxy", "_name", "_updated_attributes"]:
             return object.__getattribute__(self, item)
 
         try:
@@ -33,7 +33,9 @@ class DictProxyAccessor:
         try:
             return self._dict_proxy[item]
         except KeyError:
-            raise AttributeError(f"'{type(self).__name__}' object has no attribute '{item}'")
+            raise AttributeError(
+                f"'{type(self).__name__}' object has no attribute '{item}'"
+            )
 
     def __setattr__(self, key, value):
         if key in ["_dict_proxy", "_name", "_updated_attributes"]:
@@ -63,7 +65,17 @@ class DictProxyAccessor:
     def is_serialized(obj) -> bool:
         # Tuple of all types that are considered serialized directly.
         serialized_types = (
-            Logger, int, float, str, list, set, dict, tuple, OrientedPoint, Point, type(None)
+            Logger,
+            int,
+            float,
+            str,
+            list,
+            set,
+            dict,
+            tuple,
+            OrientedPoint,
+            Point,
+            type(None),
         )
 
         if isinstance(obj, serialized_types):
@@ -74,5 +86,3 @@ class DictProxyAccessor:
             return obj.__name__ == "CONFIG"
         except AttributeError:  # If the object doesn't have the __name__ attribute.
             return False
-
-

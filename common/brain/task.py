@@ -10,7 +10,16 @@ TDictProxyAccessor = TypeVar("TDictProxyAccessor", bound="DictProxyAccessor")
 
 
 class Task:
-    def __init__(self, function, is_process, run_on_start, refresh_rate, timeout, define_loop_later, start_loop_marker):
+    def __init__(
+        self,
+        function,
+        is_process,
+        run_on_start,
+        refresh_rate,
+        timeout,
+        define_loop_later,
+        start_loop_marker,
+    ):
         self._function = function
         self._is_process = is_process
         self._run_on_start = run_on_start
@@ -63,20 +72,19 @@ class Task:
             if not self.refresh_rate_is_set:
                 raise ValueError(
                     f"Error while evaluate [{self.name}] task: it a process with a "
-                    f"'define_loop_later' but no refresh rate is defined.")
+                    f"'define_loop_later' but no refresh rate is defined."
+                )
             wrapped_task = functools.partial(
                 SynchronousWrapper.wrap_routine_with_initialization,
                 brain_executor,
                 self._function,
                 self._refresh_rate,
-                self._start_loop_marker
+                self._start_loop_marker,
             )
         # One-shot
         elif self.is_one_shot:
             wrapped_task = functools.partial(
-                SynchronousWrapper.wrap_to_one_shot,
-                brain_executor,
-                self._function
+                SynchronousWrapper.wrap_to_one_shot, brain_executor, self._function
             )
         # Routine
         elif self.is_routine:
@@ -84,28 +92,25 @@ class Task:
                 SynchronousWrapper.wrap_to_routine,
                 brain_executor,
                 self._function,
-                self._refresh_rate
+                self._refresh_rate,
             )
         # Unknown task type
         else:
             brain_executor.logger.log(
                 f"Task-evaluation: error while wrapping [{self.name}] task. Task type unknown !",
-                LogLevels.ERROR
+                LogLevels.ERROR,
             )
-            raise ValueError(f"Task-evaluation: error while wrapping [{self.name}] task. Task type unknown !")
+            raise ValueError(
+                f"Task-evaluation: error while wrapping [{self.name}] task. Task type unknown !"
+            )
 
         # Add a timeout -> we have to convert the synchronous function to async one !
         if self.is_timed:
             async_wrapped_task = SynchronousWrapper.wrap_timeout_task(
-                brain_executor,
-                wrapped_task,
-                self._timeout,
-                self.name
+                brain_executor, wrapped_task, self._timeout, self.name
             )
         else:
-            async_wrapped_task = SynchronousWrapper.wrap_to_dummy_async(
-                wrapped_task
-            )
+            async_wrapped_task = SynchronousWrapper.wrap_to_dummy_async(wrapped_task)
 
         return async_wrapped_task
 
@@ -117,36 +122,34 @@ class Task:
         # One-shot
         if self.is_one_shot:
             wrapped_task = AsynchronousWrapper.wrap_to_one_shot(
-                brain_executor,
-                self._function
+                brain_executor, self._function
             )
         # Routine
         elif self.is_routine:
             wrapped_task = AsynchronousWrapper.wrap_to_routine(
-                brain_executor,
-                self._function,
-                self._refresh_rate
+                brain_executor, self._function, self._refresh_rate
             )
         # Unknown task type
         else:
             brain_executor.logger.log(
                 f"Task-evaluation: error while wrapping [{self.name}] task. Task type unknown !",
-                LogLevels.ERROR
+                LogLevels.ERROR,
             )
-            raise ValueError(f"Task-evaluation: error while wrapping [{self.name}] task. Task type unknown !")
+            raise ValueError(
+                f"Task-evaluation: error while wrapping [{self.name}] task. Task type unknown !"
+            )
 
         # Add a timeout
         if self.is_timed:
             wrapped_task = AsynchronousWrapper.wrap_timeout_task(
-                brain_executor,
-                wrapped_task,
-                self._timeout,
-                self.name
+                brain_executor, wrapped_task, self._timeout, self.name
             )
 
         return wrapped_task
 
-    def evaluate(self, brain_executor: TBrain, shared_brain_executor: TDictProxyAccessor):
+    def evaluate(
+        self, brain_executor: TBrain, shared_brain_executor: TDictProxyAccessor
+    ):
         if self.is_process:
             return self.__evaluate_process_task(shared_brain_executor)
         else:

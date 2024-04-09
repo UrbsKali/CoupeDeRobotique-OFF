@@ -4,6 +4,7 @@ from config_loader import CONFIG
 from WS_comms import WServer, WServerRouteManager, WSender, WSreceiver, WSmsg
 from logger import Logger, LogLevels
 from arena import MarsArena
+
 # from video import spawn_video_server
 
 # Import from local path
@@ -32,12 +33,18 @@ if __name__ == "__main__":
 
     # Websocket server
     ws_server = WServer(
-        logger=logger_ws_server, host=CONFIG.WS_HOSTNAME, port=CONFIG.WS_PORT,
-        ping_pong_clients_interval=CONFIG.WS_PING_PONG_INTERVAL
+        logger=logger_ws_server,
+        host=CONFIG.WS_HOSTNAME,
+        port=CONFIG.WS_PORT,
+        ping_pong_clients_interval=CONFIG.WS_PING_PONG_INTERVAL,
     )
     # Routes
-    ws_cmd = WServerRouteManager(WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME))
-    ws_pami = WServerRouteManager(WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME))
+    ws_cmd = WServerRouteManager(
+        WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME)
+    )
+    ws_pami = WServerRouteManager(
+        WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME)
+    )
     # Sensors
     ws_lidar = WServerRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
     ws_odometer = WServerRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
@@ -55,16 +62,13 @@ if __name__ == "__main__":
     # Brain
     brain = ServerBrain(
         logger=logger_brain,
-
         ws_cmd=ws_cmd,
         ws_lidar=ws_lidar,
         ws_odometer=ws_odometer,
         ws_camera=ws_camera,
         ws_pami=ws_pami,
-
         arena=arena,
-
-        config=CONFIG
+        config=CONFIG,
     )
 
     """

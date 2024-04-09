@@ -197,8 +197,8 @@ class SynchronousWrapper:
         param_list = ", ".join(var_initialized.keys())
         # Create a new function with the loop part
         loop_code = (
-                f"def {original_signature}__loop_func({param_list}):\n    "
-                + "\n    ".join(loop_src.split("\n"))
+            f"def {original_signature}__loop_func({param_list}):\n    "
+            + "\n    ".join(loop_src.split("\n"))
         )
 
         # Compiling and executing the initialization part
@@ -317,4 +317,4 @@ def remove_task_signature(src):
     if newline_after_signature_index == -1:
         raise ValueError("Unable to find the function body.")
 
-    return "\n" + src[newline_after_signature_index + 1:]
+    return "\n" + src[newline_after_signature_index + 1 :]

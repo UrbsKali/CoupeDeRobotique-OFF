@@ -4,6 +4,7 @@ from logger import Logger, LogLevels
 from geometry import OrientedPoint
 from teensy_comms.dummy_serial import DummySerial
 
+
 # TODO: n'a pas trop ça place ici voir pour déplacer
 # Used for curve_go_to
 # DO NOT REMOVE
@@ -45,8 +46,8 @@ class Teensy:
         logger: Logger,
         *,
         ser: int,
-        vid : int,
-        pid : int,
+        vid: int,
+        pid: int,
         baudrate: int = 115200,
         crc: bool = True,
         dummy: bool = False,
@@ -194,7 +195,9 @@ class Teensy:
                 self._crc8.reset()
                 self._crc8.update(msg)
                 if self._crc8.digest() != crc:
-                    self.logger.log(f"Invalid CRC8, sending NACK ... [{crc}]", LogLevels.WARNING)
+                    self.logger.log(
+                        f"Invalid CRC8, sending NACK ... [{crc}]", LogLevels.WARNING
+                    )
                     self.send_bytes(b"\x7F")  # send NACK
                     self._crc8.reset()
                     continue

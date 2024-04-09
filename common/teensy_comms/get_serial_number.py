@@ -1,5 +1,6 @@
 import serial.tools.list_ports
 
+
 def find_usb_devices():
     devices = serial.tools.list_ports.comports()
     usb_devices = []
@@ -8,14 +9,16 @@ def find_usb_devices():
             usb_devices.append(device.device)
     return usb_devices
 
+
 def get_serial_number(port):
     try:
         with serial.Serial(port) as ser:
-            ser.write(b's')  # Envoyer une commande pour demander le numéro de série
+            ser.write(b"s")  # Envoyer une commande pour demander le numéro de série
             return ser.readline().strip().decode()
     except serial.SerialException as e:
         print("Erreur lors de la communication avec le périphérique:", e)
         return None
+
 
 if __name__ == "__main__":
     usb_devices = find_usb_devices()
