@@ -21,13 +21,13 @@ if __name__ == "__main__":
     logger_ws_server = Logger(
         identifier="ws_server",
         decorator_level=LogLevels.INFO,
-        print_log_level=LogLevels.INFO,
+        print_log_level=LogLevels.DEBUG,
         file_log_level=LogLevels.DEBUG,
     )
     logger_brain = Logger(
         identifier="brain",
         decorator_level=LogLevels.INFO,
-        print_log_level=LogLevels.INFO,
+        print_log_level=LogLevels.DEBUG,
         file_log_level=LogLevels.DEBUG,
     )
 

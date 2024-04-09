@@ -88,7 +88,7 @@ class Robot1Brain(Brain):
             )
         )
 
-        # For now, the closest will be the ennemy position
+        # For now, the closest will be the enemy position
         self.arena.ennemy_position = (
             None
             if is_empty(obstacles)

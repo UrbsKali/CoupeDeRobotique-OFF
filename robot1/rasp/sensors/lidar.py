@@ -51,7 +51,7 @@ class Lidar:
 
         self.__lidar_obj = self.__init_lidar()
         self.__polars_angles = self.__init_polars_angle(min_angle, max_angle)
-        self.min_distance = 5
+        self.min_distance = 10
 
     """
         Private methods
