@@ -92,6 +92,7 @@ class ServerBrain(Brain):
         camera.capture()
         camera.undistor_image()
         zones_plant = color_recognizer.detect(camera.get_capture())
+
         if len(zones_plant) < 6:
             print("error in zone_plant detection")
         # calculate approximate center and exclude nearest cluster until there is 6 zones remaking
@@ -143,7 +144,7 @@ class ServerBrain(Brain):
 
         frame = Frame(camera.get_capture(), [green_objects, arucos])
         frame.draw_markers()
-        frame.write_labels()
+        frame.write_centroid()
         camera.update_monitor(frame.img)
 
     """ Main process routines """

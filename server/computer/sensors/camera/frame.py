@@ -55,3 +55,15 @@ class Frame:
                 (0, 255, 0),
                 2,
             )
+
+    def write_centroid(self):
+        for obj in self.detected_object:
+            cv2.putText(
+                self.img,
+                obj.centroid,
+                (int(obj.bounding_box[0][0]), int(obj.bounding_box[0][1] - 10)),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.5,
+                (0, 255, 0),
+                2,
+            )
