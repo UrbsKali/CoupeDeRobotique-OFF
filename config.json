@@ -57,7 +57,7 @@
           255
         ],
         "clustering_eps": 20,
-        "clustering_min_samples": 20
+        "clustering_min_samples": 10
       }
     }
   },
