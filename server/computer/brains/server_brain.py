@@ -89,6 +89,29 @@ class ServerBrain(Brain):
         )
         camera.load_undistor_coefficients()
 
+        ############################# PICKUP_ZONE DETECTION #############################
+        camera.capture()
+        camera.undistor_image()
+        zones_plant = color_recognizer.detect(camera.get_capture())
+        zones_plant = [zone for zone in zones_plant if (zone.bounding_box[1][0] - zone.bounding_box[0][0]) * (
+                    zone.bounding_box[1][1] - zone.bounding_box[0][1]) > self.config.CAMERA_PICKUP_ZONE_MIN_AREA]
+        if len(zones_plant) < 6:
+            print("error in zone_plant detection")
+        # calculate approximate center and exclude nearest cluster until there is 6 zones remaking
+        elif len(zones_plant) > 6:
+            mx = 0
+            my = 0
+            for z in zones_plant:
+                mx += z.centroid[0]
+                my += z.centroid[1]
+            apro_center = Point(mx, my)
+            zones_plant = sorted(zones_plant,
+                                 key=lambda zone: apro_center.distance(Point(zone.centroid[0], zone.centroid[1])))
+            while len(zones_plant) > 6:
+                zones_plant.pop()
+
+        for zone in zones_plant: print(zone.centroid)
+
         # ---Loop--- #
         camera.capture()
         camera.undistor_image()
