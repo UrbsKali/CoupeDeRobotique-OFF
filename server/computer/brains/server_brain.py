@@ -114,7 +114,7 @@ class ServerBrain(Brain):
         camera.capture()
         camera.undistor_image()
         image = camera.get_capture()
-        image = image[50:-50, 50:-50]
+        image = image[50:-70, 50:-50]
         zones_plant = color_recognizer.detect(image)
         if len(zones_plant) < 6:
             print("error in zone_plant detection")
