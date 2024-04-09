@@ -79,6 +79,37 @@ class ServerBrain(Brain):
         )
         camera.load_undistor_coefficients()
 
+        # ---Loop--- #
+        """camera.capture()
+        camera.undistor_image()
+
+        arucos = aruco_recognizer.detect(camera.get_capture())
+        green_objects = color_recognizer.detect(camera.get_capture())
+
+        arucos_tmp = []
+        arucos_tmp.extend(
+            (
+                aruco.encoded_number,
+                plan_transposer.image_to_relative_position(
+                    img=camera.get_capture(),
+                    segment=aruco.max_radius,
+                    center_point=aruco.centroid,
+                ),
+            )
+            for aruco in arucos
+        )
+        self.arucos = arucos_tmp
+
+        green_objects_tmp = []
+        green_objects_tmp.extend(
+            green_object.centroid for green_object in green_objects
+        )
+        self.green_objects = green_objects_tmp
+
+        frame = Frame(camera.get_capture(), [green_objects, arucos])
+        frame.draw_markers()
+        frame.write_centroid()
+        camera.update_monitor(frame.img)"""
         ############################# PICKUP_ZONE DETECTION #############################
         camera.capture()
         camera.undistor_image()
@@ -108,39 +139,6 @@ class ServerBrain(Brain):
             print(zone.centroid)
 
         frame = Frame(image, zones_plant)
-        frame.draw_markers()
-        frame.write_centroid()
-        camera.update_monitor(frame.img)
-        time.sleep(10)
-
-        # ---Loop--- #
-        camera.capture()
-        camera.undistor_image()
-
-        arucos = aruco_recognizer.detect(camera.get_capture())
-        green_objects = color_recognizer.detect(camera.get_capture())
-
-        arucos_tmp = []
-        arucos_tmp.extend(
-            (
-                aruco.encoded_number,
-                plan_transposer.image_to_relative_position(
-                    img=camera.get_capture(),
-                    segment=aruco.max_radius,
-                    center_point=aruco.centroid,
-                ),
-            )
-            for aruco in arucos
-        )
-        self.arucos = arucos_tmp
-
-        green_objects_tmp = []
-        green_objects_tmp.extend(
-            green_object.centroid for green_object in green_objects
-        )
-        self.green_objects = green_objects_tmp
-
-        frame = Frame(camera.get_capture(), [green_objects, arucos])
         frame.draw_markers()
         frame.write_centroid()
         camera.update_monitor(frame.img)
