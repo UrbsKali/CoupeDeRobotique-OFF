@@ -60,7 +60,7 @@ class Frame:
         for obj in self.detected_object:
             cv2.putText(
                 self.img,
-                obj.centroid,
+                f"({obj.centroid[0]}, {obj.centroid[1]})",
                 (int(obj.bounding_box[0][0]), int(obj.bounding_box[0][1] - 10)),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 0.5,
