@@ -91,7 +91,8 @@ class ServerBrain(Brain):
         ############################# PICKUP_ZONE DETECTION #############################
         camera.capture()
         camera.undistor_image()
-        zones_plant = color_recognizer.detect(camera.get_capture())
+        image = camera.get_capture()
+        image = image[50:-50, 50:-50]
 
         if len(zones_plant) < 6:
             print("error in zone_plant detection")
@@ -115,6 +116,9 @@ class ServerBrain(Brain):
         for zone in zones_plant:
             print(zone.centroid)
 
+        frame = Frame(image, zones_plant)
+        camera.update_monitor(frame.img)
+        time.sleep(10)
         # ---Loop--- #
         camera.capture()
         camera.undistor_image()
