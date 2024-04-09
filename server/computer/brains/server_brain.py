@@ -108,6 +108,8 @@ class ServerBrain(Brain):
             print(zone.centroid)
 
         frame = Frame(image, zones_plant)
+        frame.draw_markers()
+        frame.write_centroid()
         camera.update_monitor(frame.img)
         time.sleep(10)
 
