@@ -169,7 +169,7 @@ class ServerBrain(Brain):
         """
         message = await self.ws_lidar.receiver.get()
         if message != WSmsg():
-            self.logger.log(f"Message received on [LiDAR]: {message}.", LogLevels.DEBUG)
+            self.logger.log(f"Message received on [LiDAR]: {message.msg}.", LogLevels.DEBUG)
             self.lidar_points = [Point(x, y) for x, y in message.data]
 
     @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
