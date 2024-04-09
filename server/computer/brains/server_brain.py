@@ -1,10 +1,6 @@
 # External imports
 import asyncio
 import time
-import numpy as np
-from shapely.geometry import Point
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
 
 # Import from common
 from logger import Logger, LogLevels
@@ -41,11 +37,6 @@ class ServerBrain(Brain):
         # ROB data
         self.rob_pos: OrientedPoint | None = None
         self.lidar_points: list[Point] | None = None
-
-        # Lidar display
-        self.fig, self.ax = plt.subplots()
-        self.xdata, self.ydata = [], []
-        (self.ln,) = plt.plot([], [], "ro")
 
         # Init the brain
         super().__init__(logger, self)
@@ -211,33 +202,6 @@ class ServerBrain(Brain):
         await self.ws_camera.sender.send(
             WSmsg(sender="server", msg="green_objects", data=self.green_objects)
         )
-
-    @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
-    async def display_lidar_points(self):
-        def init():
-            self.ax.set_xlim(0, 10)
-            self.ax.set_ylim(0, 10)
-            return (self.ln,)
-
-        def update(frame):
-            points_list = self.lidar_points
-
-            xdata = [point.x for point in points_list]
-            ydata = [point.y for point in points_list]
-
-            self.ln.set_data(xdata, ydata)
-            return (self.ln,)
-
-        ani = FuncAnimation(
-            self.fig,
-            update,
-            frames=np.linspace(0, 2, 100),
-            init_func=init,
-            blit=True,
-            interval=500,
-        )
-
-        plt.show(block=False)
 
     """
         Tasks
