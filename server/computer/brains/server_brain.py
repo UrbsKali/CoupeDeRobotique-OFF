@@ -92,13 +92,6 @@ class ServerBrain(Brain):
         camera.capture()
         camera.undistor_image()
         zones_plant = color_recognizer.detect(camera.get_capture())
-        zones_plant = [
-            zone
-            for zone in zones_plant
-            if (zone.bounding_box[1][0] - zone.bounding_box[0][0])
-            * (zone.bounding_box[1][1] - zone.bounding_box[0][1])
-            > self.config.CAMERA_PICKUP_ZONE_MIN_AREA
-        ]
         if len(zones_plant) < 6:
             print("error in zone_plant detection")
         # calculate approximate center and exclude nearest cluster until there is 6 zones remaking
