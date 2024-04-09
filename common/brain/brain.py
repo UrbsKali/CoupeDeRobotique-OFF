@@ -18,32 +18,33 @@ TBrain = TypeVar("TBrain", bound="Brain")
 
 class Brain:
     """
-        The brain is a main controller of applications.
-        It manages tasks which can be routines or one-shot tasks.
-        It is also able to manage subprocesses.
-        How to use it ?
-        - Create a child class of Brain
-        - In the child's __init__ first define all attributes, who will use through the brain.
-        Then, at the END of the __init__ method, call super().__init__(logger, self).
-        Every child's __init__ parameters will be instantiated as attributes available in the brain.
-        - Transform your method into task by using the decorator @Brain.task()
-        - Classic task (executed in the main process), they have to be asynchronous
-            * Create a one-shot task by using the decorator @Brain.task() (it will be executed only once and in the
-            main process)
-            * Create a routine task by using the decorator @Brain.task(refresh_rate=<refresh rate you want>) (it will be
-            executed periodically according to the refresh rate and in the main process)
-        - Subprocess task (executed in a subprocess), they have to be synchronous
-            * Create a subprocess one-shot task by using the decorator @Brain.task(process=True) (it will be executed only
-            once in a subprocess)
-            * Create a routine subprocess task by using the decorator @Brain.task(
-            refresh_rate=<refresh rate you want>, process=True) (it will be executed periodically according to the refresh
-            and in a subprocess)
-        - Get the tasks by calling the method brain.get_tasks() and add them to the background tasks of the application
+    The brain is a main controller of applications.
+    It manages tasks which can be routines or one-shot tasks.
+    It is also able to manage subprocesses.
+    How to use it ?
+    - Create a child class of Brain
+    - In the child's __init__ first define all attributes, who will use through the brain.
+    Then, at the END of the __init__ method, call super().__init__(logger, self).
+    Every child's __init__ parameters will be instantiated as attributes available in the brain.
+    - Transform your method into task by using the decorator @Brain.task()
+    - Classic task (executed in the main process), they have to be asynchronous
+        * Create a one-shot task by using the decorator @Brain.task() (it will be executed only once and in the
+        main process)
+        * Create a routine task by using the decorator @Brain.task(refresh_rate=<refresh rate you want>) (it will be
+        executed periodically according to the refresh rate and in the main process)
+    - Subprocess task (executed in a subprocess), they have to be synchronous
+        * Create a subprocess one-shot task by using the decorator @Brain.task(process=True) (it will be executed only
+        once in a subprocess)
+        * Create a routine subprocess task by using the decorator @Brain.task(
+        refresh_rate=<refresh rate you want>, process=True) (it will be executed periodically according to the refresh
+        and in a subprocess)
+    - Get the tasks by calling the method brain.get_tasks() and add them to the background tasks of the application
 
-        -> Be careful by using subprocesses, the shared data between the main process and the subprocesses is limited,
-        only serializable data can be shared. More over the data synchronization is not real-time, it is done by a routine.
-        Subprocesses are useful to execute heavy tasks or tasks that can block the main process.
+    -> Be careful by using subprocesses, the shared data between the main process and the subprocesses is limited,
+    only serializable data can be shared. More over the data synchronization is not real-time, it is done by a routine.
+    Subprocesses are useful to execute heavy tasks or tasks that can block the main process.
     """
+
     def __init__(self, logger: Logger, child: TBrain) -> None:
         """
         This constructor have to be called in the end of  __init__ method of the child class.
@@ -192,7 +193,7 @@ class Brain:
         """
         for key in self.shared_self.get_dict().keys():
             self_attr_value = getattr(self, key)
-            self_shared_attr_value = eval(f'self.shared_self.{key}')
+            self_shared_attr_value = eval(f"self.shared_self.{key}")
 
             # Verify if the value is different between the instance and the shared data
             if self_attr_value != self_shared_attr_value:
@@ -222,8 +223,7 @@ class Brain:
                 )
                 self.__async_functions.append(
                     lambda: AsynchronousWrapper.wrap_to_routine(
-                        self, self.__sync_self_and_shared_self,
-                        0.01
+                        self, self.__sync_self_and_shared_self, 0.01
                     )
                 )
 

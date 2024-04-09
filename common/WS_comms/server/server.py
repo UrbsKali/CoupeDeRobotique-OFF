@@ -16,7 +16,13 @@ class WServer:
     * It can  run background tasks in parallel with route listening.
     """
 
-    def __init__(self, logger: Logger, host: str, port: int, ping_pong_clients_interval: int = None) -> None:
+    def __init__(
+        self,
+        logger: Logger,
+        host: str,
+        port: int,
+        ping_pong_clients_interval: int = None,
+    ) -> None:
         self.__logger = logger
 
         self.__host = host
@@ -61,7 +67,7 @@ class WServer:
         self._app.router.add_get(route, route_manager.routine)
 
     def add_background_task(
-            self, task: callable, *args, name: str = "", **kwargs
+        self, task: callable, *args, name: str = "", **kwargs
     ) -> None:
         """
         Add a new background task to the server. It is useful to execute task in parallel with the server.
@@ -97,11 +103,11 @@ class WServer:
                 if self.__ping_pong_clients_interval is not None:
                     self.add_background_task(
                         self.__ping_pong_clients_task,
-                        interval=self.__ping_pong_clients_interval
+                        interval=self.__ping_pong_clients_interval,
                     )
                     self.__logger.log(
                         f"Ping pong mode activated, interval: [{self.__ping_pong_clients_interval}]",
-                        LogLevels.DEBUG
+                        LogLevels.DEBUG,
                     )
 
                 web.run_app(self._app, host=self.__host, port=self.__port)

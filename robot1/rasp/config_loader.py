@@ -41,7 +41,7 @@ class CONFIG:
     WS_CAMERA_ROUTE = GENERAL_WS_CONFIG["camera_route"]
     WS_ODOMETER_ROUTE = GENERAL_WS_CONFIG["odometer_route"]
     WS_CMD_ROUTE = GENERAL_WS_CONFIG["cmd_route"]
-    
+
     TEENSY_VID = GENERAL_TEENSY_CONFIG["vid"]
     TEENSY_PID = GENERAL_TEENSY_CONFIG["pid"]
     TEENSY_BAUDRATE = GENERAL_TEENSY_CONFIG["baudrate"]
@@ -54,7 +54,7 @@ class CONFIG:
 
     WS_SENDER_NAME = SPECIFIC_WS_CONFIG["sender_name"]
     WS_SERVER_IP = SPECIFIC_WS_CONFIG["server_ip"]
-    
+
     # Rolling Basis
     ROLLING_BASIS_CONFIG = SPECIFIC_CONFIG["rolling_basis"]
     ROLLING_BASIS_TEENSY_SER = ROLLING_BASIS_CONFIG["rolling_basis_teensy_ser"]

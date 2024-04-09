@@ -48,7 +48,7 @@ class WSclient:
                 )
                 async with aiohttp.ClientSession() as session:
                     async with session.ws_connect(
-                            f"{self.__get_url(route)}?sender={handler.sender.name}"
+                        f"{self.__get_url(route)}?sender={handler.sender.name}"
                     ) as ws:
                         self.logger.log(
                             f"WSclient [{route}] connected !",
@@ -63,7 +63,7 @@ class WSclient:
                 )
 
     def add_route_handler(
-            self, route: str, route_manager: WSclientRouteManager
+        self, route: str, route_manager: WSclientRouteManager
     ) -> None:
         """
         Add a new route to the client.
@@ -75,9 +75,7 @@ class WSclient:
         :return:
         """
         # Add the new routine to the client tasks list with its associated url
-        self.tasks.append(
-            self.__route_handler_routine(route, route_manager)
-        )
+        self.tasks.append(self.__route_handler_routine(route, route_manager))
 
     def add_background_task(self, task: callable, *args, **kwargs) -> None:
         """

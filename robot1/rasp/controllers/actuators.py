@@ -11,14 +11,16 @@ class Actuators(Teensy):
     def __init__(
         self,
         logger: Logger,
-        ser = CONFIG.ACTUATOR_TEENSY_SER,
-        vid = CONFIG.TEENSY_VID,
-        pid = CONFIG.TEENSY_PID,
-        crc = CONFIG.TEENSY_CRC,
-        baudrate = CONFIG.TEENSY_BAUDRATE,
-        dummy: bool = CONFIG.TEENSY_DUMMY
+        ser=CONFIG.ACTUATOR_TEENSY_SER,
+        vid=CONFIG.TEENSY_VID,
+        pid=CONFIG.TEENSY_PID,
+        crc=CONFIG.TEENSY_CRC,
+        baudrate=CONFIG.TEENSY_BAUDRATE,
+        dummy: bool = CONFIG.TEENSY_DUMMY,
     ):
-        super().__init__(logger, ser=ser, vid=vid, pid=pid, baudrate = baudrate, crc = crc, dummy=dummy)
+        super().__init__(
+            logger, ser=ser, vid=vid, pid=pid, baudrate=baudrate, crc=crc, dummy=dummy
+        )
 
     class Command:  # values must correspond to the one defined on the teensy
         ServoGoTo = b"\x01"
@@ -34,7 +36,7 @@ class Actuators(Teensy):
     def update_servo(
         self, pin: int, angle: int, min_angle: int = 0, max_angle: int = 180
     ):
-        """set angle to the servo at the given pin  
+        """set angle to the servo at the given pin
 
         Args:
             pin (int): servo's pin

@@ -23,18 +23,15 @@ class ServerBrain(Brain):
     """
 
     def __init__(
-            self,
-            logger: Logger,
-
-            ws_cmd: WServerRouteManager,
-            ws_pami: WServerRouteManager,
-            ws_lidar: WServerRouteManager,
-            ws_odometer: WServerRouteManager,
-            ws_camera: WServerRouteManager,
-
-            arena: MarsArena,
-
-            config
+        self,
+        logger: Logger,
+        ws_cmd: WServerRouteManager,
+        ws_pami: WServerRouteManager,
+        ws_lidar: WServerRouteManager,
+        ws_odometer: WServerRouteManager,
+        ws_camera: WServerRouteManager,
+        arena: MarsArena,
+        config,
     ) -> None:
         # Camera data
         self.arucos = []
@@ -53,7 +50,9 @@ class ServerBrain(Brain):
 
     """ Subprocess routines """
 
-    @Brain.task(process=True, run_on_start=True, refresh_rate=0.1, define_loop_later=True)
+    @Brain.task(
+        process=True, run_on_start=True, refresh_rate=0.1, define_loop_later=True
+    )
     def camera_capture(self):
         """
         Capture the camera image and detect arucos and green objects.
@@ -65,7 +64,9 @@ class ServerBrain(Brain):
             undistorted_coefficients_path=self.config.CAMERA_COEFFICIENTS_PATH,
         )
 
-        aruco_recognizer = ArucoRecognizer(aruco_type=self.config.CAMERA_ARUCO_DICT_TYPE)
+        aruco_recognizer = ArucoRecognizer(
+            aruco_type=self.config.CAMERA_ARUCO_DICT_TYPE
+        )
 
         color_recognizer = ColorRecognizer(
             detection_range=self.config.CAMERA_COLOR_FILTER_RANGE,
@@ -124,7 +125,10 @@ class ServerBrain(Brain):
         """
         message = await self.ws_pami.receiver.get()
         if message != WSmsg():
-            self.logger.log(f"Message received on [PAMI]: {message}. Sending it to PAMIs.", LogLevels.DEBUG)
+            self.logger.log(
+                f"Message received on [PAMI]: {message}. Sending it to PAMIs.",
+                LogLevels.DEBUG,
+            )
             await self.ws_pami.sender.send(
                 WSmsg(sender="server", msg=pami_state.msg, data=pami_state.data),
             )
@@ -146,8 +150,12 @@ class ServerBrain(Brain):
         """
         message = await self.ws_odometer.receiver.get()
         if message != WSmsg():
-            self.logger.log(f"Message received on [Odometer]: {message}.", LogLevels.DEBUG)
-            self.rob_pos = OrientedPoint(message.data[0], message.data[1], message.data[2])
+            self.logger.log(
+                f"Message received on [Odometer]: {message}.", LogLevels.DEBUG
+            )
+            self.rob_pos = OrientedPoint(
+                message.data[0], message.data[1], message.data[2]
+            )
 
     @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
     async def camera_com(self):

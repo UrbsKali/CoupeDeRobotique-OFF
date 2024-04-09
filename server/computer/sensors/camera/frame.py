@@ -6,9 +6,9 @@ from sensors.camera.detected_object import DetectedObject, Aruco, ColorObject
 
 class Frame:
     def __init__(
-            self,
-            img: np.ndarray,
-            detected_object: list[DetectedObject] or list[list[DetectedObject]] = None,
+        self,
+        img: np.ndarray,
+        detected_object: list[DetectedObject] or list[list[DetectedObject]] = None,
     ):
         self.img = img
 
