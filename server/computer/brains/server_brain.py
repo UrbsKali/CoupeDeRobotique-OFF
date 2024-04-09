@@ -18,7 +18,6 @@ from video.server import MJPEGHandler
 from sensors import Camera, ArucoRecognizer, ColorRecognizer, PlanTransposer, Frame
 
 
-
 class ServerBrain(Brain):
     """
     This brain is the main controller of the server.
@@ -44,9 +43,9 @@ class ServerBrain(Brain):
         self.lidar_points: list[Point] | None = None
 
         # Lidar display
-        self.fig,self. ax = plt.subplots()
+        self.fig, self.ax = plt.subplots()
         self.xdata, self.ydata = [], []
-        self.ln, = plt.plot([], [], 'ro')
+        (self.ln,) = plt.plot([], [], "ro")
 
         # Init the brain
         super().__init__(logger, self)
@@ -184,7 +183,8 @@ class ServerBrain(Brain):
         def init():
             self.ax.set_xlim(0, 10)
             self.ax.set_ylim(0, 10)
-            return self.ln,
+            return (self.ln,)
+
         def update(frame):
             points_list = self.lidar_points
 
@@ -192,12 +192,19 @@ class ServerBrain(Brain):
             ydata = [point.y for point in points_list]
 
             self.ln.set_data(xdata, ydata)
-            return self.ln,
+            return (self.ln,)
 
-        ani = FuncAnimation(self.fig, update, frames=np.linspace(0, 2, 100),
-                            init_func=init, blit=True, interval=500)
+        ani = FuncAnimation(
+            self.fig,
+            update,
+            frames=np.linspace(0, 2, 100),
+            init_func=init,
+            blit=True,
+            interval=500,
+        )
 
         plt.show(block=False)
+
     """
         Tasks
     """
