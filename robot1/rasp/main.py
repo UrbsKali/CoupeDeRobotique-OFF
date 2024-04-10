@@ -78,14 +78,12 @@ if __name__ == "__main__":
                 max_angle=CONFIG.LIDAR_MAX_ANGLE,
                 unity_angle=CONFIG.LIDAR_ANGLES_UNIT,
                 unity_distance=CONFIG.LIDAR_DISTANCES_UNIT,
-                min_distance=CONFIG.LIDAR_MIN_DISTANCE_DETECTION
+                min_distance=CONFIG.LIDAR_MIN_DISTANCE_DETECTION,
             )
     # Robot
     rolling_basis = RollingBasis(logger=logger_rolling_basis)
 
     actuators = Actuators(logger=logger_actuators)
-
-
 
     # Arena
     start_zone_id = 0
