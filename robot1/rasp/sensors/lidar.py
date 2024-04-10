@@ -4,6 +4,8 @@ from logger import Logger, LogLevels
 # External imports
 from typing import TypeVar
 import numpy as np
+import threading
+import time
 import math
 
 TLidar = TypeVar("TLidar", bound="pysicktim")
@@ -25,13 +27,14 @@ class Lidar:
     """
 
     def __init__(
-        self,
-        logger: Logger,
-        min_angle: float,
-        max_angle: float,
-        unity_angle: str = "deg",
-        unity_distance: str = "cm",
-        min_distance: float = 5.0,
+            self,
+            logger: Logger,
+            min_angle: float,
+            max_angle: float,
+            unity_angle: str = "deg",
+            unity_distance: str = "cm",
+            min_distance: float = 5.0,
+            initialization_fail_refresh_rate: float = 0.5
     ) -> None:
         """
         Initialize the lidar object and the polars angles.
@@ -48,12 +51,18 @@ class Lidar:
         :return:
         """
         self._logger = logger
-        self.__distance_unity = self.__init_distances_unity(unity_distance)
+        self.__min_angle = min_angle
+        self.__max_angle = max_angle
         self.__angle_unity = self.__init_angles_unity(unity_angle)
+        self.__distance_unity = self.__init_distances_unity(unity_distance)
 
-        self.__lidar_obj = self.__init_lidar()
-        self.__polars_angles = self.__init_polars_angle(min_angle, max_angle)
         self._min_distance = min_distance
+        self.__initialization_fail_refresh_rate = initialization_fail_refresh_rate
+
+        self.__is_connected = False
+        self.__lidar_obj = None
+        self.__polars_angles = None
+        self.__threading_init_lidar()
 
     """
         Private methods
@@ -68,24 +77,48 @@ class Lidar:
             import pysicktim as lidar
 
             if lidar is None:
-                self._logger.log("Lidar is not connected !", LogLevels.CRITICAL)
+                self._logger.log("[init_lidar] Lidar is not connected !", LogLevels.CRITICAL)
                 raise ConnectionError("Lidar is not connected !")
             else:
-                self._logger.log("Lidar is connected !", LogLevels.INFO)
+                self._logger.log("[init_lidar] Lidar is connected !", LogLevels.INFO)
 
             # Test lidar connection by testing scan function
             lidar.scan()
             if lidar.scan.distances is None or lidar.scan.distances == []:
-                self._logger.log("Lidar doesn't work correctly", LogLevels.CRITICAL)
+                self._logger.log("[init_lidar] Lidar doesn't work correctly", LogLevels.CRITICAL)
                 raise ConnectionError("Lidar doesn't work correctly !")
 
             return lidar
 
         except Exception as error:
             self._logger.log(
-                f"Error while importing lidar [{error}]", LogLevels.CRITICAL
+                f"[init_lidar] Error while importing lidar [{error}]", LogLevels.CRITICAL
             )
             raise ImportError(f"Error while importing lidar [{error}] !") from error
+
+    def __threading_init_lidar(self):
+        """
+        Initialize the lidar in a thread. It will retry to initialize the lidar until is connected.
+        :return:
+        """
+
+        def init():
+            while not self.__is_connected:
+                try:
+                    self._logger.log("[init_lidar_in_thread] Try to initialize lidar ...", LogLevels.DEBUG)
+                    self.__lidar_obj = self.__init_lidar()
+                    # Initialize the polars angles depends on the lidar number of measurements points
+                    self.__polars_angles = self.__init_polars_angle(self.__min_angle, self.__max_angle)
+                    self.__is_connected = True
+                except Exception as error:
+                    self._logger.log(
+                        f"[init_lidar_in_thread] Error while initializing lidar [{error}] "
+                        f"retry in {self.__initialization_fail_refresh_rate}s ...",
+                        LogLevels.WARNING)
+                    time.sleep(self.__initialization_fail_refresh_rate)
+
+        thread = threading.Thread(target=init)
+        thread.start()
 
     def __init_polars_angle(self, min_angle: float, max_angle: float) -> np.ndarray:
         """
@@ -111,6 +144,22 @@ class Lidar:
 
         return polars
 
+    def __init_angles_unity(self, unity: str) -> float:
+        """
+        Initialize the unity of the angles
+        :param unity_angle: the unity of the angles
+        :return:
+        """
+        if unity == "deg":
+            return 1
+        if unity == "rad":
+            return math.pi / 180
+
+        self._logger.log(
+            f"Unity of angles not recognized [{unity}] !", LogLevels.CRITICAL
+        )
+        raise ValueError(f"Unity of angles not recognized [{unity}] !")
+
     def __init_distances_unity(self, unity: str) -> float:
         """
         Initialize the unity of the distances
@@ -131,32 +180,29 @@ class Lidar:
         )
         raise ValueError(f"Unity of distances not recognized [{unity}] !")
 
-    def __init_angles_unity(self, unity: str) -> float:
-        """
-        Initialize the unity of the angles
-        :param unity_angle: the unity of the angles
-        :return:
-        """
-        if unity == "deg":
-            return 1
-        if unity == "rad":
-            return math.pi / 180
-
-        self._logger.log(
-            f"Unity of angles not recognized [{unity}] !", LogLevels.CRITICAL
-        )
-        raise ValueError(f"Unity of angles not recognized [{unity}] !")
-
     def __scan(self):
         """
         Scan the environment with the lidar and store the distances.
-        in the lidar object.
+        in the lidar object. If the scan fails, it will try to reconnect the lidar.
         """
-        self.__lidar_obj.scan()
+        try:
+            self.__lidar_obj.scan()
+        except Exception as error:
+            # LiDAR seems to be disconnected
+            self._logger.log(f"Error while scanning, LiDAR is disconnected ? [{error}]", LogLevels.ERROR)
+            # Try to reconnect LiDAR if it was connected before
+            if self.__is_connected:
+                self.__is_connected = False
+                self.__threading_init_lidar()
 
     """
         Public methods and properties
     """
+
+    def is_connected(self, force_check=False):
+        if force_check:
+            self.__scan()
+        return self.__is_connected
 
     @property
     def distances(self) -> np.ndarray:
@@ -166,8 +212,8 @@ class Lidar:
         :return: the distances array
         """
         return (
-            np.array(self.__lidar_obj.scan.distances, dtype=np.float32)
-            * self.__distance_unity
+                np.array(self.__lidar_obj.scan.distances, dtype=np.float32)
+                * self.__distance_unity
         )
 
     @property
