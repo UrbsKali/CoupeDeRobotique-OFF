@@ -92,7 +92,8 @@
       "distances_unit": "cm",
       "angles_unit": "rad",
       "min_angle": -134.8335,
-      "max_angle": 134.8335
+      "max_angle": 134.8335,
+      "min_distance_detection": 5.0
     }
   }
 }

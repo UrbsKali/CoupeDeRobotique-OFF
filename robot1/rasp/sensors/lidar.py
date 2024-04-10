@@ -31,6 +31,7 @@ class Lidar:
         max_angle: float,
         unity_angle: str = "deg",
         unity_distance: str = "cm",
+        min_distance: float = 5.0,
     ) -> None:
         """
         Initialize the lidar object and the polars angles.
@@ -43,6 +44,7 @@ class Lidar:
         :param max_angle: the maximum angle of the lidar (min angle at right)
         :param unity_angle: the unity of the angles (default: "deg")
         :param unity_distance: the unity of the distances (default: "cm")
+        :param min_distance: the minimum distance to consider a distance as valid (default: 5.0 cm)
         :return:
         """
         self._logger = logger
@@ -51,7 +53,7 @@ class Lidar:
 
         self.__lidar_obj = self.__init_lidar()
         self.__polars_angles = self.__init_polars_angle(min_angle, max_angle)
-        self.min_distance = 10
+        self._min_distance = min_distance
 
     """
         Private methods
@@ -79,11 +81,11 @@ class Lidar:
 
             return lidar
 
-        except ImportError as error:
+        except Exception as error:
             self._logger.log(
                 f"Error while importing lidar [{error}]", LogLevels.CRITICAL
             )
-            raise ImportError(f"Error while importing lidar [{error}] !")
+            raise ImportError(f"Error while importing lidar [{error}] !") from error
 
     def __init_polars_angle(self, min_angle: float, max_angle: float) -> np.ndarray:
         """
@@ -191,4 +193,4 @@ class Lidar:
         :return: the polars array
         """
         self.__scan()
-        return self.polars[self.polars[:, 1] > self.min_distance]
+        return self.polars[self.polars[:, 1] > self._min_distance]

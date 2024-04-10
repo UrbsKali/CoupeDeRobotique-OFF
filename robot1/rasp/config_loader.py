@@ -79,9 +79,10 @@ class CONFIG:
         "god_hand_grab_servo_close_angle_diff_right"
     ]
 
-    ## Lidar
+    # Lidar
     LIDAR_CONFIG = SPECIFIC_CONFIG["lidar"]
     LIDAR_ANGLES_UNIT = LIDAR_CONFIG["angles_unit"]
     LIDAR_DISTANCES_UNIT = LIDAR_CONFIG["distances_unit"]
     LIDAR_MIN_ANGLE = LIDAR_CONFIG["min_angle"]
     LIDAR_MAX_ANGLE = LIDAR_CONFIG["max_angle"]
+    LIDAR_MIN_DISTANCE_DETECTION = LIDAR_CONFIG["min_distance_detection"]
