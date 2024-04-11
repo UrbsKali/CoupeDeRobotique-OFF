@@ -23,9 +23,7 @@ def camera_capture(self):
         undistorted_coefficients_path=self.config.CAMERA_COEFFICIENTS_PATH,
     )
 
-    aruco_recognizer = ArucoRecognizer(
-        aruco_type=self.config.CAMERA_ARUCO_DICT_TYPE
-    )
+    aruco_recognizer = ArucoRecognizer(aruco_type=self.config.CAMERA_ARUCO_DICT_TYPE)
 
     color_recognizer = ColorRecognizer(
         detection_range=self.config.CAMERA_COLOR_FILTER_RANGE,
@@ -49,7 +47,9 @@ def camera_capture(self):
 
     pickup_zone = []
     for zone in detected_plant_zones:
-        if (zone.bounding_box[1][0] - zone.bounding_box[0][0]) * (zone.bounding_box[1][1] - zone.bounding_box[0][1]) > self.config.CAMERA_PICKUP_ZONE_MIN_AREA:
+        if (zone.bounding_box[1][0] - zone.bounding_box[0][0]) * (
+            zone.bounding_box[1][1] - zone.bounding_box[0][1]
+        ) > self.config.CAMERA_PICKUP_ZONE_MIN_AREA:
             pickup_zone.append(zone)
 
     if len(pickup_zone) < 6:
@@ -63,14 +63,17 @@ def camera_capture(self):
             mx += z.centroid[0]
             my += z.centroid[1]
         apro_center = Point(mx / len(pickup_zone), my / len(pickup_zone))
-        pickup_zone = sorted(pickup_zone,
-                             key=lambda zone: apro_center.distance(Point(zone.centroid[0], zone.centroid[1])))
+        pickup_zone = sorted(
+            pickup_zone,
+            key=lambda zone: apro_center.distance(
+                Point(zone.centroid[0], zone.centroid[1])
+            ),
+        )
         while len(pickup_zone) > 6:
             pickup_zone.pop()
 
     for zone in pickup_zone:
         print(zone.centroid)
-
 
     # ---Loop--- #
     camera.capture()
@@ -94,13 +97,10 @@ def camera_capture(self):
     self.arucos = arucos_tmp
 
     green_objects_tmp = []
-    green_objects_tmp.extend(
-        green_object.centroid for green_object in green_objects
-    )
+    green_objects_tmp.extend(green_object.centroid for green_object in green_objects)
     self.green_objects = green_objects_tmp
 
     frame = Frame(camera.get_capture(), [green_objects, arucos])
     frame.draw_markers()
     frame.write_centroid()
     camera.update_monitor(frame.img)
-
