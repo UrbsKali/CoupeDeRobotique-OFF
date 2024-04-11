@@ -97,7 +97,7 @@ class Brain:
                     setattr(self.shared_self, name, value)
                 else:
                     self.logger.log(
-                        f"Brain [{self}]-[dynamic_init] cannot serialize attribute [{name}].",
+                        f"[dynamic_init] cannot serialize attribute [{name}].",
                         LogLevels.WARNING,
                     )
 
@@ -170,10 +170,9 @@ class Brain:
         else:
 
             async def coroutine_executor():
-                evaluated_task = task.evaluate(
+                return await task.evaluate(
                     brain_executor=self, shared_brain_executor=self.shared_self
                 )
-                return await evaluated_task
 
             setattr(self, task.name, coroutine_executor)
 

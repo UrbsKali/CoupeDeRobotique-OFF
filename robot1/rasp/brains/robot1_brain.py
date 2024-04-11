@@ -37,14 +37,14 @@ class Robot1Brain(Brain):
 
         # to delete, only use for completion
         # self.rolling_basis:  RollingBasis
-        self.actuators: Actuators
+        # self.actuators: Actuators
         # self.arena: MarsArena
         # self.lidar:  Lidar
 
         super().__init__(logger, self)
 
         self.logger.log(
-            f"Robot1 Brain initialized, current position: {self.rolling_basis.odometrie}",
+            f"Robot1 Brain initialized, current position: {1}",
             LogLevels.INFO,
         )
 

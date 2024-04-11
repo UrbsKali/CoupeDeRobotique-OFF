@@ -14,7 +14,7 @@ from brain import Brain
 from sensors import Camera, ArucoRecognizer, ColorRecognizer, PlanTransposer, Frame
 
 
-class ServerBrain(Brain):
+class MainBrain(Brain):
     """
     This brain is the main controller of the server.
     """

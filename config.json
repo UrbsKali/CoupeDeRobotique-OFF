@@ -58,7 +58,8 @@
         ],
         "clustering_eps": 40,
         "clustering_min_samples": 50
-      }
+      },
+      "camera_pickup_zone_min_area" : 1
     }
   },
   "robot1": {
