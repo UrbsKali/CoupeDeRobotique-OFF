@@ -49,8 +49,8 @@ if __name__ == "__main__":
     )
     logger_lidar = Logger(
         identifier="lidar",
-        decorator_level=LogLevels.DEBUG,
-        print_log_level=LogLevels.DEBUG,
+        decorator_level=LogLevels.INFO,
+        print_log_level=LogLevels.INFO,
         file_log_level=LogLevels.DEBUG,
     )
 
@@ -69,15 +69,17 @@ if __name__ == "__main__":
     ws_client.add_route_handler(CONFIG.WS_CAMERA_ROUTE, ws_camera)
 
     # Lidar
-    lidar = Lidar(
-        logger=logger_lidar,
-        min_angle=CONFIG.LIDAR_MIN_ANGLE,
-        max_angle=CONFIG.LIDAR_MAX_ANGLE,
-        unity_angle=CONFIG.LIDAR_ANGLES_UNIT,
-        unity_distance=CONFIG.LIDAR_DISTANCES_UNIT,
-        min_distance=CONFIG.LIDAR_MIN_DISTANCE_DETECTION
-    )
-
+    lidar = None
+    while lidar is None:
+        with contextlib.suppress(Exception):
+            lidar = Lidar(
+                logger=logger_lidar,
+                min_angle=CONFIG.LIDAR_MIN_ANGLE,
+                max_angle=CONFIG.LIDAR_MAX_ANGLE,
+                unity_angle=CONFIG.LIDAR_ANGLES_UNIT,
+                unity_distance=CONFIG.LIDAR_DISTANCES_UNIT,
+                min_distance=CONFIG.LIDAR_MIN_DISTANCE_DETECTION,
+            )
     # Robot
     rolling_basis = RollingBasis(logger=logger_rolling_basis)
 
