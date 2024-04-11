@@ -10,13 +10,12 @@
       "frame_route": "/frame",
       "pami_route": "/pami"
     },
-
-    "teensy":{
-      "vid" : 5824,
-      "pid" : 1155,
-      "baudrate" : 115200,
-      "crc" : true,
-      "dummy" : false
+    "teensy": {
+      "vid": 5824,
+      "pid": 1155,
+      "baudrate": 115200,
+      "crc": true,
+      "dummy": false
     }
   },
   "computer": {
@@ -58,7 +57,8 @@
         ],
         "clustering_eps": 40,
         "clustering_min_samples": 50
-      }
+      },
+      "camera_pickup_zone_min_area": 1
     }
   },
   "robot1": {
@@ -68,11 +68,11 @@
       "sender_name": "rob",
       "server_ip": "192.168.0.104"
     },
-    "rolling_basis" : {
-      "rolling_basis_teensy_ser" : 12675800
+    "rolling_basis": {
+      "rolling_basis_teensy_ser": 12675800
     },
     "actuators": {
-      "actuators_teensy_ser" : 12678600,
+      "actuators_teensy_ser": 12678600,
       "god_hand_grab_servo_pins_left": [
         2,
         3

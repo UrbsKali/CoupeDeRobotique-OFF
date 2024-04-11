@@ -100,3 +100,4 @@ class CONFIG:
     CAMERA_COLOR_CLUSTERING_MIN_SAMPLES = int(
         SPECIFIC_CAMERA_CONFIG["color_object"]["clustering_min_samples"]
     )
+    CAMERA_PICKUP_ZONE_MIN_AREA = SPECIFIC_CAMERA_CONFIG["camera_pickup_zone_min_area"]
