@@ -56,7 +56,7 @@
           255
         ],
         "clustering_eps": 40,
-        "clustering_min_samples": 50
+        "clustering_min_samples": 100
       },
       "camera_pickup_zone_min_area": 1
     }
