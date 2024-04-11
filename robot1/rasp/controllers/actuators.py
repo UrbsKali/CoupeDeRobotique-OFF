@@ -1,8 +1,8 @@
 from config_loader import CONFIG
+from logger import Logger, LogLevels
 
 # Import from common
 from teensy_comms import Teensy
-from logger import Logger
 
 import struct
 
@@ -10,14 +10,17 @@ import struct
 class Actuators(Teensy):
     def __init__(
         self,
-        vid: int = 5824,
-        pid: int = 1155,
-        baudrate: int = 115200,
-        crc: bool = True,
-        pin_servos: list[int] = CONFIG.SERVO_PINS,
+        logger: Logger,
+        ser=CONFIG.ACTUATOR_TEENSY_SER,
+        vid=CONFIG.TEENSY_VID,
+        pid=CONFIG.TEENSY_PID,
+        crc=CONFIG.TEENSY_CRC,
+        baudrate=CONFIG.TEENSY_BAUDRATE,
+        dummy: bool = CONFIG.TEENSY_DUMMY,
     ):
-        super().__init__(vid, pid, baudrate, crc)
-        self.pin_servos = pin_servos
+        super().__init__(
+            logger, ser=ser, vid=vid, pid=pid, baudrate=baudrate, crc=crc, dummy=dummy
+        )
 
     class Command:  # values must correspond to the one defined on the teensy
         ServoGoTo = b"\x01"
@@ -30,18 +33,27 @@ class Actuators(Teensy):
     #########################
 
     @Logger
-    def servo_go_to(
+    def update_servo(
         self, pin: int, angle: int, min_angle: int = 0, max_angle: int = 180
     ):
+        """set angle to the servo at the given pin
+
+        Args:
+            pin (int): servo's pin
+            angle (int): the angle to set
+            min_angle (int, optional): angle lower -> angle won't be set. Defaults to 0.
+            max_angle (int, optional): angle higher -> angle won't be set. Defaults to 180.
+        """
         if angle >= min_angle and angle <= max_angle:
             msg = (
                 self.Command.ServoGoTo
                 + struct.pack("<B", pin)
-                + struct.pack("B", angle)
+                + struct.pack("<B", angle)
             )
             # https://docs.python.org/3/library/struct.html#format-characters
             self.send_bytes(msg)
         else:
-            print(
-                f"you tried to write {angle}° on pin {pin} wheras angle must be between {min_angle} and {max_angle}°"
+            self.l.log(
+                f"you tried to write {angle}° on pin {pin} whereas angle must be between {min_angle} and {max_angle}°",
+                LogLevels.ERROR,
             )

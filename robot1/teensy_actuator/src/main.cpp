@@ -1,29 +1,31 @@
 #include <Arduino.h>
 #include <actions.h>
-#include <pins.h>
-//#include <Servo.h>
+#include <Servo.h>
 
 Com *com;
-
+Servo* servos[48]={nullptr}; // higher than the maximum number of pin
+int nb_servo = 0;
 void (*functions[256])(byte *msg, byte size); // a tab a pointer to void functions
 
 // Define a global array of Servo_Motor. Some name of variables are not allowed becaused they are used in Servo
-int servo_pins[] = {SERVO1_PIN,SERVO2_PIN,SERVO3_PIN};
-constexpr int nb_servos = sizeof(servo_pins)/sizeof(servo_pins[0]);
-Servo_Motor s[nb_servos];
+
+bool is_declared(int i)
+{
+  if(servos[i]==nullptr) return false;
+  return true;
+}
 
 void call_servo_go_to(byte *msg, byte size)
 {
     msg_Servo_Go_To *servo_go_to_msg = (msg_Servo_Go_To*) msg;
-    bool lauched = false;
-    for(int i=0; !lauched && i<nb_servos;i++)
+    if (!is_declared(servo_go_to_msg->pin))
     {
-        if(s[i].pin==servo_go_to_msg->pin)
-        {
-          servo_go_to(s[i].actuator,servo_go_to_msg->angle);
-          lauched = true;
-        }
+      Servo* actuator = new Servo();
+      actuator->attach(servo_go_to_msg->pin);
+      servos[servo_go_to_msg->pin]=actuator;
+      nb_servo ++;
     }
+    servo_go_to(servos[servo_go_to_msg->pin],servo_go_to_msg->angle);
 }
 
 void setup()
@@ -34,15 +36,6 @@ void setup()
   functions[SERVO_GO_TO] = &call_servo_go_to;
 
   Serial.begin(115200);
-
-  // Init Servos
-  for(int i=0;i<nb_servos;i++)
-  {
-    s[i].actuator = new Servo();
-    s[i].actuator->attach(servo_pins[i]);
-    s[i].pin = servo_pins[i];
-  }
-
 }
 
 void loop()

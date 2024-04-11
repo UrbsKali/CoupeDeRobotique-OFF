@@ -56,6 +56,7 @@ class CONFIG:
     WS_CAMERA_ROUTE = GENERAL_WS_CONFIG["camera_route"]
     WS_ODOMETER_ROUTE = GENERAL_WS_CONFIG["odometer_route"]
     WS_CMD_ROUTE = GENERAL_WS_CONFIG["cmd_route"]
+    WS_PAMI_ROUTE = GENERAL_WS_CONFIG["pami_route"]
 
     # Specific config
     SPECIFIC_CONFIG = CONFIG_STORE[SPECIFIC_CONFIG_KEY]
@@ -65,6 +66,7 @@ class CONFIG:
 
     WS_SENDER_NAME = SPECIFIC_WS_CONFIG["sender_name"]
     WS_HOSTNAME = SPECIFIC_WS_CONFIG["hostname"]
+    WS_PING_PONG_INTERVAL = int(SPECIFIC_WS_CONFIG["ping_pong_interval"])
 
     # Specific camera config
     SPECIFIC_CAMERA_CONFIG = SPECIFIC_CONFIG["camera"]
@@ -97,4 +99,8 @@ class CONFIG:
     )
     CAMERA_COLOR_CLUSTERING_MIN_SAMPLES = int(
         SPECIFIC_CAMERA_CONFIG["color_object"]["clustering_min_samples"]
+    )
+
+    CAMERA_PICKUP_ZONE_MIN_AREA = int(
+        SPECIFIC_CAMERA_CONFIG["camera_pickup_zone_min_area"]
     )

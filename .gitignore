@@ -22,7 +22,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -162,6 +161,7 @@ cython_debug/
 
 rasp/bot_venv/
 robot1/rasp/test_zones.py
+robot1/rasp/test.py
 robot1/rasp/test_stage.py
 server/server_venv/
 
@@ -171,3 +171,4 @@ server/server_venv/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+/server/computer/sensors/camera/undistort_coef.json

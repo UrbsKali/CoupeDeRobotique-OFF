@@ -1,6 +1,7 @@
 from geometry.geometry import (
     Point,
     Polygon,
+    MultiPoint,
     MultiPolygon,
     LineString,
     BufferCapStyle,
@@ -11,4 +12,8 @@ from geometry.geometry import (
     prepare,
     distance,
     scale,
+    rad,
 )
+
+from shapely.ops import nearest_points
+from shapely import is_empty

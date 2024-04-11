@@ -33,6 +33,7 @@ class CONFIG:
     # General config
     GENERAL_CONFIG = CONFIG_STORE[GENERAL_CONFIG_KEY]
     GENERAL_WS_CONFIG = GENERAL_CONFIG["ws"]
+    GENERAL_TEENSY_CONFIG = GENERAL_CONFIG["teensy"]
 
     WS_PORT = int(GENERAL_WS_CONFIG["port"])
     WS_LIDAR_ROUTE = GENERAL_WS_CONFIG["lidar_route"]
@@ -41,6 +42,12 @@ class CONFIG:
     WS_ODOMETER_ROUTE = GENERAL_WS_CONFIG["odometer_route"]
     WS_CMD_ROUTE = GENERAL_WS_CONFIG["cmd_route"]
 
+    TEENSY_VID = GENERAL_TEENSY_CONFIG["vid"]
+    TEENSY_PID = GENERAL_TEENSY_CONFIG["pid"]
+    TEENSY_BAUDRATE = GENERAL_TEENSY_CONFIG["baudrate"]
+    TEENSY_CRC = GENERAL_TEENSY_CONFIG["crc"]
+    TEENSY_DUMMY = GENERAL_TEENSY_CONFIG["dummy"]
+
     # Specific config
     SPECIFIC_CONFIG = CONFIG_STORE[SPECIFIC_CONFIG_KEY]
     SPECIFIC_WS_CONFIG = SPECIFIC_CONFIG["ws"]
@@ -48,6 +55,34 @@ class CONFIG:
     WS_SENDER_NAME = SPECIFIC_WS_CONFIG["sender_name"]
     WS_SERVER_IP = SPECIFIC_WS_CONFIG["server_ip"]
 
-    ## Actuators
+    # Rolling Basis
+    ROLLING_BASIS_CONFIG = SPECIFIC_CONFIG["rolling_basis"]
+    ROLLING_BASIS_TEENSY_SER = ROLLING_BASIS_CONFIG["rolling_basis_teensy_ser"]
+
+    # Actuators
     ACTUATORS_CONFIG = SPECIFIC_CONFIG["actuators"]
-    SERVO_PINS = ACTUATORS_CONFIG["servo_pins"]
+    ACTUATOR_TEENSY_SER = ACTUATORS_CONFIG["actuators_teensy_ser"]
+    GOD_HAND_GRAB_SERVO_PINS_LEFT = ACTUATORS_CONFIG["god_hand_grab_servo_pins_left"]
+    GOD_HAND_GRAB_SERVO_PINS_RIGHT = ACTUATORS_CONFIG["god_hand_grab_servo_pins_right"]
+    GOD_HAND_DEPLOYMENT_SERVO_PIN = ACTUATORS_CONFIG["god_hand_deployment_servo_pin"]
+    GOD_HAND_GRAB_SERVO_OPEN_ANGLE = ACTUATORS_CONFIG["god_hand_grab_servo_open_angle"]
+    GOD_HAND_DEPLOYMENT_SERVO_DEPLOY_ANGLE = ACTUATORS_CONFIG[
+        "god_hand_deployment_servo_deploye_angle"
+    ]
+    GOD_HAND_DEPLOYMENT_SERVO_UNDEPLOY_ANGLE = ACTUATORS_CONFIG[
+        "god_hand_deployment_servo_undeploy_angle"
+    ]
+    GOD_HAND_GRAB_SERVO_CLOSE_ANGLE_DIFF_LEFT = ACTUATORS_CONFIG[
+        "god_hand_grab_servo_close_angle_diff_left"
+    ]
+    GOD_HAND_GRAB_SERVO_CLOSE_ANGLE_DIFF_RIGHT = ACTUATORS_CONFIG[
+        "god_hand_grab_servo_close_angle_diff_right"
+    ]
+
+    # Lidar
+    LIDAR_CONFIG = SPECIFIC_CONFIG["lidar"]
+    LIDAR_ANGLES_UNIT = LIDAR_CONFIG["angles_unit"]
+    LIDAR_DISTANCES_UNIT = LIDAR_CONFIG["distances_unit"]
+    LIDAR_MIN_ANGLE = LIDAR_CONFIG["min_angle"]
+    LIDAR_MAX_ANGLE = LIDAR_CONFIG["max_angle"]
+    LIDAR_MIN_DISTANCE_DETECTION = LIDAR_CONFIG["min_distance_detection"]

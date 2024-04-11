@@ -1,6 +1,9 @@
-from typing import Union
+from math import cos, sin
+
+
 from geometry import (
     Point,
+    MultiPoint,
     Polygon,
     MultiPolygon,
     LineString,
@@ -11,7 +14,11 @@ from geometry import (
     prepare,
     distance,
     scale,
+    OrientedPoint,
+    rad,
 )
+from logger import Logger, LogLevels
+import numpy as np
 
 
 class Arena:
@@ -19,11 +26,17 @@ class Arena:
 
     def __init__(
         self,
+        logger: Logger,
+        safe_collision_distance: float = 30,
         game_borders: Polygon = create_straight_rectangle(Point(0, 0), Point(200, 300)),
-        zones: Union[dict[str, MultiPolygon], None] = None,
+        zones: dict[str, MultiPolygon] | None = None,
     ):
+        self.l: Logger = logger
+        self.game_borders: Polygon = game_borders
+        self.game_borders_buffered: Polygon = self.game_borders.buffer(-10)
+        self.safe_collision_distance: float = safe_collision_distance
+        self.ennemy_position: Point | None = None
 
-        self.game_borders = game_borders
         if zones is not None:
             self.zones = zones
 
@@ -34,6 +47,8 @@ class Arena:
 
     def prepare_zones(self):
         """Prepare all values of self.zones, to optimize later calculations"""
+        prepare(self.game_borders)
+        prepare(self.game_borders_buffered)
         for zone in self.zones.values():
             prepare(zone)
 
@@ -55,10 +70,21 @@ class Arena:
 
         return self.zones[zone_name].intersects(element)
 
-    def enable_go_to(
+    def enable_go_to_point(
+        self,
+        start: Point,
+        target: Point,
+        buffer_distance: float = 15,
+        forbidden_zone_name: str = "forbidden",
+    ) -> bool:
+        return self.enable_go_on_path(
+            LineString([start, target]), buffer_distance, forbidden_zone_name
+        )
+
+    def enable_go_on_path(
         self,
         path: LineString,
-        buffer_distance: float = 0,
+        buffer_distance: float = 15,
         forbidden_zone_name: str = "forbidden",
     ) -> bool:
         """this function checks if a given line (or series of connected lines) move can be made into the arena. It
@@ -80,13 +106,7 @@ class Arena:
         # define the area touched by the buffer, for example the sides of a robot moving
 
         geometry_to_check = (
-            path.buffer(
-                buffer_distance,
-                cap_style=BufferCapStyle.round,
-                join_style=BufferJoinStyle.round,
-            )
-            if buffer_distance > 0
-            else path
+            path.buffer(buffer_distance) if buffer_distance > 0 else path
         )
         # Important to check buffer_distance > 0, otherwise the geometry can become a polygon without surface that never
         # intersects with anything
@@ -100,9 +120,20 @@ class Arena:
         return not self.zone_intersects(forbidden_zone_name, geometry_to_check)
 
     def compute_go_to_destination(
-        self, start_point: Point, zone_name: str, delta: float = 0, closer: bool = True
-    ):
-        center = self.zones[zone_name].centroid
+        self, start_point: Point, zone: Polygon, delta: float = 5, closer: bool = True
+    ) -> Point | None:
+        """_summary_
+
+        Args:
+            start_point (Point): _description_
+            zone (Polygon): _description_
+            delta (float, optional): _description_. Defaults to 0.
+            closer (bool, optional): _description_. Defaults to True.
+
+        Returns:
+            _type_: _description_
+        """
+        center: Point = zone.centroid
 
         # Get the boundary (circle) of the disc of radius delta around the center
         circle_delta = center.buffer(delta).boundary
@@ -116,17 +147,61 @@ class Arena:
         # Check that we found at least 2 intersections, should always be ok unless start_point is inside circle_delta
         # (therefore the scale function wasn't enough to reach the far away intersection)
         # or the circle is a point (delta = 0)
-        if (delta > 0 and len(intersections.geoms) < 2) or (
-            delta == 0 and len(intersections.geoms) < 1
-        ):
+        print(f"Delta: {delta}, intersections: {intersections}")
+        if (
+            delta > 0
+            and (
+                not isinstance(intersections, MultiPoint)
+                or not len(intersections.geoms) == 2
+            )
+        ) or (delta == 0 and not isinstance(intersections, Point)):
             return None
 
         # Return closest or furthest intersection
 
         else:
-            if distance(start_point, intersections.geoms[0]) <= distance(
-                start_point, intersections.geoms[1]
-            ):
-                return intersections.geoms[0] if closer else intersections.geoms[1]
+            if isinstance(intersections, Point):
+                return intersections
             else:
-                return intersections.geoms[1] if closer else intersections.geoms[0]
+                if distance(start_point, intersections.geoms[0]) <= distance(
+                    start_point, intersections.geoms[1]
+                ):
+                    return intersections.geoms[0] if closer else intersections.geoms[1]
+                else:
+                    return intersections.geoms[1] if closer else intersections.geoms[0]
+
+    def check_collision_by_distances(
+        self, distances_to_check: list[float], pos_robot: OrientedPoint
+    ):
+        """Currently hard-coded for 90-180° with 3 distances/°
+
+        Args:
+            distances_to_check (list[float]): _description_
+            pos_robot (OrientedPoint): _description_
+        """
+
+        for i in range(len(distances_to_check)):
+
+            # Check if the point is close enough to be a risk, and far enough to remove lidar aberrations (might be done in lidar code as well)
+            if 5 < distances_to_check[i] < self.safe_collision_distance:
+                # Then check that it isn't outside the game zone (with a buffer)
+                if self.game_borders_buffered.intersects(
+                    self.translate_relative_polar(
+                        distances_to_check[i], i / 3, pos_robot
+                    )
+                ):
+                    return True
+
+        return False
+
+    @staticmethod
+    def translate_relative_polar(
+        distance: float, relative_angle: float, pos_robot: OrientedPoint
+    ):
+        return Point(
+            pos_robot.x + distance * cos(rad(pos_robot.theta - 45 + relative_angle)),
+            pos_robot.y + distance * sin(rad(pos_robot.theta - 45 + relative_angle)),
+        )
+
+    def remove_outside(self, points: MultiPoint):
+        return self.game_borders_buffered.intersection(points)

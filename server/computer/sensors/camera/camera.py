@@ -1,6 +1,7 @@
 import json
 import os
 import time
+from video import MJPEGHandler
 
 import cv2
 import imutils
@@ -12,7 +13,12 @@ from utils import Utils
 
 class Camera:
     def __init__(
-        self, res_w=800, res_h=800, captures_path="./", undistorted_coefficients_path=""
+        self,
+        res_w=800,
+        res_h=800,
+        captures_path="./",
+        undistorted_coefficients_path="",
+        skip_warmup=False,
     ):
         self.resolution = [res_h, res_w]
         self.camera = VideoStream(src=0).start()
@@ -21,7 +27,8 @@ class Camera:
         self.undistorted_coefficients_path = undistorted_coefficients_path
 
         # Wait for the camera to warm up
-        time.sleep(2.0)
+        if not skip_warmup:
+            time.sleep(2.0)
 
         # Use later
         self.last_record_image = None
@@ -76,6 +83,8 @@ class Camera:
         self.last_record_image = imutils.resize(
             self.camera.read(), height=self.resolution[0], width=self.resolution[1]
         )
+
+        MJPEGHandler.current_img = self.last_record_image
         return self.last_record_image
 
     def undistor_image(self):

@@ -1,12 +1,98 @@
 from config_loader import CONFIG
 
 # Import from common
-from teensy_comms import Teensy
-from geometry import OrientedPoint, Point
-from logger import Logger
+from teensy_comms import Teensy, calc_center
+from geometry import OrientedPoint, Point, distance
+from logger import Logger, LogLevels
+from utils import Utils
 
 import struct
 import math
+import asyncio
+from enum import Enum
+from dataclasses import dataclass
+import time
+
+
+class Command(Enum):
+    GO_TO_POINT = b"\x00"
+    CURVE_GO_TO = b"\x01"
+    KEEP_CURRENT_POSITION = b"\02"
+    DISABLE_PID = b"\03"
+    ENABLE_PID = b"\04"
+    RESET_POSITION = b"\05"
+    SET_PID = b"\06"
+    SET_HOME = b"\07"
+    STOP = b"\x7E"  # 7E = 126
+    INVALID = b"\xFF"
+
+
+@dataclass
+class Instruction:
+    cmd: Command
+    msg: bytes  # msg is often the same as cmd, but can contain extra info
+
+    def __str__(self):
+        return f"cmd:{self.cmd}, msg:{self.msg}"
+
+
+class RB_Queue:
+
+    tracked_commands = (Command.GO_TO_POINT, Command.CURVE_GO_TO)
+
+    def __init__(self, logger: Logger) -> None:
+        self.id_counter = 0
+        self.last_deleted_id = -1
+        self.__queue: list[Instruction] = []
+
+    @staticmethod
+    def __is_tracked_command(command: Command) -> bool:
+        return command in RB_Queue.tracked_commands
+
+    def __is_tracked_command_at_index(self, __index: int) -> bool:
+        return RB_Queue.__is_tracked_command(self.__queue[__index].cmd)
+
+    def append(self, __object: Instruction) -> int:
+        self.__queue.append(__object)
+        if RB_Queue.__is_tracked_command(__object.cmd):
+            self.id_counter += 1
+            return self.id_counter - 1
+        else:
+            return -1
+
+    def pop(self, __index: int = -1) -> Instruction:
+        if self.__is_tracked_command_at_index(__index):
+            self.last_deleted_id += 1
+        return self.__queue.pop(__index)
+
+    def clear(self) -> None:
+        # Count the number of tracked commands in the queue to add to last_deleted_id
+        self.last_deleted_id += len(
+            [i for i in self.__queue if RB_Queue.__is_tracked_command(i.cmd)]
+        )
+        self.__queue.clear()
+
+    def delete_up_to(self, __index: int) -> None:
+        for i in range(__index + 1):
+            if self.__is_tracked_command_at_index(0):
+                self.last_deleted_id += 1
+            del self.__queue[0]
+
+    def insert(self, __index: int, __object: Instruction) -> None:
+        """Cannot insert tracked elements to keep things simple"""
+        assert not RB_Queue.__is_tracked_command(
+            __object.cmd
+        ), "Tried to insert tracked command (should only be appended)"
+        self.__queue.insert(__index, __object)
+
+    def __getitem__(self, __index) -> Instruction:
+        return self.__queue[__index]
+
+    def __len__(self) -> int:
+        return len(self.__queue)
+
+    def __str__(self) -> str:
+        return str(self.__queue)
 
 
 class RollingBasis(Teensy):
@@ -15,18 +101,19 @@ class RollingBasis(Teensy):
     ######################
     def __init__(
         self,
-        ser=12678590,
-        vid: int = 5824,
-        pid: int = 1155,
-        baudrate: int = 115200,
-        crc: bool = True,
-        dummy: bool = False,
+        logger: Logger,
+        ser: int = CONFIG.ROLLING_BASIS_TEENSY_SER,
+        crc: bool = CONFIG.TEENSY_CRC,
+        vid: int = CONFIG.TEENSY_VID,
+        pid: int = CONFIG.TEENSY_PID,
+        baudrate: int = CONFIG.TEENSY_BAUDRATE,
+        dummy: bool = CONFIG.TEENSY_DUMMY,
     ):
-        super().__init__(ser, vid, pid, baudrate, crc, dummy)
-        # All position are in the form tuple(X, Y, THETA)
-        self.odometrie = OrientedPoint(0.0, 0.0, 0.0)
-        self.position_offset = OrientedPoint(0.0, 0.0, 0.0)
-        self.current_action = None
+        super().__init__(
+            logger, ser=ser, vid=vid, pid=pid, baudrate=baudrate, crc=crc, dummy=dummy
+        )
+        self.odometrie: OrientedPoint = OrientedPoint((0.0, 0.0), 0.0)
+        self.position_offset = OrientedPoint((0.0, 0.0), 0.0)
         """
         This is used to match a handling function to a message type.
         add_callback can also be used.
@@ -35,84 +122,93 @@ class RollingBasis(Teensy):
             128: self.rcv_odometrie,  # \x80
             129: self.rcv_action_finish,  # \x81
             130: self.rcv_print,  # \x82
-            255: self.unknowed_msg,
+            255: self.rcv_unknown_msg,
         }
 
-        self.queue = []
+        self.queue = RB_Queue(self.logger)
 
     #####################
     # Position handling #
     #####################
     def true_pos(self, position: OrientedPoint) -> OrientedPoint:
         """
-        _summary_
+        enables to correct the position using a fixed offset if required
 
         :param position: _description_
         :type position: OrientedPoint
         :return: _description_
         :rtype: OrientedPoint
         """
-        return position + self.position_offset
+        return OrientedPoint(
+            (position.x + self.position_offset.x, position.y + self.position_offset.y),
+            position.theta + self.position_offset.theta,
+        )
 
     #############################
     # Received message handling #
     #############################
     def rcv_print(self, msg: bytes):
-        self.l.log("Teensy says : " + msg.decode("ascii", errors="ignore"))
+        self.logger.log(
+            "Teensy says : " + msg.decode("ascii", errors="ignore"), LogLevels.INFO
+        )
 
     def rcv_odometrie(self, msg: bytes):
         self.odometrie = OrientedPoint(
-            struct.unpack("<f", msg[0:4])[0],
-            struct.unpack("<f", msg[4:8])[0],
+            (struct.unpack("<f", msg[0:4])[0], struct.unpack("<f", msg[4:8])[0]),
             struct.unpack("<f", msg[8:12])[0],
         )
 
-    def rcv_action_finish(self, msg: bytes):
-        self.l.log("Action finished : " + msg.hex())
+    def rcv_action_finish(self, cmd_finished: bytes):
+        self.logger.log("Action finished : " + cmd_finished.hex(), LogLevels.INFO)
         if not self.queue or len(self.queue) == 0:
-            self.l.log("Received action_finished but no action in queue", 1)
+            self.logger.log(
+                "Received action_finish but no action in queue", LogLevels.WARNING
+            )
             return
-        # remove the action that just finished
+        # remove actions up to the one that just finished
         for i in range(len(self.queue)):
-            if list(self.queue[i].keys())[0] == msg:
-                self.l.log(f"Removing action {i} from queue : " + str(self.queue[i]))
-                self.queue.pop(i)
+            if self.queue[i].cmd.value == cmd_finished:
+                self.logger.log(
+                    f"Removing actions up to {i} from queue : "
+                    + str(self.queue[: i + 1]),
+                    LogLevels.INFO,
+                )
+                self.queue.delete_up_to(i)
                 break
-        # TODO: jamais execute car on le teste deja dans le if not self.queue or len(self.queue) == 0:
+
         if len(self.queue) == 0:
-            self.l.log("Queue is empty")
-            self.current_action = None
-            return
-        self.send_bytes(list(self.queue[0].values())[0])
-        self.current_action = list(self.queue[0].keys())[0]
-        self.l.log("Sending next action in queue")
+            self.logger.log("Queue is empty, not sending anything")
+        else:
+            self.logger.log("Sending next action in queue")
+            self.send_bytes(self.queue[0].msg)
 
-    def unknowed_msg(self, msg: bytes):
-        self.l.log(f"Teensy does not know the command {msg.hex()}", 1)
+    def rcv_unknown_msg(self, msg: bytes):
+        self.logger.log(
+            f"Teensy does not know the command {msg.hex()}", LogLevels.WARNING
+        )
 
-    #########################
-    # User facing functions #
-    #########################
-    # TODO: class command a definir ailleurs ?
-    class Command:
-        GoToPoint = b"\x00"
-        CurveGoTo = b"\x01"
-        KeepCurrentPosition = b"\02"
-        DisablePid = b"\03"
-        EnablePid = b"\04"
-        ResetPosition = b"\05"
-        SetPID = b"\06"
-        SetHome = b"\07"
-        Stop = b"\x7E"  # 7E = 126
-        Invalid = b"\xFF"
+    def append_to_queue(self, instruction: Instruction) -> int:
+        new_id = self.queue.append(instruction)
 
-    # TODO: nommage avec majuscule a revoir -> il faut en full minisucule
+        if len(self.queue) == 1:
+            self.send_bytes(self.queue[0].msg)
+
+        return new_id
+
+    def insert_in_queue(
+        self, index: int, instruction: Instruction, force_send: bool = False
+    ) -> None:
+        """Should only take non tracked instructions. To use carefully, adding an action in front of an unfinished one may trigger the unfinished one again afterwards."""
+        self.queue.insert(index, instruction)
+
+        if len(self.queue) == 1 or force_send:
+            self.send_bytes(self.queue[0].msg)
+
     @Logger
-    def Go_To(
+    def go_to(
         self,
         position: Point,
         *,  # force keyword arguments
-        skip_queue=False,
         is_forward: bool = True,
         max_speed: int = 150,
         next_position_delay: int = 100,
@@ -123,12 +219,12 @@ class RollingBasis(Teensy):
         acceleration_distance: float = 10,
         deceleration_end_speed: int = 80,
         deceleration_distance: float = 10,
-    ) -> None:
+    ) -> int:
         """
-        Va à la position donnée en paramètre
+        Va à la position donnée en paramètre, return l'id dans la queue de l'action
 
         :param position: la position en X et Y (et theta)
-        :type position: OrientedPoint
+        :type position: Point
         :param is_forward: en avant (false) ou en arrière (true), defaults to False
         :type direction: bool, optional
         :param speed: Vitesse du déplacement, defaults to b'\x64'
@@ -140,9 +236,11 @@ class RollingBasis(Teensy):
         :param traj_precision: la précision du déplacement, defaults to 50
         :type traj_precision: int, optional
         """
-        pos = position + Point(self.position_offset.x, self.position_offset.y)
+        pos = Point(
+            position.x + self.position_offset.x, position.y + self.position_offset.y
+        )
         msg = (
-            self.Command.GoToPoint
+            Command.GO_TO_POINT.value
             + struct.pack("<f", pos.x)
             + struct.pack("<f", pos.y)
             + struct.pack("<?", is_forward)
@@ -157,11 +255,144 @@ class RollingBasis(Teensy):
             + struct.pack("<f", deceleration_distance)
         )
         # https://docs.python.org/3/library/struct.html#format-characters
-        if skip_queue or len(self.queue) == 0:
-            self.queue.insert(0, {self.Command.GoToPoint: msg})
-            self.send_bytes(msg)
+
+        return self.append_to_queue(Instruction(Command.GO_TO_POINT, msg))
+
+    @Logger
+    def go_to_relative(
+        self,
+        position: Point,
+        *,  # force keyword arguments
+        is_forward: bool = True,
+        max_speed: int = 150,
+        next_position_delay: int = 100,
+        action_error_auth: int = 50,
+        traj_precision: int = 50,
+        correction_trajectory_speed: int = 80,
+        acceleration_start_speed: int = 80,
+        acceleration_distance: float = 10,
+        deceleration_end_speed: int = 80,
+        deceleration_distance: float = 10,
+    ) -> int:
+        """
+        Va à la position donnée en paramètre, return l'id dans la queue de l'action
+
+        :param position: la position en X et Y (et theta)
+        :type position: Point
+        :param is_forward: en avant (false) ou en arrière (true), defaults to False
+        :type direction: bool, optional
+        :param speed: Vitesse du déplacement, defaults to b'\x64'
+        :type speed: bytes, optional
+        :param next_position_delay: delay avant la prochaine position, defaults to 100
+        :type next_position_delay: int, optional
+        :param action_error_auth: l'erreur autorisé dans le déplacement, defaults to 20
+        :type action_error_auth: int, optional
+        :param traj_precision: la précision du déplacement, defaults to 50
+        :type traj_precision: int, optional
+        """
+        pos = Point(
+            position.x + self.position_offset.x + self.odometrie.x,
+            position.y + self.position_offset.y + self.odometrie.y,
+        )
+        msg = (
+            Command.GO_TO_POINT.value
+            + struct.pack("<f", pos.x)
+            + struct.pack("<f", pos.y)
+            + struct.pack("<?", is_forward)
+            + struct.pack("<B", max_speed)
+            + struct.pack("<H", next_position_delay)
+            + struct.pack("<H", action_error_auth)
+            + struct.pack("<H", traj_precision)
+            + struct.pack("<B", correction_trajectory_speed)
+            + struct.pack("<B", acceleration_start_speed)
+            + struct.pack("<f", acceleration_distance)
+            + struct.pack("<B", deceleration_end_speed)
+            + struct.pack("<f", deceleration_distance)
+        )
+        # https://docs.python.org/3/library/struct.html#format-characters
+
+        return self.append_to_queue(Instruction(Command.GO_TO_POINT, msg))
+
+    @Logger
+    async def go_to_and_wait(
+        self,
+        position: Point,
+        *,  # force keyword arguments
+        tolerance: float = 5,
+        timeout: float = -1,  # in seconds
+        is_forward: bool = True,
+        max_speed: int = 150,
+        next_position_delay: int = 100,
+        action_error_auth: int = 50,
+        traj_precision: int = 50,
+        correction_trajectory_speed: int = 80,
+        acceleration_start_speed: int = 80,
+        acceleration_distance: float = 10,
+        deceleration_end_speed: int = 80,
+        deceleration_distance: float = 10,
+    ) -> int:
+        """Waits to go over timeout or finish the queue (by finishing movement or being interrupted)
+
+        Args:
+            position (Point): Target.
+            tolerance (float): Distance to be within to return a success if not timed out.
+            timeout (float): Max time to wait in s, -1 for no limit. Defaults to -1.
+            is_forward (bool, optional): _description_. Defaults to True.
+            max_speed (int, optional): _description_. Defaults to 150.
+            next_position_delay (int, optional): _description_. Defaults to 100.
+            action_error_auth (int, optional): _description_. Defaults to 50.
+            traj_precision (int, optional): _description_. Defaults to 50.
+            correction_trajectory_speed (int, optional): _description_. Defaults to 80.
+            acceleration_start_speed (int, optional): _description_. Defaults to 80.
+            acceleration_distance (float, optional): _description_. Defaults to 10.
+            deceleration_end_speed (int, optional): _description_. Defaults to 80.
+            deceleration_distance (float, optional): _description_. Defaults to 10.
+
+        Returns:
+            int: 0 if finished normally, 1 if timed out, 2 if finished without timeout but not at targret position
+        """
+
+        start_time = Utils.get_ts()
+        queue_id = self.go_to(
+            position,
+            is_forward=is_forward,
+            max_speed=max_speed,
+            next_position_delay=next_position_delay,
+            action_error_auth=action_error_auth,
+            traj_precision=traj_precision,
+            correction_trajectory_speed=correction_trajectory_speed,
+            acceleration_start_speed=acceleration_start_speed,
+            acceleration_distance=acceleration_distance,
+            deceleration_end_speed=deceleration_end_speed,
+            deceleration_distance=deceleration_distance,
+        )
+
+        while (
+            Utils.time_since(start_time) < timeout
+            and self.queue.last_deleted_id < queue_id
+        ):
+            await asyncio.sleep(0.2)
+
+        if Utils.time_since(start_time) >= timeout:
+            self.logger.log(
+                f"Reached timeout in Go_To_And_Wait, clearing queue, at: {self.odometrie}",
+                LogLevels.WARNING,
+            )
+            self.stop_and_clear_queue()
+            return 1
+        elif distance(Point(self.odometrie.x, self.odometrie.y), position) <= tolerance:
+            self.logger.log(
+                f"Reached target in go_to_and_wait, at: {self.odometrie}",
+                LogLevels.INFO,
+            )
+            return 0
         else:
-            self.queue.append({self.Command.GoToPoint: msg})
+            self.logger.log(
+                f"Didn't timeout in Go_To_And_Wait but did not arrive, at: {self.odometrie}",
+                LogLevels.WARNING,
+            )
+            # self.stop_and_clear_queue()
+            return 2
 
     @Logger
     def curve_go_to(
@@ -176,13 +407,14 @@ class RollingBasis(Teensy):
         next_position_delay: int = 100,
         action_error_auth: int = 20,
         traj_precision: int = 50,
-        test: bool = False,
     ) -> None:
         """Go to a point with a curve"""
 
         middle_point = OrientedPoint(
-            (self.odometrie.x + destination.x) / 2,
-            (self.odometrie.y + destination.y) / 2,
+            (
+                (self.odometrie.x + destination.x) / 2,
+                (self.odometrie.y + destination.y) / 2,
+            )
         )
         # alpha est l'angle entre la droite (position, destination) et l'axe des ordonnées (y)
         alpha = math.atan2(
@@ -192,17 +424,18 @@ class RollingBasis(Teensy):
         theta = math.pi / 2 - alpha
 
         third_point = OrientedPoint(
-            middle_point.x + math.cos(theta) * corde,
-            middle_point.y + math.sin(theta) * corde,
+            (
+                middle_point.x + math.cos(theta) * corde,
+                middle_point.y + math.sin(theta) * corde,
+            )
         )
 
         center = calc_center(self.odometrie, third_point, destination)
         destination = self.true_pos(destination)
         center = self.true_pos(center)
-        if test:
-            return center
+
         curve_msg = (
-            self.Command.CurveGoTo  # command
+            Command.CURVE_GO_TO.value  # command
             + struct.pack("<ff", destination.x, destination.y)  # target_point
             + struct.pack("<ff", center.x, center.y)  # center_point
             + struct.pack("<H", interval)  # interval (distance between two points)
@@ -213,62 +446,77 @@ class RollingBasis(Teensy):
             + struct.pack("<H", traj_precision)  # precision
         )
         if skip_queue or len(self.queue) == 0:
-            self.l.log("Skipping Queue ...")
-            self.queue.insert(0, {self.Command.CurveGoTo: curve_msg})
-            self.l.log(self.queue)
+            self.logger.log("Skipping Queue ...")
+            self.queue.insert(0, Instruction(Command.CURVE_GO_TO, curve_msg))
+            self.logger.log(str(self.queue))
             self.send_bytes(curve_msg)
         else:
-            self.queue.append({self.Command.CurveGoTo: curve_msg})
+            self.queue.append(Instruction(Command.CURVE_GO_TO, curve_msg))
 
     # TODO: grosse redondance sur le skip queue, utile de mettre en place un decorateur pour faire ça automatiquement ?
     @Logger
-    def Keep_Current_Position(self, skip_queue=False):
-        msg = self.Command.KeepCurrentPosition
+    def keep_current_pos(self, skip_queue=False):
+        msg = Command.KEEP_CURRENT_POSITION.value
         if skip_queue:
-            self.queue.insert(0, {self.Command.KeepCurrentPosition: msg})
-            self.send_bytes(msg)
+            self.insert_in_queue(
+                0, Instruction(Command.KEEP_CURRENT_POSITION, msg), True
+            )
         else:
-            self.queue.append({self.Command.KeepCurrentPosition: msg})
+            self.append_to_queue(Instruction(Command.KEEP_CURRENT_POSITION, msg))
 
     @Logger
-    def Disable_Pid(self, skip_queue=False):
-        msg = self.Command.DisablePid
-        if skip_queue or len(self.queue) == 0:
-            self.queue.insert(0, {self.Command.DisablePid: msg})
-            self.send_bytes(msg)
-        else:
-            self.queue.append({self.Command.DisablePid: msg})
+    def clear_queue(self):
+        self.queue.clear()
 
     @Logger
-    def Enable_Pid(self, skip_queue=False):
-        msg = self.Command.EnablePid
-        if skip_queue or len(self.queue) == 0:
-            self.queue.insert(0, {self.Command.EnablePid: msg})
-            self.send_bytes(msg)
-        else:
-            self.queue.append({self.Command.EnablePid: msg})
+    def stop_and_clear_queue(self):
+        self.clear_queue()
+        self.keep_current_pos(True)
 
     @Logger
-    def Reset_Odo(self, skip_queue=False):
-        msg = self.Command.ResetPosition
-        if skip_queue or len(self.queue) == 0:
-            self.queue.insert(0, {self.Command.ResetPosition: msg})
-            self.send_bytes(msg)
+    def disable_pid(self, skip_queue=False):
+        msg = Command.DISABLE_PID.value
+        if skip_queue:
+            self.insert_in_queue(0, Instruction(Command.DISABLE_PID, msg), True)
         else:
-            self.queue.append({self.Command.ResetPosition: msg})
+            self.queue.append(Instruction(Command.DISABLE_PID, msg))
 
-    def Set_Home(self, x, y, theta, *, skip_queue=False):
-        msg = self.Command.SetHome + struct.pack("<fff", x, y, theta)
-        if skip_queue or len(self.queue) == 0:
-            self.queue.insert(0, {self.Command.SetHome: msg})
-            self.send_bytes(msg)
+    @Logger
+    def enable_pid(self, skip_queue=False):
+        msg = Command.ENABLE_PID.value
+        if skip_queue:
+            self.insert_in_queue(0, Instruction(Command.ENABLE_PID, msg), True)
         else:
-            self.queue.append({self.Command.SetHome: msg})
+            self.append_to_queue(Instruction(Command.ENABLE_PID, msg))
 
-    def Set_PID(self, Kp: float, Ki: float, Kd: float, skip_queue=False):
-        msg = self.Command.SetPID + struct.pack("<fff", Kp, Ki, Kp)
-        if skip_queue or len(self.queue) == 0:
-            self.queue.insert(0, {self.Command.SetPID: msg})
-            self.send_bytes(msg)
+    @Logger
+    def reset_odo(self, skip_queue=False):
+        """reset teensy's odo to (0,0,0)
+
+        Args:
+            skip_queue (bool, optional): wether to skip the queue or not. Defaults to False.
+        """
+        msg = Command.RESET_POSITION.value
+        if skip_queue:
+            self.insert_in_queue(0, Instruction(Command.RESET_POSITION, msg), True)
         else:
-            self.queue.append({self.Command.SetPID: msg})
+            self.append_to_queue(Instruction(Command.RESET_POSITION, msg))
+
+    def set_odo(self, new_odo: Point, *, skip_queue=False):
+        msg = Command.SET_HOME.value + struct.pack(
+            "<fff",
+            new_odo.x,
+            new_odo.y,
+            new_odo.theta if isinstance(new_odo, OrientedPoint) else 0.0,
+        )
+        if skip_queue:
+            self.insert_in_queue(0, Instruction(Command.SET_HOME, msg), True)
+        else:
+            self.append_to_queue(Instruction(Command.SET_HOME, msg))
+
+    def set_pid(self, Kp: float, Ki: float, Kd: float, skip_queue=False):
+        msg = Command.SET_PID.value + struct.pack("<fff", Kp, Ki, Kd)
+        if skip_queue:
+            self.queue.insert(0, Instruction(Command.SET_PID, msg))
+        else:
+            self.append_to_queue(Instruction(Command.SET_PID, msg))

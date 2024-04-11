@@ -7,53 +7,93 @@
       "camera_route": "/camera",
       "log_route": "/log",
       "cmd_route": "/cmd",
-      "frame_route": "/frame"
+      "frame_route": "/frame",
+      "pami_route": "/pami"
+    },
+    "teensy": {
+      "vid": 5824,
+      "pid": 1155,
+      "baudrate": 115200,
+      "crc": true,
+      "dummy": false
     }
   },
   "computer": {
     "ws": {
       "sender_name": "computer",
-      "hostname": "0.0.0.0"
+      "hostname": "0.0.0.0",
+      "ping_pong_interval": 1
     },
-    "camera":
-    {
-      "resolution": [800, 800],
-
-      "chessboard_size": [9, 6],
+    "camera": {
+      "resolution": [
+        800,
+        800
+      ],
+      "chessboard_size": [
+        9,
+        6
+      ],
       "chessboard_square_size": 0.044,
       "distance_cam_table": 0.2,
-
       "save_path": "|sensors|camera|images_save",
       "calibration_path": "|sensors|camera|calibration_path",
       "coefficients_path": "|sensors|camera|undistort_coef.json",
-
-      "aruco":
-      {
+      "aruco": {
         "cam_obj_function_a": 1077.2,
         "cam_obj_function_b": -0.809,
-
         "aruco_dict_type": "DICT_4X4_100"
       },
-
-      "color_object":
-      {
+      "color_object": {
         "color": "green",
-        "hsv_min": [30, 80, 80],
-        "hsv_max": [90, 255, 255],
-        "clustering_eps": 20,
-        "clustering_min_samples": 20
-      }
+        "hsv_min": [
+          30,
+          80,
+          80
+        ],
+        "hsv_max": [
+          90,
+          255,
+          255
+        ],
+        "clustering_eps": 40,
+        "clustering_min_samples": 100
+      },
+      "camera_pickup_zone_min_area": 1
     }
   },
   "robot1": {
     "log_level": 0,
     "print_log": true,
     "ws": {
-      "sender_name": "robot1",
+      "sender_name": "rob",
       "server_ip": "192.168.0.104"
     },
+    "rolling_basis": {
+      "rolling_basis_teensy_ser": 12675800
+    },
     "actuators": {
-      "servo_pins": []
+      "actuators_teensy_ser": 12678600,
+      "god_hand_grab_servo_pins_left": [
+        2,
+        3
+      ],
+      "god_hand_grab_servo_pins_right": [
+        4,
+        5
+      ],
+      "god_hand_deployment_servo_pin": 6,
+      "god_hand_deployment_servo_deploye_angle": 90,
+      "god_hand_deployment_servo_undeploy_angle": 90,
+      "god_hand_grab_servo_open_angle": 90,
+      "god_hand_grab_servo_close_angle_diff_left": 22,
+      "god_hand_grab_servo_close_angle_diff_right": -22
+    },
+    "lidar": {
+      "distances_unit": "cm",
+      "angles_unit": "rad",
+      "min_angle": -134.8335,
+      "max_angle": 134.8335,
+      "min_distance_detection": 5.0
     }
   }
 }

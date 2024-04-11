@@ -5,6 +5,8 @@ from WS_comms import WServer, WServerRouteManager, WSender, WSreceiver, WSmsg
 from logger import Logger, LogLevels
 from arena import MarsArena
 
+# from video import spawn_video_server
+
 # Import from local path
 from brains import ServerBrain
 from sensors import Camera, ArucoRecognizer, ColorRecognizer, PlanTransposer, Frame
@@ -15,80 +17,65 @@ if __name__ == "__main__":
     """
     ###--- Initialization ---###
     """
-    # Logger
-    logger = Logger(
-        identifier="computer",
-        dec_level=LogLevels.INFO,
-        log_level=LogLevels.DEBUG,
+    # Loggers
+    logger_ws_server = Logger(
+        identifier="ws_server",
+        decorator_level=LogLevels.INFO,
+        print_log_level=LogLevels.DEBUG,
+        file_log_level=LogLevels.DEBUG,
+    )
+    logger_brain = Logger(
+        identifier="brain",
+        decorator_level=LogLevels.INFO,
+        print_log_level=LogLevels.DEBUG,
+        file_log_level=LogLevels.DEBUG,
     )
 
     # Websocket server
-    ws_server = WServer(CONFIG.WS_HOSTNAME, CONFIG.WS_PORT)
+    ws_server = WServer(
+        logger=logger_ws_server,
+        host=CONFIG.WS_HOSTNAME,
+        port=CONFIG.WS_PORT,
+        ping_pong_clients_interval=CONFIG.WS_PING_PONG_INTERVAL,
+    )
+    # Routes
     ws_cmd = WServerRouteManager(
         WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME)
     )
-    ws_log = WServerRouteManager(
+    ws_pami = WServerRouteManager(
         WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME)
     )
     # Sensors
     ws_lidar = WServerRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
     ws_odometer = WServerRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
     ws_camera = WServerRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
-
+    # Add routes
     ws_server.add_route_handler(CONFIG.WS_CMD_ROUTE, ws_cmd)
-    ws_server.add_route_handler(CONFIG.WS_LOG_ROUTE, ws_log)
-
+    ws_server.add_route_handler(CONFIG.WS_PAMI_ROUTE, ws_pami)
     ws_server.add_route_handler(CONFIG.WS_LIDAR_ROUTE, ws_lidar)
     ws_server.add_route_handler(CONFIG.WS_ODOMETER_ROUTE, ws_odometer)
     ws_server.add_route_handler(CONFIG.WS_CAMERA_ROUTE, ws_camera)
 
-    # Camera
-    camera = Camera(
-        res_w=CONFIG.CAMERA_RESOLUTION[0],
-        res_h=CONFIG.CAMERA_RESOLUTION[1],
-        captures_path=CONFIG.CAMERA_SAVE_PATH,
-        undistorted_coefficients_path=CONFIG.CAMERA_COEFFICIENTS_PATH,
-    )
-
-    aruco_recognizer = ArucoRecognizer(aruco_type=CONFIG.CAMERA_ARUCO_DICT_TYPE)
-
-    color_recognizer = ColorRecognizer(
-        detection_range=CONFIG.CAMERA_COLOR_FILTER_RANGE,
-        name=CONFIG.CAMERA_COLOR_FILTER_NAME,
-        clustering_eps=CONFIG.CAMERA_COLOR_CLUSTERING_EPS,
-        clustering_min_samples=CONFIG.CAMERA_COLOR_CLUSTERING_MIN_SAMPLES,
-    )
-
-    plan_transposer = PlanTransposer(
-        camera_table_distance=CONFIG.CAMERA_DISTANCE_CAM_TABLE,
-        alpha=CONFIG.CAMERA_CAM_OBJ_FUNCTION_A,
-        beta=CONFIG.CAMERA_CAM_OBJ_FUNCTION_B,
-    )
-    camera.load_undistor_coefficients()
-
     # Arena
-    arena = MarsArena(1)
+    arena = MarsArena(2, Logger(identifier="arena", print_log_level=LogLevels.INFO))
 
     # Brain
     brain = ServerBrain(
-        logger=logger,
+        logger=logger_brain,
         ws_cmd=ws_cmd,
-        ws_log=ws_log,
         ws_lidar=ws_lidar,
         ws_odometer=ws_odometer,
         ws_camera=ws_camera,
-        camera=camera,
-        aruco_recognizer=aruco_recognizer,
-        color_recognizer=color_recognizer,
-        plan_transposer=plan_transposer,
+        ws_pami=ws_pami,
         arena=arena,
+        config=CONFIG,
     )
 
     """
         ###--- Run ---###
     """
     # Add background tasks, in format ws_server.add_background_task(func, func_params)
-    for routine in brain.get_routines():
+    for routine in brain.get_tasks():
         ws_server.add_background_task(routine)
 
     ws_server.run()
