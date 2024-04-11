@@ -12,6 +12,7 @@ from WS_comms import WSmsg
 # Import from local path
 # ...
 
+
 @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
 async def pami_com(self):
     """
@@ -37,9 +38,7 @@ async def lidar_com(self):
     """
     message = await self.ws_lidar.receiver.get()
     if message != WSmsg():
-        self.logger.log(
-            f"Message received on [LiDAR]: {message.msg}.", LogLevels.DEBUG
-        )
+        self.logger.log(f"Message received on [LiDAR]: {message.msg}.", LogLevels.DEBUG)
         self.lidar_points = [Point(x, y) for x, y in message.data]
 
 
@@ -50,12 +49,8 @@ async def odometer_com(self):
     """
     message = await self.ws_odometer.receiver.get()
     if message != WSmsg():
-        self.logger.log(
-            f"Message received on [Odometer]: {message}.", LogLevels.DEBUG
-        )
-        self.rob_pos = OrientedPoint(
-            message.data[0], message.data[1], message.data[2]
-        )
+        self.logger.log(f"Message received on [Odometer]: {message}.", LogLevels.DEBUG)
+        self.rob_pos = OrientedPoint(message.data[0], message.data[1], message.data[2])
 
 
 @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
