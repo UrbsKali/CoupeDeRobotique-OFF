@@ -79,8 +79,43 @@ class ServerBrain(Brain):
         )
         camera.load_undistor_coefficients()
 
+        # can't use external functions in tasks when process = true
+        ############################# PICKUP_ZONE DETECTION #############################
+        camera.capture()
+        camera.undistor_image()
+        pickup_zone = color_recognizer.detect(camera.get_capture())
+        pickup_zone = [
+            zone
+            for zone in pickup_zone
+            if (zone.bounding_box[1][0] - zone.bounding_box[0][0])
+            * (zone.bounding_box[1][1] - zone.bounding_box[0][1])
+            > self.config.CAMERA_PICKUP_ZONE_MIN_AREA
+        ]
+        if len(pickup_zone) < 6:
+            print("error in zone_plant detection")
+        # calcultate aproximative center and exclude neareast cluster until there is 6 zones remaing
+        elif len(pickup_zone) > 6:
+            mx = 0
+            my = 0
+            for z in pickup_zone:
+                mx += z.centroid[0]
+                my += z.centroid[1]
+            apro_center = Point(mx / len(pickup_zone), my / len(pickup_zone))
+            pickup_zone = sorted(
+                pickup_zone,
+                key=lambda zone: apro_center.distance(
+                    Point(zone.centroid[0], zone.centroid[1])
+                ),
+            )
+            while len(pickup_zone) > 6:
+                pickup_zone.pop()
+
+        for zone in pickup_zone:
+            print(zone.centroid)
+        ##################################################################################
+
         # ---Loop--- #
-        """camera.capture()
+        camera.capture()
         camera.undistor_image()
 
         arucos = aruco_recognizer.detect(camera.get_capture())
@@ -107,38 +142,6 @@ class ServerBrain(Brain):
         self.green_objects = green_objects_tmp
 
         frame = Frame(camera.get_capture(), [green_objects, arucos])
-        frame.draw_markers()
-        frame.write_centroid()
-        camera.update_monitor(frame.img)"""
-        ############################# PICKUP_ZONE DETECTION #############################
-        camera.capture()
-        camera.undistor_image()
-        image = camera.get_capture()
-        image = image[50:-70, 50:-50]
-        zones_plant = color_recognizer.detect(image)
-        if len(zones_plant) < 6:
-            print("error in zone_plant detection")
-        # calculate approximate center and exclude nearest cluster until there is 6 zones remaking
-        elif len(zones_plant) > 6:
-            mx = 0
-            my = 0
-            for z in zones_plant:
-                mx += z.centroid[0]
-                my += z.centroid[1]
-            apro_center = Point(mx, my)
-            zones_plant = sorted(
-                zones_plant,
-                key=lambda zone: apro_center.distance(
-                    Point(zone.centroid[0], zone.centroid[1])
-                ),
-            )
-            while len(zones_plant) > 6:
-                zones_plant.pop()
-
-        for zone in zones_plant:
-            print(zone.centroid)
-
-        frame = Frame(image, zones_plant)
         frame.draw_markers()
         frame.write_centroid()
         camera.update_monitor(frame.img)
