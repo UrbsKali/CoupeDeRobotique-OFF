@@ -8,7 +8,7 @@ from arena import MarsArena
 # from video import spawn_video_server
 
 # Import from local path
-from brains import ServerBrain
+from brains import MainBrain
 from sensors import Camera, ArucoRecognizer, ColorRecognizer, PlanTransposer, Frame
 
 import asyncio
@@ -60,7 +60,7 @@ if __name__ == "__main__":
     arena = MarsArena(2, Logger(identifier="arena", print_log_level=LogLevels.INFO))
 
     # Brain
-    brain = ServerBrain(
+    brain = MainBrain(
         logger=logger_brain,
         ws_cmd=ws_cmd,
         ws_lidar=ws_lidar,

@@ -3,15 +3,15 @@ import asyncio
 import time
 
 # Import from common
-from logger import Logger, LogLevels
-from geometry import OrientedPoint, Point
-from arena import MarsArena
-from WS_comms import WSmsg, WServerRouteManager
 from brain import Brain
 
+from WS_comms import WSmsg, WServerRouteManager
+from geometry import OrientedPoint, Point
+from logger import Logger, LogLevels
+from arena import MarsArena
 
 # Import from local path
-from sensors import Camera, ArucoRecognizer, ColorRecognizer, PlanTransposer, Frame
+# ...
 
 
 class MainBrain(Brain):

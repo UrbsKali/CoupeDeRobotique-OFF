@@ -1,1 +1,1 @@
-from brains.server_brain import ServerBrain
+from brains.main_brain import MainBrain
