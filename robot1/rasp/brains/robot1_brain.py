@@ -78,7 +78,7 @@ class Robot1Brain(Brain):
     async def compute_ennemy_position(self):
         polars: np.ndarray = self.lidar.scan_to_polars()
         self.logger.log(f"New measure", LogLevels.CRITICAL)
-        self.logger.log(f"Polars: {polars.tolist()}", LogLevels.INFO)
+        self.logger.log(f"Polars ({polars.shape}): {polars.tolist()}", LogLevels.INFO)
         obstacles: MultiPoint | Point = self.arena.remove_outside(
             self.pol_to_abs_cart(polars)
         )
