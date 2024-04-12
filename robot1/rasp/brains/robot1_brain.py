@@ -74,13 +74,16 @@ class Robot1Brain(Brain):
         if msg != WSmsg():
             self.camera = msg.data
 
-    @Brain.task(process=False, run_on_start=True, refresh_rate=0.25)
+    @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
     async def compute_ennemy_position(self):
+        polars = self.lidar.scan_to_polars()
+        self.logger.log(f"New measure", LogLevels.CRITICAL)
+        self.logger.log(f"Polars: {polars}", LogLevels.INFO)
         obstacles: MultiPoint | Point = self.arena.remove_outside(
-            self.pol_to_abs_cart(self.lidar.scan_to_polars())
+            self.pol_to_abs_cart(polars)
         )
 
-        self.logger.log(f"obstacles: {obstacles}", LogLevels.DEBUG)
+        self.logger.log(f"obstacles: {obstacles}", LogLevels.INFO)
 
         asyncio.create_task(
             self.ws_lidar.sender.send(
@@ -98,7 +101,8 @@ class Robot1Brain(Brain):
         )
 
         self.logger.log(
-            f"Ennemy position computed: {self.arena.ennemy_position}", LogLevels.INFO
+            f"Ennemy position computed: {self.arena.ennemy_position}, at angle: {math.degrees(math.atan((self.arena.ennemy_position.x - self.rolling_basis.odometrie.x)/(self.arena.ennemy_position.y - self.rolling_basis.odometrie.y)))} and distance: {math.sqrt(pow(self.arena.ennemy_position.x - self.rolling_basis.odometrie.x,2)+pow(self.arena.ennemy_position.y - self.rolling_basis.odometrie.y,2))}",
+            LogLevels.INFO,
         )
 
         # For now, just stop if close. When updating, consider self.arena.check_collision_by_distances
