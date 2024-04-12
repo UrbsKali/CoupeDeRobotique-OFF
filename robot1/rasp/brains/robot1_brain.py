@@ -87,7 +87,12 @@ class Robot1Brain(Brain):
         asyncio.create_task(
             self.ws_lidar.sender.send(
                 WSmsg(
-                    msg="obstacles", data=[(geom.x, geom.y) for geom in obstacles.geoms]
+                    msg="obstacles",
+                    data=(
+                        [(geom.x, geom.y) for geom in obstacles.geoms]
+                        if not is_empty(obstacles)
+                        else []
+                    ),
                 )
             )
         )
