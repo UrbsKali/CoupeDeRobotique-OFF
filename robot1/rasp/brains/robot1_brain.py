@@ -32,7 +32,6 @@ class Robot1Brain(Brain):
         arena: MarsArena,
     ) -> None:
 
-        self.lidar_angle_extremums = (90, 180)
         self.camera = {}
 
         # to delete, only use for completion
