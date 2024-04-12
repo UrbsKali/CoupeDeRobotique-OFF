@@ -23,7 +23,7 @@ class Lidar:
     * The lidar is a SICK TIM 571.
     * The angle and distance are stored in a numpy array (type float32).
 
-    -> The default lidar distance unity is m.
+    -> The default lidar distance unit is m.
     """
 
     def __init__(
@@ -31,8 +31,8 @@ class Lidar:
         logger: Logger,
         min_angle: float,
         max_angle: float,
-        unity_angle: str = "deg",
-        unity_distance: str = "cm",
+        unit_angle: str = "deg",
+        unit_distance: str = "cm",
         min_distance: float = 5.0,
         initialization_fail_refresh_rate: float = 0.5,
     ) -> None:
@@ -45,16 +45,16 @@ class Lidar:
         :param logger: logger to log the lidar's events
         :param min_angle: the minimum angle of the lidar (max angle at left)
         :param max_angle: the maximum angle of the lidar (min angle at right)
-        :param unity_angle: the unity of the angles (default: "deg")
-        :param unity_distance: the unity of the distances (default: "cm")
+        :param unit_angle: the unit of the angles (default: "deg")
+        :param unit_distance: the unit of the distances (default: "cm")
         :param min_distance: the minimum distance to consider a distance as valid (default: 5.0 cm)
         :return:
         """
         self._logger = logger
         self.__min_angle = min_angle
         self.__max_angle = max_angle
-        self.__angle_unity = self.__init_angles_unity(unity_angle)
-        self.__distance_unity = self.__init_distances_unity(unity_distance)
+        self.__angle_unit = self.__init_angles_unit(unit_angle)
+        self.__distance_unit = self.__init_distances_unit(unit_distance)
 
         self._min_distance = min_distance
         self.__initialization_fail_refresh_rate = initialization_fail_refresh_rate
@@ -147,7 +147,7 @@ class Lidar:
         # Init the polars array with zeros, then fill it with angles
         polars = np.zeros(n, dtype=np.float32)
         for i in range(n):
-            polars[i] = min_angle + i * angle_step * self.__angle_unity
+            polars[i] = min_angle + i * angle_step * self.__angle_unit
 
         if polars.size == 0:
             self._logger.log("Error while initializing polars", LogLevels.CRITICAL)
@@ -155,41 +155,41 @@ class Lidar:
 
         return polars
 
-    def __init_angles_unity(self, unity: str) -> float:
+    def __init_angles_unit(self, unit: str) -> float:
         """
-        Initialize the unity of the angles
-        :param unity_angle: the unity of the angles
+        Initialize the unit of the angles
+        :param unit_angle: the unit of the angles
         :return:
         """
-        if unity == "deg":
+        if unit == "deg":
             return 1
-        if unity == "rad":
+        if unit == "rad":
             return math.pi / 180
 
         self._logger.log(
-            f"Unity of angles not recognized [{unity}] !", LogLevels.CRITICAL
+            f"unit of angles not recognized [{unit}] !", LogLevels.CRITICAL
         )
-        raise ValueError(f"Unity of angles not recognized [{unity}] !")
+        raise ValueError(f"unit of angles not recognized [{unit}] !")
 
-    def __init_distances_unity(self, unity: str) -> float:
+    def __init_distances_unit(self, unit: str) -> float:
         """
-        Initialize the unity of the distances
-        :param unity_distance: the unity of the distances
+        Initialize the unit of the distances
+        :param unit_distance: the unit of the distances
         :return:
         """
-        if unity == "mm":
+        if unit == "mm":
             return 1000
-        if unity == "cm":
+        if unit == "cm":
             return 100
-        if unity == "m":
+        if unit == "m":
             return 1
-        if unity == "inch":
+        if unit == "inch":
             return 0.0254
 
         self._logger.log(
-            f"Unity of distances not recognized [{unity}] !", LogLevels.CRITICAL
+            f"unit of distances not recognized [{unit}] !", LogLevels.CRITICAL
         )
-        raise ValueError(f"Unity of distances not recognized [{unity}] !")
+        raise ValueError(f"unit of distances not recognized [{unit}] !")
 
     def __scan(self):
         """
@@ -222,19 +222,19 @@ class Lidar:
     def distances(self) -> np.ndarray:
         """
         Get the distances from the last scan.
-        It automatically converts the distances to the right unity.
+        It automatically converts the distances to the right unit.
         :return: the distances array
         """
         return (
             np.array(self.__lidar_obj.scan.distances, dtype=np.float32)
-            * self.__distance_unity
+            * self.__distance_unit
         )
 
     @property
     def polars(self) -> np.ndarray:
         """
         Get the polars array.
-        It automatically converts the angles to the right unity.
+        It automatically converts the angles to the right unit.
         :return: the polars array
         """
         return np.column_stack((self.__polars_angles, self.distances))
