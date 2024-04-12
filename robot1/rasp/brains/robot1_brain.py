@@ -88,7 +88,15 @@ class Robot1Brain(Brain):
             self.ws_lidar.sender.send(
                 WSmsg(
                     msg="obstacles",
-                    data=(np.array(obstacles.coords)),
+                    data=(
+                        []
+                        if is_empty(obstacles)
+                        else (
+                            [(geom.x, geom.y) for geom in obstacles.geoms]
+                            if isinstance(obstacles, MultiPoint)
+                            else (obstacles.x, obstacles.y)
+                        )
+                    ),
                 )
             )
         )
