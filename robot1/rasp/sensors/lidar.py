@@ -141,6 +141,7 @@ class Lidar:
         n = len(self.distances)  # Number of distances
         if n == 0:
             self.__scan()
+            n = len(self.distances)  # Number of distances
 
         angle_step = abs(max_angle - min_angle) / n
 
