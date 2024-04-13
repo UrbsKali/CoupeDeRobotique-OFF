@@ -148,9 +148,7 @@ class Lidar:
         # Init the polars array with zeros, then fill it with angles centered, so that the "front" of the lidar is 0
         centered_polars = np.zeros(n, dtype=np.float32)
         for i in range(n):
-            centered_polars[i] = (
-                -((max_angle - min_angle) / 2) + i * angle_step * self.__angle_unit
-            )
+            centered_polars[i] = -((max_angle - min_angle) / 2) + i * angle_step
 
         if centered_polars.size == 0:
             self._logger.log("Error while initializing polars", LogLevels.CRITICAL)
