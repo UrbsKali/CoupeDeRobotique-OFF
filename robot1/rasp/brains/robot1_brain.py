@@ -35,10 +35,14 @@ class Robot1Brain(Brain):
         self.camera = {}
 
         # to delete, only use for completion
-        # self.rolling_basis:  RollingBasis
+        # self.rolling_basis: RollingBasis
         # self.actuators: Actuators
         # self.arena: MarsArena
-        # self.lidar:  Lidar
+        # self.lidar: Lidar
+        # self.ws_lidar: WSclientRouteManager
+        # self.ws_camera: WSclientRouteManager
+        # self.ws_odometer: WSclientRouteManager
+        # self.ws_cmd: WSclientRouteManager
 
         super().__init__(logger, self)
 
@@ -264,7 +268,8 @@ class Robot1Brain(Brain):
 
                 if is_arrived:
                     self.close_god_hand()
-                    destination_plant_zone.take_plants(5)
+                    if destination_plant_zone is not None:
+                        destination_plant_zone.take_plants(5)
 
             is_arrived = False
             while not is_arrived:
@@ -284,7 +289,8 @@ class Robot1Brain(Brain):
                 )
                 if is_arrived:
                     self.open_god_hand()
-                    destination_plant_zone.drop_plants(5)
+                    if destination_plant_zone is not None:
+                        destination_plant_zone.drop_plants(5)
 
     @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
     async def zombie_mode(self):

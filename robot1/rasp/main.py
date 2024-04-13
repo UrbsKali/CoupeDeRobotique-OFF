@@ -91,7 +91,7 @@ if __name__ == "__main__":
         start_zone_id, logger=logger_arena
     )  # must be declared from external calculus interface or switch on the robot
 
-    start_pos = OrientedPoint.from_Point(arena.zones["home"].centroid)
+    start_pos = OrientedPoint.from_Point(arena.zones["home"].centroid, 0)  # tmp theta
 
     rolling_basis.set_odo(start_pos)
 
