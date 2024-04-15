@@ -32,7 +32,7 @@ class Logger:
         *,
         identifier: str = "unknown",
         decorator_level: LogLevels = LogLevels.DEBUG,
-        print_log_level: LogLevels = LogLevels.DEBUG,
+        print_log_level: LogLevels = LogLevels.INFO,
         file_log_level: LogLevels = LogLevels.DEBUG,
         print_log: bool = True,
         write_to_file: bool = True,
