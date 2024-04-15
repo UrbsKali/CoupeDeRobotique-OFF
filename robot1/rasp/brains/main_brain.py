@@ -66,7 +66,7 @@ class MainBrain(Brain):
         Tasks
     """
 
-    @Brain.task(process=False, run_on_start=False, timeout=300)
+    @Brain.task(process=False, run_on_start=True, timeout=300)
     async def plant_stage(self):
         start_stage_time = Utils.get_ts()
         while 300 - Utils.time_since(start_stage_time) > 10:
