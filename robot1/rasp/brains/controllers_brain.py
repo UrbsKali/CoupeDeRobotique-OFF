@@ -47,13 +47,13 @@ def undeploy_god_hand(self):
 
 @Logger
 def open_god_hand(self):
-    for servo in FRONT_GOD_HAND:
+    for servo in CONFIG.FRONT_GOD_HAND:
         self.actuators.update_servo(servo["pin"], servo["open_angle"])
 
 
 @Logger
 def close_god_hand(self):
-    for servo in FRONT_GOD_HAND:
+    for servo in CONFIG.FRONT_GOD_HAND:
         self.actuators.update_servo(servo["pin"], servo["close_angle"])
 
 
