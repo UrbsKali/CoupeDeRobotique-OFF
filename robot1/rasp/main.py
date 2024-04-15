@@ -19,7 +19,7 @@ if __name__ == "__main__":
     logger_ws_client = Logger(
         identifier="ws_client",
         decorator_level=LogLevels.INFO,
-        print_log_level=LogLevels.WARNING,
+        print_log_level=LogLevels.CRITICAL,
         file_log_level=LogLevels.DEBUG,
     )
     logger_brain = Logger(
