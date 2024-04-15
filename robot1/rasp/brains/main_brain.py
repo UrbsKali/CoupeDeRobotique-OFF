@@ -66,8 +66,15 @@ class MainBrain(Brain):
     """
         Tasks
     """
+    @Brain.task(process=False, run_on_start=True, refresh_rate=5, timeout=2000)
+    async def test_hand(self):
+        self.logger.log("Open hand", LogLevels.INFO)
+        self.open_god_hand()
+        await asyncio.sleep(5)
+        self.logger.log("Close hand", LogLevels.INFO)
+        self.close_god_hand()
 
-    @Brain.task(process=False, run_on_start=True, timeout=300)
+    @Brain.task(process=False, run_on_start=False, timeout=30000)
     async def plant_stage(self):
         start_stage_time = Utils.get_ts()
         while 300 - Utils.time_since(start_stage_time) > 10:
