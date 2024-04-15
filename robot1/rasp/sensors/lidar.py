@@ -27,14 +27,14 @@ class Lidar:
     """
 
     def __init__(
-        self,
-        logger: Logger,
-        min_angle: float,
-        max_angle: float,
-        unit_angle: str = "deg",
-        unit_distance: str = "cm",
-        min_distance: float = 5.0,
-        initialization_fail_refresh_rate: float = 0.5,
+            self,
+            logger: Logger,
+            min_angle: float,
+            max_angle: float,
+            unit_angle: str = "deg",
+            unit_distance: str = "cm",
+            min_distance: float = 5.0,
+            initialization_fail_refresh_rate: float = 0.5,
     ) -> None:
         """
         Initialize the lidar object and the polars angles.
@@ -210,6 +210,8 @@ class Lidar:
                 self.__is_connected = False
                 self.__threading_init_lidar()
 
+            raise Exception(f"Error while scanning, LiDAR is disconnected ? [{error}]")
+
     """
         Public methods and properties
     """
@@ -227,8 +229,8 @@ class Lidar:
         :return: the distances array
         """
         return (
-            np.array(self.__lidar_obj.scan.distances, dtype=np.float32)
-            * self.__distance_unit
+                np.array(self.__lidar_obj.scan.distances, dtype=np.float32)
+                * self.__distance_unit
         )
 
     @property
