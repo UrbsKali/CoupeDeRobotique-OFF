@@ -66,7 +66,7 @@ class MainBrain(Brain):
     """
         Tasks
     """
-    @Brain.task(process=False, run_on_start=True, refresh_rate=5, timeout=2000)
+    @Brain.task(process=False, run_on_start=False, refresh_rate=5, timeout=2000)
     async def test_hand(self):
         self.logger.log("Open hand", LogLevels.INFO)
         self.open_god_hand()
