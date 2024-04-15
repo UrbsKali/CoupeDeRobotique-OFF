@@ -20,13 +20,13 @@ from sensors import Lidar
 @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
 async def compute_ennemy_position(self):
     polars: np.ndarray = self.lidar.scan_to_polars()
-    # self.logger.log(f"New measure", LogLevels.CRITICAL)
-    # self.logger.log(f"Polars ({polars.shape}): {polars.tolist()}", LogLevels.INFO)
+    self.logger.log(f"New measure", LogLevels.CRITICAL)
+    self.logger.log(f"Polars ({polars.shape}): {polars.tolist()}", LogLevels.INFO)
     obstacles: MultiPoint | Point = self.arena.remove_outside(
         self.pol_to_abs_cart(polars)
     )
 
-    self.logger.log(f"obstacles: {obstacles}", LogLevels.DEBUG)
+    self.logger.log(f"obstacles: {obstacles}", LogLevels.INFO)
 
     asyncio.create_task(
         self.ws_lidar.sender.send(
