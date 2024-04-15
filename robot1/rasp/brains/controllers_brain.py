@@ -67,18 +67,18 @@ async def go_best_zone(self, plant_zones: list[Plants_zone], delta=15):
             delta=delta,
         )
         if self.arena.enable_go_to_point(
-                self.rolling_basis.odometrie,
-                target,
+            self.rolling_basis.odometrie,
+            target,
         ):
             destination_point = target
             destination_plant_zone = plant_zone
             break
     if (
-            destination_point != None
-            and await self.rolling_basis.go_to_and_wait(
-        position=destination_point, timeout=30
-    )
-            == 0
+        destination_point != None
+        and await self.rolling_basis.go_to_and_wait(
+            position=destination_point, timeout=30
+        )
+        == 0
     ):
         return True, destination_plant_zone
     return False, destination_plant_zone
