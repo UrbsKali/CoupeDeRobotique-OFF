@@ -55,9 +55,7 @@ if __name__ == "__main__":
 
     # Websocket server
     ws_client = WSclient(
-        logger=logger_ws_client,
-        host=CONFIG.WS_SERVER_IP,
-        port=CONFIG.WS_PORT
+        logger=logger_ws_client, host=CONFIG.WS_SERVER_IP, port=CONFIG.WS_PORT
     )
     # Routes
     ws_cmd = WSclientRouteManager(

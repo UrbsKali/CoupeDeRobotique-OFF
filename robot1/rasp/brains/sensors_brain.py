@@ -58,12 +58,11 @@ async def compute_ennemy_position(self):
 
     # For now, just stop if close. When updating, consider self.arena.check_collision_by_distances
     if self.rolling_basis.odometrie.distance(self.arena.ennemy_position) < 40:
-        self.logger.log(
-            "ACS triggered, performing emergency stop", LogLevels.WARNING
-        )
+        self.logger.log("ACS triggered, performing emergency stop", LogLevels.WARNING)
         self.rolling_basis.stop_and_clear_queue()
     else:
         self.logger.log("ACS not triggered", LogLevels.DEBUG)
+
 
 def pol_to_abs_cart(self, polars: np.ndarray) -> MultiPoint:
     return MultiPoint(
