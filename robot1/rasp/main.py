@@ -1,4 +1,3 @@
-import contextlib
 from config_loader import CONFIG
 
 # Import from common
@@ -8,8 +7,8 @@ from geometry import OrientedPoint
 from arena import MarsArena
 
 # Import from local path
+from brains import MainBrain
 from controllers import RollingBasis, Actuators
-from brains import Robot1Brain
 from sensors import Lidar
 
 if __name__ == "__main__":
@@ -55,34 +54,40 @@ if __name__ == "__main__":
     )
 
     # Websocket server
-    ws_client = WSclient(CONFIG.WS_SERVER_IP, CONFIG.WS_PORT, logger=logger_ws_client)
+    ws_client = WSclient(
+        logger=logger_ws_client,
+        host=CONFIG.WS_SERVER_IP,
+        port=CONFIG.WS_PORT
+    )
+    # Routes
     ws_cmd = WSclientRouteManager(
         WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME)
     )
+    ws_pami = WSclientRouteManager(
+        WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME)
+    )
+    # Sensors
     ws_lidar = WSclientRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
     ws_odometer = WSclientRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
     ws_camera = WSclientRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
-
+    # Add routes
     ws_client.add_route_handler(CONFIG.WS_CMD_ROUTE, ws_cmd)
+    ws_client.add_route_handler(CONFIG.WS_PAMI_ROUTE, ws_pami)
     ws_client.add_route_handler(CONFIG.WS_LIDAR_ROUTE, ws_lidar)
     ws_client.add_route_handler(CONFIG.WS_ODOMETER_ROUTE, ws_odometer)
     ws_client.add_route_handler(CONFIG.WS_CAMERA_ROUTE, ws_camera)
 
     # Lidar
-    lidar = None
-    while lidar is None:
-        with contextlib.suppress(Exception):
-            lidar = Lidar(
-                logger=logger_lidar,
-                min_angle=CONFIG.LIDAR_MIN_ANGLE,
-                max_angle=CONFIG.LIDAR_MAX_ANGLE,
-                unit_angle=CONFIG.LIDAR_ANGLES_UNIT,
-                unit_distance=CONFIG.LIDAR_DISTANCES_UNIT,
-                min_distance=CONFIG.LIDAR_MIN_DISTANCE_DETECTION,
-            )
+    lidar = Lidar(
+        logger=logger_lidar,
+        min_angle=CONFIG.LIDAR_MIN_ANGLE,
+        max_angle=CONFIG.LIDAR_MAX_ANGLE,
+        unit_angle=CONFIG.LIDAR_ANGLES_UNIT,
+        unit_distance=CONFIG.LIDAR_DISTANCES_UNIT,
+        min_distance=CONFIG.LIDAR_MIN_DISTANCE_DETECTION,
+    )
     # Robot
     rolling_basis = RollingBasis(logger=logger_rolling_basis)
-
     actuators = Actuators(logger=logger_actuators)
 
     # Arena
@@ -92,11 +97,10 @@ if __name__ == "__main__":
     )  # must be declared from external calculus interface or switch on the robot
 
     start_pos = OrientedPoint.from_Point(arena.zones["home"].centroid, 0)  # tmp theta
-
     rolling_basis.set_odo(start_pos)
 
     # Brain
-    brain = Robot1Brain(
+    brain = MainBrain(
         actuators=actuators,
         logger=logger_brain,
         ws_cmd=ws_cmd,

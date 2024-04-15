@@ -1,21 +1,23 @@
+# External imports
+import numpy as np
+import asyncio
+import math
+import time
+
 # Import from common
-import numpy as np
-from logger import Logger, LogLevels
-from geometry import OrientedPoint, Point
-from arena import MarsArena, Plants_zone
-from WS_comms import WSclientRouteManager, WSmsg
+from config_loader import CONFIG
+
 from brain import Brain
+
+from WS_comms import WSmsg, WServerRouteManager
+from geometry import OrientedPoint, Point, Polygon, MultiPoint, nearest_points, is_empty
+from logger import Logger, LogLevels
+from arena import MarsArena, Plants_zone
 from utils import Utils
-import numpy as np
 
 # Import from local path
 from sensors import Lidar
 from controllers import RollingBasis, Actuators
-import asyncio
-from geometry import Polygon, MultiPoint, nearest_points, is_empty
-from config_loader import CONFIG
-import time
-import math
 
 
 class Robot1Brain(Brain):
@@ -71,11 +73,7 @@ class Robot1Brain(Brain):
     #     else:
     #         self.logger.log("ACS not triggered", LogLevels.DEBUG)
 
-    @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
-    async def get_camera(self):
-        msg = await self.ws_camera.receiver.get()
-        if msg != WSmsg():
-            self.camera = msg.data
+
 
     @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
     async def compute_ennemy_position(self):

@@ -1,1 +1,1 @@
-from brains.robot1_brain import Robot1Brain
+from brains.main_brain import MainBrain
