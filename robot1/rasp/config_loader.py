@@ -63,22 +63,7 @@ class CONFIG:
     # Actuators
     ACTUATORS_CONFIG = SPECIFIC_CONFIG["actuators"]
     ACTUATOR_TEENSY_SER = ACTUATORS_CONFIG["actuators_teensy_ser"]
-    GOD_HAND_GRAB_SERVO_PINS_LEFT = ACTUATORS_CONFIG["god_hand_grab_servo_pins_left"]
-    GOD_HAND_GRAB_SERVO_PINS_RIGHT = ACTUATORS_CONFIG["god_hand_grab_servo_pins_right"]
-    GOD_HAND_DEPLOYMENT_SERVO_PIN = ACTUATORS_CONFIG["god_hand_deployment_servo_pin"]
-    GOD_HAND_GRAB_SERVO_OPEN_ANGLE = ACTUATORS_CONFIG["god_hand_grab_servo_open_angle"]
-    GOD_HAND_DEPLOYMENT_SERVO_DEPLOY_ANGLE = ACTUATORS_CONFIG[
-        "god_hand_deployment_servo_deploye_angle"
-    ]
-    GOD_HAND_DEPLOYMENT_SERVO_UNDEPLOY_ANGLE = ACTUATORS_CONFIG[
-        "god_hand_deployment_servo_undeploy_angle"
-    ]
-    GOD_HAND_GRAB_SERVO_CLOSE_ANGLE_DIFF_LEFT = ACTUATORS_CONFIG[
-        "god_hand_grab_servo_close_angle_diff_left"
-    ]
-    GOD_HAND_GRAB_SERVO_CLOSE_ANGLE_DIFF_RIGHT = ACTUATORS_CONFIG[
-        "god_hand_grab_servo_close_angle_diff_right"
-    ]
+    FRONT_GOD_HAND = ACTUATORS_CONFIG["front_god_hand"]
 
     # Lidar
     LIDAR_CONFIG = SPECIFIC_CONFIG["lidar"]

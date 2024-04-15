@@ -73,20 +73,13 @@
     },
     "actuators": {
       "actuators_teensy_ser": 12678600,
-      "god_hand_grab_servo_pins_left": [
-        2,
-        3
-      ],
-      "god_hand_grab_servo_pins_right": [
-        4,
-        5
-      ],
-      "god_hand_deployment_servo_pin": 6,
-      "god_hand_deployment_servo_deploye_angle": 90,
-      "god_hand_deployment_servo_undeploy_angle": 90,
-      "god_hand_grab_servo_open_angle": 90,
-      "god_hand_grab_servo_close_angle_diff_left": 22,
-      "god_hand_grab_servo_close_angle_diff_right": -22
+      "front_god_hand":
+      [
+        {"pin":  2, "open_angle":  10, "close_angle":  35},
+        {"pin":  3, "open_angle":  10, "close_angle":  32},
+        {"pin":  4, "open_angle":  50, "close_angle":  30},
+        {"pin":  5, "open_angle":  58, "close_angle":  38}
+      ]
     },
     "lidar": {
       "distances_unit": "cm",

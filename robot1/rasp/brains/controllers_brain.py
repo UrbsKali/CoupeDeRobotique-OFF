@@ -47,26 +47,14 @@ def undeploy_god_hand(self):
 
 @Logger
 def open_god_hand(self):
-    for pin in CONFIG.GOD_HAND_GRAB_SERVO_PINS_LEFT:
-        self.actuators.update_servo(pin, CONFIG.GOD_HAND_GRAB_SERVO_OPEN_ANGLE)
-    for pin in CONFIG.GOD_HAND_GRAB_SERVO_PINS_RIGHT:
-        self.actuators.update_servo(pin, CONFIG.GOD_HAND_GRAB_SERVO_OPEN_ANGLE)
+    for servo in FRONT_GOD_HAND:
+        self.actuators.update_servo(servo["pin"], servo["open_angle"])
 
 
 @Logger
 def close_god_hand(self):
-    for pin in CONFIG.GOD_HAND_GRAB_SERVO_PINS_LEFT:
-        self.actuators.update_servo(
-            pin,
-            CONFIG.GOD_HAND_GRAB_SERVO_OPEN_ANGLE
-            + CONFIG.GOD_HAND_GRAB_SERVO_CLOSE_ANGLE_DIFF_LEFT,
-        )
-    for pin in CONFIG.GOD_HAND_GRAB_SERVO_PINS_RIGHT:
-        self.actuators.update_servo(
-            pin,
-            CONFIG.GOD_HAND_GRAB_SERVO_OPEN_ANGLE
-            + CONFIG.GOD_HAND_GRAB_SERVO_CLOSE_ANGLE_DIFF_RIGHT,
-        )
+    for servo in FRONT_GOD_HAND:
+        self.actuators.update_servo(servo["pin"], servo["close_angle"])
 
 
 async def go_best_zone(self, plant_zones: list[Plants_zone], delta=15):
@@ -79,18 +67,18 @@ async def go_best_zone(self, plant_zones: list[Plants_zone], delta=15):
             delta=delta,
         )
         if self.arena.enable_go_to_point(
-            self.rolling_basis.odometrie,
-            target,
+                self.rolling_basis.odometrie,
+                target,
         ):
             destination_point = target
             destination_plant_zone = plant_zone
             break
     if (
-        destination_point != None
-        and await self.rolling_basis.go_to_and_wait(
-            position=destination_point, timeout=30
-        )
-        == 0
+            destination_point != None
+            and await self.rolling_basis.go_to_and_wait(
+        position=destination_point, timeout=30
+    )
+            == 0
     ):
         return True, destination_plant_zone
     return False, destination_plant_zone
