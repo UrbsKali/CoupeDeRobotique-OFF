@@ -19,6 +19,7 @@ class MainBrain(Brain):
     """
     This brain is the main controller of ROB (robot1).
     """
+
     def __init__(
         self,
         logger: Logger,
@@ -29,7 +30,7 @@ class MainBrain(Brain):
         actuators: Actuators,
         rolling_basis: RollingBasis,
         lidar: Lidar,
-        arena: MarsArena
+        arena: MarsArena,
     ) -> None:
         # Camera data
         self.arucos = []
@@ -45,8 +46,9 @@ class MainBrain(Brain):
         undeploy_god_hand,
         open_god_hand,
         close_god_hand,
-        go_best_zone
+        go_best_zone,
     )
+
     # Sensors functions
     from brains.sensors_brain import compute_ennemy_position, pol_to_abs_cart
 
@@ -59,7 +61,6 @@ class MainBrain(Brain):
 
     """ Main process routines """
     from brains.com_brain import camera_com, odometer_com, zombie_mode
-
 
     """
         Tasks

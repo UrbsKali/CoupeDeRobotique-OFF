@@ -73,8 +73,6 @@ class Robot1Brain(Brain):
     #     else:
     #         self.logger.log("ACS not triggered", LogLevels.DEBUG)
 
-
-
     @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
     async def compute_ennemy_position(self):
         polars: np.ndarray = self.lidar.scan_to_polars()

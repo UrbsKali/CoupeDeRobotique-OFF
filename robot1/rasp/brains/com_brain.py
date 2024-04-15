@@ -13,7 +13,6 @@ from logger import Logger, LogLevels
 # from sensors import Lidar
 
 
-
 @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
 async def camera_com(self):
     """
@@ -78,9 +77,7 @@ async def zombie_mode(self):
 
         elif cmd.msg == "set_pid":
             self.rolling_basis.clear_queue()
-            self.rolling_basis.set_pid(
-                Kp=cmd.data[0], Ki=cmd.data[1], Kd=cmd.data[2]
-            )
+            self.rolling_basis.set_pid(Kp=cmd.data[0], Ki=cmd.data[1], Kd=cmd.data[2])
         elif cmd.msg == "go_to_and_wait":
             await self.rolling_basis.go_to_and_wait(
                 position=Point(cmd.data[0], cmd.data[1]),
