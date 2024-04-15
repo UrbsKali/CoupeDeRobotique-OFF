@@ -9,6 +9,7 @@ from WS_comms import WSmsg, WSclientRouteManager
 from geometry import OrientedPoint, Point
 from logger import Logger, LogLevels
 from arena import MarsArena
+from utils import Utils
 
 # Import from local path
 from controllers import RollingBasis, Actuators
