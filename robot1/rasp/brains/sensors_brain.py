@@ -8,6 +8,7 @@ from config_loader import CONFIG
 from brain import Brain
 
 from geometry import OrientedPoint, Point, MultiPoint
+from WS_comms import WSmsg, WSclientRouteManager
 from arena import MarsArena, Plants_zone
 from logger import Logger, LogLevels
 
