@@ -420,7 +420,9 @@ class RollingBasis(Teensy):
             + struct.pack("<ff", pos.x, pos.y)
             + struct.pack("<?", is_forward)
             + struct.pack("<B", max_speed)
-            + struct.pack("<HHH", next_position_delay, action_error_auth, traj_precision)
+            + struct.pack(
+                "<HHH", next_position_delay, action_error_auth, traj_precision
+            )
             + struct.pack("<BB", correction_trajectory_speed, acceleration_start_speed)
             + struct.pack("<f", acceleration_distance)
             + struct.pack("<B", deceleration_end_speed)

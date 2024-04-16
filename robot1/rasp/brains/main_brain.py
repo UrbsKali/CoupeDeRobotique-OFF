@@ -42,7 +42,6 @@ class MainBrain(Brain):
 
     # Controllers functions
     from brains.controllers_brain import (
-        go_to_and_wait_test,
         deploy_god_hand,
         undeploy_god_hand,
         open_god_hand,
