@@ -1,4 +1,5 @@
 #include <actions.h>
+
 // tries to call the functions called by the rasp and send back an error message otherwise
 void handle_callback(Com *com)
 {
@@ -10,7 +11,12 @@ void handle_callback(Com *com)
         if (functions[msg[0]] != 0) // verifies if the id of the function received by com is defined
         {
             functions[msg[0]](msg, size); // call the function by it's id and with the parameters received by com
-        }    
+        }
+        else if (msg[0] == NACK)
+        {
+            // send again the message that wasn't received by the rasp
+            com->send_msg((byte *)&com->last_msg->msg, com->last_msg->size, true);
+        }
         else
         {
             msg_Unknown_Msg_Type error_message;
@@ -20,10 +26,10 @@ void handle_callback(Com *com)
     }
 }
 
-/// @brief if the given servo exists this function enables to write the given angle on it  
+/// @brief if the given servo exists this function enables to write the given angle on it
 /// @param servo a pointer to an instance of Servo_Motor
 /// @param angle the angle to write of the servo
-void servo_go_to(Servo* servo, int angle)
+void servo_go_to(Servo *servo, int angle)
 {
     servo->write(angle);
 }
