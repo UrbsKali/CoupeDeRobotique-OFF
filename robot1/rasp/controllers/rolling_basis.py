@@ -416,7 +416,7 @@ class RollingBasis(Teensy):
             position.x + self.position_offset.x, position.y + self.position_offset.y
         )
         msg = (
-            Command.GO_TO_POINT.value
+            Command.GET_ORIENTATION.value
             + struct.pack("<f", pos.x)
             + struct.pack("<f", pos.y)
             + struct.pack("<?", is_forward)
