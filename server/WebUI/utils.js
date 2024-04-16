@@ -35,3 +35,18 @@ class WebSocketManager {
         this.websockets[route].send(this.#create_trame(msg, data))
     }
 }
+
+// change background color of button during .05s when clicked
+function button_click_effect(button) {
+    button.style.backgroundColor = "#0232FF";
+    setTimeout(() => {
+        button.style.backgroundColor = "#B3C2FF";
+    }, 50)
+}
+
+let buttons = document.querySelectorAll(".button");
+buttons.forEach(button => {
+    button.addEventListener("click", () => {
+        button_click_effect(button);
+    })
+})

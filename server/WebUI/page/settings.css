@@ -1,0 +1,8 @@
+.pid{
+    width: 400px;
+    display: flex;
+}
+
+input{
+    max-width: 50px;
+}

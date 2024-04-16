@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../assets/style/roboto.css">
+    <link rel="stylesheet" href="../assets/style/icons.css">
+    <link rel="stylesheet" href="../assets/style/dpad.css">
+    <link rel="stylesheet" href="../assets/style/inter.css">
+    <link rel="stylesheet" href="../assets/style/bento.css">
+    <link rel="stylesheet" href="settings.css">
+    <link rel="shortcut icon" href="../assets/fav.ico" type="image/x-icon">
+    <title>CDR Dashboard | Settings</title>
+</head>
+
+<body>
+    <div class="menu">
+        <a href="../index.html" class="item_menu"><i class="menu_icon icon"></i>Général</a>
+        <a href="./map.html" class="item_menu"><i class="map_icon icon"></i>Map</a>
+        <a href="./cam.html" class="item_menu"><i class="cam_icon icon"></i>Caméra</a>
+        <a href="./start.html" class="item_menu"><i class="save_icon icon"></i>Start</a>
+        <a href="./settings.html" class="item_menu active"><i class="settings_icon icon"></i>Settings</a>
+    </div>
+    <div class="sushi">
+        <div class="pid">
+            <div class="p">
+                <p>Kp</p>
+                <input type="number" name="kp" id="" step="0.1">
+            </div>
+            <div class="i">
+                <p>Ki</p>
+                <input type="number" name="ki" id="" step="0.1">
+            </div>
+            <div class="d">
+                <p>Kd</p>
+                <input type="number" name="kd" id="" step="0.1">
+            </div>
+            <div class="button send">send</div>
+        </div>
+    </div>
+    <div class="sushi">
+        <!--
+            is_forward: bool = True,
+        max_speed: int = 150,
+        next_position_delay: int = 100,
+        action_error_auth: int = 50,
+        traj_precision: int = 50,
+        correction_trajectory_speed: int = 80,
+        acceleration_start_speed: int = 80,
+        acceleration_distance: float = 10,
+        deceleration_end_speed: int = 80,
+        deceleration_distance: float = 10,
+        -->
+        <div class="params">
+            <div class="point">
+                <p>Position</p>
+                <input type="number" name="x" id="" step="5">
+                <input type="number" name="y" id="" step="5">
+                <input type="number" name="z" id="" step="5">
+            </div>
+            <div class="max_speed">
+                <p>Max speed</p>
+                <input type="number" name="max_speed" id="" step="5">
+                <p>Next position delay</p>
+                <input type="number" name="npd" id="" step="5">
+                <p>action error auth</p>
+                <input type="number" name="aea" id="" step="5">
+                <p>traj_precision</p>
+                <input type="number" name="traj_precision" id="" step="5">
+                <p>correction trajectory speed</p>
+                <input type="number" name="correction" id="" step="5">
+                <p>acceleration start speed</p>
+                <input type="number" name="accel_start_speed" id="" step="5">
+                <p>acceleration distance</p>
+                <input type="number" name="accel_distance" id="" step="5">
+                <p>decceleration end speed</p>
+                <input type="number" name="deccel_end_speed" id="" step="5">
+                <p>decceleration distance</p>
+                <input type="number" name="deccel_distance" id="" step="5">
+            </div>
+            <div class="button send">send</div>
+
+        </div>
+    </div>
+    <script src="../utils.js"></script>
+    <script src="settings.js"></script>
+</body>
+
+</html>
