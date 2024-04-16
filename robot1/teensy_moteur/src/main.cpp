@@ -52,7 +52,7 @@ Rolling_Basis_Ptrs rolling_basis_ptrs;
 /* Strat part */
 Com *com;
 
-Complex_Action *current_action = nullptr;
+Action *current_action = nullptr;
 
 void swap_action(Action *new_action)
 {
@@ -70,7 +70,8 @@ void swap_action(Action *new_action)
 void get_orientation(byte *msg, byte size)
 {
   msg_Get_Orientation *get_orientation_msg = (msg_Get_Orientation *)msg;
-  //com->print("get_orientation");
+  Point target_point(get_orientation_msg->x, get_orientation_msg->y, 0.0f);
+  com->print("get_orientation");
   Precision_Params params{
       get_orientation_msg->next_position_delay,
       get_orientation_msg->action_error_auth,
@@ -103,7 +104,7 @@ void get_orientation(byte *msg, byte size)
   );
 
   swap_action(new_action);
-  //com->print("swap action");
+  com->print("swap action");
 }
 
 void go_to(byte *msg, byte size)

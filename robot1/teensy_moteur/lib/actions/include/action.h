@@ -10,8 +10,9 @@ public:
     Action_state state = not_started;
     
     // Propertie(s)
+    virtual inline byte get_id() {return 0;} // Return the id of the action (usefull for Com), not obligatory implemented on childs classes
     bool is_finished();
-
+    
     // Constructor
     Action() = default;
 
