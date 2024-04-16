@@ -22,7 +22,7 @@
 
 // Creation Rolling Basis
 #define ENCODER_RESOLUTION 1024
-#define CENTER_DISTANCE 27.07
+#define CENTER_DISTANCE 29.01
 #define WHEEL_DIAMETER 6.1
 
 // Motor Left
@@ -54,7 +54,7 @@ Com *com;
 
 Complex_Action *current_action = nullptr;
 
-void swap_action(Complex_Action *new_action)
+void swap_action(Action *new_action)
 {
   // implémentation des destructeurs manquante
   if (current_action == new_action)
@@ -70,8 +70,8 @@ void swap_action(Complex_Action *new_action)
 void get_orientation(byte *msg, byte size)
 {
   msg_Get_Orientation *get_orientation_msg = (msg_Get_Orientation *)msg;
-  Point target_point(go_to_msg->x, go_to_msg->y, 0.0f);
-  com->print("get_orientation");
+  Point target_point(get_orientation_msg->x, get_orientation_msg->y, 0.0f);
+  //com->print("get_orientation");
   Precision_Params params{
       get_orientation_msg->next_position_delay,
       get_orientation_msg->action_error_auth,
@@ -92,10 +92,10 @@ void get_orientation(byte *msg, byte size)
 
   Get_Orientation *new_action = new Get_Orientation(
     target_point, 
-    go_to_msg->is_forward ? forward : backward, 
+    get_orientation_msg->is_forward ? forward : backward, 
     Speed_Driver_From_Distance(
-      go_to_msg->max_speed,
-      go_to_msg->correction_trajectory_speed,
+      get_orientation_msg->max_speed,
+      get_orientation_msg->correction_trajectory_speed,
       acceleration,
       deceleration
     ),
@@ -103,7 +103,7 @@ void get_orientation(byte *msg, byte size)
   );
 
   swap_action(new_action);
-  com->print("swap action");
+  //com->print("swap action");
 }
 
 void go_to(byte *msg, byte size)
