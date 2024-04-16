@@ -108,21 +108,23 @@ class WServer:
                 )
                 # Add ping pong task if self.__ping_pong_clients_interval has a value, then run server
                 if self.__ping_pong_clients_interval is not None:
+
                     async def ping_pong_clients_interval_executor():
-                        await self.__ping_pong_clients_task(self.__ping_pong_clients_interval)
+                        await self.__ping_pong_clients_task(
+                            self.__ping_pong_clients_interval
+                        )
 
                     self.add_background_task(
                         lambda: ping_pong_clients_interval_executor
                     )
                     self.__logger.log(
                         f"Ping pong mode activated, interval: [{self.__ping_pong_clients_interval}]",
-                        LogLevels.DEBUG
+                        LogLevels.DEBUG,
                     )
 
                 web.run_app(self._app, host=self.__host, port=self.__port)
             except Exception as error:
                 self.__logger.log(
-                    f"WServer error: ({error}), try to restart...",
-                    LogLevels.ERROR
+                    f"WServer error: ({error}), try to restart...", LogLevels.ERROR
                 )
                 time.sleep(5)
