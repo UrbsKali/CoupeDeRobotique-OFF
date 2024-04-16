@@ -115,7 +115,7 @@ class WServer:
                         )
 
                     self.add_background_task(
-                        lambda: ping_pong_clients_interval_executor
+                        ping_pong_clients_interval_executor
                     )
                     self.__logger.log(
                         f"Ping pong mode activated, interval: [{self.__ping_pong_clients_interval}]",
