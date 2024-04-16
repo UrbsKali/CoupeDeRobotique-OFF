@@ -23,6 +23,7 @@ class Command(Enum):
     RESET_POSITION = b"\05"
     SET_PID = b"\06"
     SET_HOME = b"\07"
+    GET_ORIENTATION = b"\08"
     STOP = b"\x7E"  # 7E = 126
     INVALID = b"\xFF"
 
@@ -393,6 +394,47 @@ class RollingBasis(Teensy):
             )
             # self.stop_and_clear_queue()
             return 2
+        
+    
+    
+    @Logger
+    def get_orientation(
+        self,
+        position: Point,
+        *,  # force keyword arguments
+        is_forward: bool = True,
+        max_speed: int = 150,
+        next_position_delay: int = 100,
+        action_error_auth: int = 50,
+        traj_precision: int = 50,
+        correction_trajectory_speed: int = 80,
+        acceleration_start_speed: int = 80,
+        acceleration_distance: float = 10,
+        deceleration_end_speed: int = 80,
+        deceleration_distance: float = 10,
+    )->None:
+        
+        pos = Point(
+            position.x + self.position_offset.x, position.y + self.position_offset.y
+        )
+        msg = (
+            Command.GO_TO_POINT.value
+            + struct.pack("<f", pos.x)
+            + struct.pack("<f", pos.y)
+            + struct.pack("<?", is_forward)
+            + struct.pack("<B", max_speed)
+            + struct.pack("<H", next_position_delay)
+            + struct.pack("<H", action_error_auth)
+            + struct.pack("<H", traj_precision)
+            + struct.pack("<B", correction_trajectory_speed)
+            + struct.pack("<B", acceleration_start_speed)
+            + struct.pack("<f", acceleration_distance)
+            + struct.pack("<B", deceleration_end_speed)
+            + struct.pack("<f", deceleration_distance)
+        )
+        # https://docs.python.org/3/library/struct.html#format-characters
+
+        return self.append_to_queue(Instruction(Command.GET_ORIENTATION, msg))
 
     @Logger
     def curve_go_to(
