@@ -38,7 +38,7 @@ class WServer:
     async def __ping_pong_clients_task(self, interval: int):
         while True:
             for route, manager in self.__route_managers.items():
-                for client_name, client_ws_connection in manager.clients:
+                for client_name, client_ws_connection in manager.clients.items():
                     self.__logger.log(
                         f"Ping client [{client_name}] on route [{route}]",
                         LogLevels.DEBUG,
@@ -109,13 +109,9 @@ class WServer:
                 # Add ping pong task if self.__ping_pong_clients_interval has a value, then run server
                 if self.__ping_pong_clients_interval is not None:
 
-                    async def ping_pong_clients_interval_executor():
-                        await self.__ping_pong_clients_task(
-                            self.__ping_pong_clients_interval
-                        )
-
                     self.add_background_task(
-                        ping_pong_clients_interval_executor
+                        self.__ping_pong_clients_task,
+                        interval=self.__ping_pong_clients_interval
                     )
                     self.__logger.log(
                         f"Ping pong mode activated, interval: [{self.__ping_pong_clients_interval}]",
