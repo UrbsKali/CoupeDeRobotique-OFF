@@ -39,7 +39,7 @@ class MarsArena(Arena):
 
         :param start_zone: The start zone of the robot, must be between 1 and 6
         :type start_zone: int
-        :raises ValueError: If start_zone is not between 1 and 6
+        :raises ValueError: If start_zone is not between 0 and 5
         """
         if not (0 <= start_zone_id <= 5):
             raise ValueError("start_zone must be between 0 and 5")
