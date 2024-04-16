@@ -96,6 +96,7 @@ if __name__ == "__main__":
 
     start_pos = OrientedPoint.from_Point(arena.zones["home"].centroid, 0)  # tmp theta
     rolling_basis.set_odo(start_pos)
+    logger_brain.log(f"Start position: {start_pos}", LogLevels.INFO)
 
     # Brain
     brain = MainBrain(
