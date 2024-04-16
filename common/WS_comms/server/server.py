@@ -44,9 +44,9 @@ class WServer:
                         LogLevels.DEBUG,
                     )
                     try:
-                        await client_ws_connection.ping()
+                        result = await client_ws_connection.ping()
                         self.__logger.log(
-                            f"Ping client [{client_name} success", LogLevels.DEBUG
+                            f"Ping client [{client_name} success [{result}]", LogLevels.DEBUG
                         )
                     except Exception as error:
                         self.__logger.log(
