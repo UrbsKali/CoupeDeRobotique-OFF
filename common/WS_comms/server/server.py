@@ -44,16 +44,30 @@ class WServer:
                         LogLevels.DEBUG,
                     )
                     try:
-                        result = await client_ws_connection.ping()
+                        await asyncio.wait_for(client_ws_connection.ping(), timeout=10)
                         self.__logger.log(
-                            f"Ping client [{client_name} success [{result}]", LogLevels.DEBUG
+                            f"Ping client [{client_name} success", LogLevels.DEBUG
+                        )
+                        continue
+                    except asyncio.TimeoutError:
+                        self.__logger.log(
+                            f"Pinging timeout [{client_name}] on route [{route}]. "
+                            f"The client have been suddenly disconnected.",
+                            LogLevels.WARNING,
+                        )
+                    except websockets.exceptions.ConnectionClosed:
+                        self.__logger.log(
+                            f"Connection closed [{client_name}] on route [{route}]. "
+                            f"The client have been suddenly disconnected.",
+                            LogLevels.WARNING,
                         )
                     except Exception as error:
                         self.__logger.log(
-                            f"Error while pinging client [{client_name}] on route [{route}]. The client have been suddenly disconnected ({error})",
+                            f"Error while pinging client [{client_name}] on route [{route}]. "
+                            f"The client have been suddenly disconnected ({error})",
                             LogLevels.WARNING,
                         )
-                        del manager.clients[client_name]
+                    del manager.clients[client_name]
             await asyncio.sleep(interval)
 
     def add_route_handler(self, route: str, route_manager: WServerRouteManager) -> None:
