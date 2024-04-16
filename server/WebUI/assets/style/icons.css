@@ -22,3 +22,6 @@ i.eye_icon{
 i.compass_icon{
     mask: url(../icons/compass.svg) no-repeat center;
 }
+i.settings_icon{
+    mask: url(../icons/settings.svg) no-repeat center;
+}
