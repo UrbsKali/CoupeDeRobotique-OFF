@@ -1,2 +1,3 @@
 #define SERVO_GO_TO 1
 #define UNKNOWN_MSG_TYPE 255
+#define NACK 126

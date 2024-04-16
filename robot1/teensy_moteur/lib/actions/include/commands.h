@@ -11,6 +11,7 @@
 #define SET_PID 6
 #define SET_HOME 7
 #define GET_ORIENTATION 8
+#define GET_PID 9
 
 // two ways : 127 (Convention)
 #define NACK 127
@@ -19,6 +20,7 @@
 #define UPDATE_POSITION 128
 #define ACTION_FINISHED 129
 #define STRING 130
+#define SEND_PID 131
 #define UNKNOWN_MSG_TYPE 255
 
 extern void (*functions[256])(byte *msg, byte size);

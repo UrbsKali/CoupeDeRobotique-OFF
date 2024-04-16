@@ -417,15 +417,11 @@ class RollingBasis(Teensy):
         )
         msg = (
             Command.GET_ORIENTATION.value
-            + struct.pack("<f", pos.x)
-            + struct.pack("<f", pos.y)
+            + struct.pack("<ff", pos.x, pos.y)
             + struct.pack("<?", is_forward)
             + struct.pack("<B", max_speed)
-            + struct.pack("<H", next_position_delay)
-            + struct.pack("<H", action_error_auth)
-            + struct.pack("<H", traj_precision)
-            + struct.pack("<B", correction_trajectory_speed)
-            + struct.pack("<B", acceleration_start_speed)
+            + struct.pack("<HHH", next_position_delay, action_error_auth, traj_precision)
+            + struct.pack("<BB", correction_trajectory_speed, acceleration_start_speed)
             + struct.pack("<f", acceleration_distance)
             + struct.pack("<B", deceleration_end_speed)
             + struct.pack("<f", deceleration_distance)
