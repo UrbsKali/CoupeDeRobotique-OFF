@@ -53,19 +53,19 @@ class WServer:
                         self.__logger.log(
                             f"Pinging timeout [{client_name}] on route [{route}]. "
                             f"The client have been suddenly disconnected.",
-                            LogLevels.WARNING
+                            LogLevels.WARNING,
                         )
                     except websockets.exceptions.ConnectionClosed:
                         self.__logger.log(
                             f"Connection closed [{client_name}] on route [{route}]. "
                             f"The client have been suddenly disconnected.",
-                            LogLevels.WARNING
+                            LogLevels.WARNING,
                         )
                     except Exception as error:
                         self.__logger.log(
                             f"Error while pinging client [{client_name}] on route [{route}]. "
                             f"The client have been suddenly disconnected ({error})",
-                            LogLevels.WARNING
+                            LogLevels.WARNING,
                         )
                     del manager.clients[client_name]
             await asyncio.sleep(interval)
