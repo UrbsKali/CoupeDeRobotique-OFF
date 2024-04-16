@@ -69,7 +69,50 @@
       "server_ip": "192.168.0.104"
     },
     "rolling_basis": {
-      "rolling_basis_teensy_ser": 12675800
+      "rolling_basis_teensy_ser": 12675800,
+      "go_to_profiles": {
+        "precision": {
+          "high_precision": {
+            "next_position_delay": 100,
+            "action_error_auth": 10,
+            "traj_precision":  10
+          },
+          "classic_precision": {
+            "next_position_delay": 100,
+            "action_error_auth": 50,
+            "traj_precision":  50
+          },
+          "low_precision": {
+            "next_position_delay": 100,
+            "action_error_auth": 100,
+            "traj_precision":  100
+          }
+        },
+        "speed": {
+          "high_speed": {
+            "max_speed": 200,
+            "correction_trajectory_speed":  150,
+            "acceleration_start_speed": 120,
+            "acceleration_distance": 15,
+            "deceleration_end_speed": 150,
+            "deceleration_distance": 8
+          },
+          "cruise_speed": {
+            "max_speed": 150,
+            "acceleration_start_speed": 120,
+            "acceleration_distance": 5,
+            "deceleration_end_speed": 120,
+            "deceleration_distance": 10
+          },
+          "low_speed": {
+            "max_speed": 120,
+            "acceleration_start_speed": 120,
+            "acceleration_distance": 0,
+            "deceleration_end_speed": 120,
+            "deceleration_distance": 0
+          }
+        }
+      }
     },
     "actuators": {
       "actuators_teensy_ser": 12678600,

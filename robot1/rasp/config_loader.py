@@ -59,6 +59,8 @@ class CONFIG:
     # Rolling Basis
     ROLLING_BASIS_CONFIG = SPECIFIC_CONFIG["rolling_basis"]
     ROLLING_BASIS_TEENSY_SER = ROLLING_BASIS_CONFIG["rolling_basis_teensy_ser"]
+    SPEED_PROFILES = ROLLING_BASIS_CONFIG["go_to_profiles"]["speed"]
+    PRECISION_PROFILES = ROLLING_BASIS_CONFIG["go_to_profiles"]["precision"]
 
     # Actuators
     ACTUATORS_CONFIG = SPECIFIC_CONFIG["actuators"]

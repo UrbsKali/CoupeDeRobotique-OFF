@@ -17,7 +17,7 @@ from logger import Logger, LogLevels
 from sensors import Lidar
 
 
-@Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
+@Brain.task(process=False, run_on_start=True, refresh_rate=0.1)
 async def compute_ennemy_position(self):
     polars: np.ndarray = self.lidar.scan_to_polars()
     # self.logger.log(f"Polars ({polars.shape}): {polars.tolist()}", LogLevels.INFO)
