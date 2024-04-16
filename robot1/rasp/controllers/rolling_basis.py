@@ -394,9 +394,7 @@ class RollingBasis(Teensy):
             )
             # self.stop_and_clear_queue()
             return 2
-        
-    
-    
+
     @Logger
     def get_orientation(
         self,
@@ -412,8 +410,8 @@ class RollingBasis(Teensy):
         acceleration_distance: float = 10,
         deceleration_end_speed: int = 80,
         deceleration_distance: float = 10,
-    )->None:
-        
+    ) -> None:
+
         pos = Point(
             position.x + self.position_offset.x, position.y + self.position_offset.y
         )
