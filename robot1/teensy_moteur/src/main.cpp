@@ -67,6 +67,45 @@ void swap_action(Complex_Action *new_action)
   current_action = new_action;
 }
 
+void get_orientation(byte *msg, byte size)
+{
+  msg_Get_Orientation *get_orientation_msg = (msg_Get_Orientation *)msg;
+  Point target_point(go_to_msg->x, go_to_msg->y, 0.0f);
+  com->print("get_orientation");
+  Precision_Params params{
+      get_orientation_msg->next_position_delay,
+      get_orientation_msg->action_error_auth,
+      get_orientation_msg->traj_precision,
+  };
+
+  Profil_params acceleration {
+    get_orientation_msg->acceleration_start_speed,
+    -1.0f,
+    get_orientation_msg->acceleration_distance
+  };
+
+  Profil_params deceleration {
+    get_orientation_msg->deceleration_end_speed,
+    -1.0f,
+    get_orientation_msg->deceleration_distance
+  };
+
+  Get_Orientation *new_action = new Get_Orientation(
+    target_point, 
+    go_to_msg->is_forward ? forward : backward, 
+    Speed_Driver_From_Distance(
+      go_to_msg->max_speed,
+      go_to_msg->correction_trajectory_speed,
+      acceleration,
+      deceleration
+    ),
+    params
+  );
+
+  swap_action(new_action);
+  com->print("swap action");
+}
+
 void go_to(byte *msg, byte size)
 {
   msg_Go_To *go_to_msg = (msg_Go_To *)msg;
@@ -123,6 +162,8 @@ void curve_go_to(byte *msg, byte size)
   Curve_Go_To *new_action = new Curve_Go_To(target_point, center_point, curve_msg->interval, curve_msg->direction ? backward : forward, curve_msg->speed, params);
   swap_action(new_action);
 }*/
+
+
 
 // Whether to keep position when no action is active
 bool keep_curr_pos_when_no_action = true;
@@ -239,6 +280,7 @@ void setup()
   functions[RESET_ODO] = &reset_odo,
   functions[SET_PID] = &set_pid,
   functions[SET_HOME] = &set_home,
+  functions[GET_ORIENTATION] = &get_orientation;
 
   Serial.begin(115200);
 

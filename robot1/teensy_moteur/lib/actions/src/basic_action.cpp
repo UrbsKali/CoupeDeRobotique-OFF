@@ -101,7 +101,6 @@ void Move_Rotation::compute(Point current_point, Ticks current_ticks, Rolling_Ba
 
     // Create the step action
     this->step_action = new Step_Rotation(delta_theta, this->speed_driver, this->precision_params);
-    this->step_action = new Step_Rotation(delta_theta, this->speed_driver, this->precision_params);
 
     // Compute the step action
     this->step_action->compute(current_ticks, rolling_basis_params);

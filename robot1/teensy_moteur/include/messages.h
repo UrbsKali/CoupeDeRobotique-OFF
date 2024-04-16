@@ -23,6 +23,23 @@ struct msg_Go_To
     float deceleration_distance;
 };
 
+struct msg_Get_Orientation
+{
+    byte command = GET_ORIENTATION;
+    float x;
+    float y;
+    bool is_forward;
+    byte max_speed;
+    uint16_t next_position_delay; 
+    uint16_t action_error_auth;
+    uint16_t traj_precision;
+    byte correction_trajectory_speed;
+    byte acceleration_start_speed;
+    float acceleration_distance;
+    byte deceleration_end_speed;
+    float deceleration_distance;
+};
+
 struct msg_Curve_Go_To
 {
     byte command = CURVE_GO_TO;
@@ -87,3 +104,4 @@ struct msg_String
     byte command = STRING;
     char str[249]; // Max size is 256 - 6 (Intercom) - 1 (cmd ID)
 };
+
