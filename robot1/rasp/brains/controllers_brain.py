@@ -15,21 +15,6 @@ from logger import Logger, LogLevels
 from controllers import RollingBasis, Actuators
 
 
-@Brain.task(process=False, run_on_start=False)
-async def go_to_and_wait_test(self):
-    await asyncio.sleep(1)
-    result = await self.rolling_basis.go_to_and_wait(
-        Point(50, 50), tolerance=5, timeout=20
-    )
-
-    if result == 0:
-        self.logger.log("Success of movement test")
-    elif result == 1:
-        self.logger.log("Timed out of movement test")
-    elif result == 2:
-        self.logger.log("Error moving: didn't reach destination")
-
-
 @Logger
 def deploy_god_hand(self):
     self.actuators.update_servo(
