@@ -70,7 +70,6 @@ void swap_action(Action *new_action)
 void get_orientation(byte *msg, byte size)
 {
   msg_Get_Orientation *get_orientation_msg = (msg_Get_Orientation *)msg;
-  Point target_point(get_orientation_msg->x, get_orientation_msg->y, 0.0f);
   //com->print("get_orientation");
   Precision_Params params{
       get_orientation_msg->next_position_delay,
@@ -91,15 +90,16 @@ void get_orientation(byte *msg, byte size)
   };
 
   Get_Orientation *new_action = new Get_Orientation(
-    target_point, 
-    get_orientation_msg->is_forward ? forward : backward, 
-    Speed_Driver_From_Distance(
+    get_orientation_msg->x,
+    get_orientation_msg->y, 
+    &(get_orientation_msg->is_forward ? forward : backward), 
+    new Speed_Driver_From_Distance(
       get_orientation_msg->max_speed,
       get_orientation_msg->correction_trajectory_speed,
       acceleration,
       deceleration
     ),
-    params
+    &params
   );
 
   swap_action(new_action);
