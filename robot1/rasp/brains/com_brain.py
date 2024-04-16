@@ -7,6 +7,7 @@ from config_loader import CONFIG
 from brain import Brain
 
 from WS_comms import WSmsg, WServerRouteManager
+from geometry import OrientedPoint, Point
 from logger import Logger, LogLevels
 
 # Import from local path
