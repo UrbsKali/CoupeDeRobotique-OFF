@@ -9,9 +9,6 @@ public:
     // so they are only stored in the high-level class; 
     // lower-level classes access them via pointers
     
-    // Property
-    virtual inline byte get_id() = 0;
-
     // Operators
     virtual bool operator==(Complex_Action &other) = 0;
 
@@ -39,7 +36,7 @@ class Go_To : public Complex_Action
 {
 public:
     // Property
-    inline byte get_id() {return GO_TO; }
+    inline byte get_id() { return GO_TO; }
 
     // Operators
     bool operator==(Complex_Action &other);
