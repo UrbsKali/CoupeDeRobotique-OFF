@@ -16,18 +16,17 @@ struct msg_Unknown_Msg_Type
 struct msg_Servo_Go_To
 {
     byte command = SERVO_GO_TO;
-    byte pin;
-    byte angle;
+    byte pin;   // pin to which the servo is connected
+    byte angle; // angle to which the servo should be moved in degrees
 };
 
 struct msg_Stepper_Go_To
 {
-    byte command = STEPPER_GO_TO;
-    int steps;    // Number of steps to turn, positive turn towrd direction,negative opposite one
+    byte command = STEPPER_STEP;
+    int steps;           // Number of steps to turn, positive or negative define direction
+    int number_of_steps; // total number of steps this motor can take
     int motor_pin_1;
     int motor_pin_2;
     int motor_pin_3;
-    int motor_pin_4; // 4 pins to control our stepper motor, can change to 2 or 5     
-    int direction;  // Direction of rotation
-    int number_of_steps;    // total number of steps this motor can take
+    int motor_pin_4;     // 4 pins to control our stepper motor, can change to 2 or 5     
 };
