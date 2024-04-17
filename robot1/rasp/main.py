@@ -49,7 +49,7 @@ if __name__ == "__main__":
     logger_lidar = Logger(
         identifier="lidar",
         decorator_level=LogLevels.INFO,
-        print_log_level=LogLevels.INFO,
+        print_log_level=LogLevels.CRITICAL,
         file_log_level=LogLevels.DEBUG,
     )
 

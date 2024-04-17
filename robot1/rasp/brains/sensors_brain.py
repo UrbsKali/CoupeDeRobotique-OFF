@@ -78,3 +78,11 @@ def pol_to_abs_cart(self, polars: np.ndarray) -> MultiPoint:
             for i in range(len(polars))
         ]
     )
+
+
+@Brain.task(process=False, run_on_start=True, refresh_rate=2)
+async def print_odometer(self):
+    self.logger.log(
+        f"Odometer: {self.rolling_basis.odometrie}",
+        LogLevels.INFO,
+    )
