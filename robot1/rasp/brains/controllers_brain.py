@@ -32,17 +32,17 @@ def undeploy_god_hand(self):
 
 
 @Logger
-def open_god_hand(self):
+async def open_god_hand(self):
     for servo in CONFIG.FRONT_GOD_HAND["deployement_ser"]:
         self.actuators.update_servo(servo["pin"], servo["open_angle"])
-        time.sleep(0.1)  # Wait 100ms to avoid com overload
+        await asyncio.sleep(0.1)  # Wait 100ms to avoid com overload
 
 
 @Logger
-def close_god_hand(self):
+async def close_god_hand(self):
     for servo in CONFIG.FRONT_GOD_HAND:
         self.actuators.update_servo(servo["pin"], servo["close_angle"])
-        time.sleep(0.1)  # Wait 100ms to avoid com overload
+        await asyncio.sleep(0.1)  # Wait 100ms to avoid com overload
 
 
 async def go_best_zone(self, plant_zones: list[Plants_zone], delta=15):
