@@ -33,7 +33,7 @@ class MainBrain(Brain):
         rolling_basis: RollingBasis,
         lidar: Lidar,
         arena: MarsArena,
-        jack: PIN
+        jack: PIN,
     ) -> None:
         # Camera data
         self.arucos = []
@@ -80,7 +80,9 @@ class MainBrain(Brain):
         end_zones = self.arena.sort_drop_zone(self.rolling_basis.odometrie, maxi=100)
         while end_zones is None or end_zones == []:
             await asyncio.sleep(0.5)
-            end_zones = self.arena.sort_drop_zone(self.rolling_basis.odometrie, maxi=100)
+            end_zones = self.arena.sort_drop_zone(
+                self.rolling_basis.odometrie, maxi=100
+            )
         await self.go_best_zone(end_zones, delta=0)
 
     @Brain.task(process=False, run_on_start=False, timeout=300)
