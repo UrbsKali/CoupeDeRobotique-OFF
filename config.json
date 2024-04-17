@@ -65,7 +65,7 @@
     "log_level": 0,
     "print_log": true,
     "stop_treshold": 20,
-    "anticollision_mode":2,
+    "anticollision_mode": 2,
     "min_stop_angle": 80,
     "max_stop_angle": 180,
     "ws": {
@@ -146,13 +146,13 @@
             "close_angle": 38
           }
         ],
-        "minimum_delay": 0.1,
         "deployment_servo": {
           "pin": 6,
           "deploy_angle": 100,
           "undeploy_angle": 70
         }
-      }
+      },
+      "minimum_delay": 0.1
     },
     "lidar": {
       "distances_unit": "cm",
