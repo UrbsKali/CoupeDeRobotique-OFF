@@ -17,32 +17,32 @@ from controllers import RollingBasis, Actuators
 
 @Logger
 def deploy_god_hand(self):
+    servo = CONFIG.FRONT_GOD_HAND["take_servo"]
     self.actuators.update_servo(
-        CONFIG.GOD_HAND_DEPLOYMENT_SERVO_PIN,
-        CONFIG.GOD_HAND_DEPLOYMENT_SERVO_DEPLOY_ANGLE,
+        self.actuators.update_servo(servo["pin"], servo["close_angle"])
     )
 
 
 @Logger
 def undeploy_god_hand(self):
+    servo = CONFIG.FRONT_GOD_HAND["take_servo"]
     self.actuators.update_servo(
-        CONFIG.GOD_HAND_DEPLOYMENT_SERVO_PIN,
-        CONFIG.GOD_HAND_DEPLOYMENT_SERVO_UNDEPLOY_ANGLE,
+        self.actuators.update_servo(servo["pin"], servo["open_angle"])
     )
 
 
 @Logger
-def open_god_hand(self):
-    for servo in CONFIG.FRONT_GOD_HAND:
+async def open_god_hand(self):
+    for servo in CONFIG.FRONT_GOD_HAND["deployement_ser"]:
         self.actuators.update_servo(servo["pin"], servo["open_angle"])
-        time.sleep(0.1)  # Wait 100ms to avoid com overload
+        await asyncio.sleep(0.1)  # Wait 100ms to avoid com overload
 
 
 @Logger
-def close_god_hand(self):
+async def close_god_hand(self):
     for servo in CONFIG.FRONT_GOD_HAND:
         self.actuators.update_servo(servo["pin"], servo["close_angle"])
-        time.sleep(0.1)  # Wait 100ms to avoid com overload
+        await asyncio.sleep(0.1)  # Wait 100ms to avoid com overload
 
 
 async def go_best_zone(self, plant_zones: list[Plants_zone], delta=15):
