@@ -43,6 +43,7 @@ async def close_god_hand(self):
         self.actuators.update_servo(servo["pin"], servo["close_angle"])
         time.sleep(0.1)  # Wait 100ms to avoid com overload
 
+
 async def go_best_zone(self, plant_zones: list[Plants_zone], delta=15):
     destination_point = None
     destination_plant_zone = None
