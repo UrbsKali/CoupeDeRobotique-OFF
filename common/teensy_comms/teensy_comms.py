@@ -233,8 +233,8 @@ class Teensy:
                     time.sleep(0.5)
 
             except Exception as e:
-                #self.logger.log(
+                # self.logger.log(
                 #    f"Device connection seems to be closed, teensy crashed ? [{e}]",
                 #    LogLevels.CRITICAL,
-                #)
+                # )
                 pass
