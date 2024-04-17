@@ -102,8 +102,8 @@ if __name__ == "__main__":
     )  # must be declared from external calculus interface or switch on the robot
 
     start_pos = OrientedPoint.from_Point(
-        arena.zones["home"].centroid,
-        math.pi / 2 if start_zone_id <= 2 else -math.pi / 2,
+        arena.game_borders.centroid,
+        0,
     )
 
     rolling_basis.set_odo(start_pos)

@@ -1,6 +1,7 @@
 # External imports
 import asyncio
 import time
+import math
 
 # Import from common
 from brain import Brain
@@ -68,14 +69,45 @@ class MainBrain(Brain):
         Tasks
     """
 
-    @Brain.task(process=False, run_on_start=False)
+    @Brain.task(process=False, run_on_start=True)
     async def start(self):
+
+        self.logger.log(
+            f"Game start, waiting for start info from RC...", LogLevels.INFO
+        )
+        # Wait for RC start info
+        zone = await self.ws_cmd.receiver.get()
+        while zone == WSmsg() and zone.msg != "zone":
+            zone = await self.ws_cmd.receiver.get()
+            await asyncio.sleep(0.2)
+
+        start_zone_id = zone.data
+        self.logger.log(
+            f"Got start zone: {start_zone_id}, re-initializing arena and resetting odo...",
+            LogLevels.INFO,
+        )
+
+        self.arena = MarsArena(start_zone_id=start_zone_id, logger=self.arena.logger)
+
+        self.rolling_basis.set_odo(
+            OrientedPoint.from_Point(
+                self.arena.zones["home"].centroid,
+                math.pi / 2 if start_zone_id <= 2 else -math.pi / 2,
+            )
+        )
+
+        self.logger.log(f"Waiting for jack trigger...", LogLevels.INFO)
+
         # Check jack state
         while self.jack.digital_read():
             await asyncio.sleep(0.1)
 
+        self.logger.log(f"Starting plant stage...", LogLevels.INFO)
         await self.plant_stage()
 
+        self.logger.log(
+            f"Finished game, returning to a friendly drop zone...", LogLevels.INFO
+        )
         # Compute nearest friendly drop zone
         end_zones = self.arena.sort_drop_zone(self.rolling_basis.odometrie, maxi=100)
         while end_zones is None or end_zones == []:
@@ -84,6 +116,8 @@ class MainBrain(Brain):
                 self.rolling_basis.odometrie, maxi=100
             )
         await self.go_best_zone(end_zones, delta=0)
+
+        self.logger.log(f"Game over", LogLevels.INFO)
 
     @Brain.task(process=False, run_on_start=False, timeout=300)
     async def plant_stage(self):
