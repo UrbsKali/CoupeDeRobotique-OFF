@@ -13,6 +13,7 @@ class LogLevels(IntEnum):
     WARNING = 2
     ERROR = 3
     CRITICAL = 4
+    FATAL = 5
 
 
 class STYLES:
