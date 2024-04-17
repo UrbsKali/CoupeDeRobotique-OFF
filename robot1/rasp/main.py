@@ -10,6 +10,7 @@ from arena import MarsArena
 from brains import MainBrain
 from controllers import RollingBasis, Actuators
 from sensors import Lidar
+import math
 
 if __name__ == "__main__":
     """
@@ -94,7 +95,11 @@ if __name__ == "__main__":
         start_zone_id, logger=logger_arena
     )  # must be declared from external calculus interface or switch on the robot
 
-    start_pos = OrientedPoint.from_Point(arena.zones["home"].centroid, 0)  # tmp theta
+    start_pos = OrientedPoint.from_Point(
+        arena.zones["home"].centroid,
+        math.pi / 2 if start_zone_id <= 2 else -math.pi / 2,
+    )
+
     rolling_basis.set_odo(start_pos)
     logger_brain.log(f"Start position: {start_pos}", LogLevels.INFO)
 

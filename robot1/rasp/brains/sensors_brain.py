@@ -53,7 +53,7 @@ async def compute_ennemy_position(self):
 
     self.logger.log(
         f"Ennemy position computed: {self.arena.ennemy_position if self.arena.ennemy_position is not None else 'None'}, at angle: {math.degrees(math.atan((self.arena.ennemy_position.x - self.rolling_basis.odometrie.x)/(self.arena.ennemy_position.y - self.rolling_basis.odometrie.y))) if self.arena.ennemy_position is not None else 'None'} and distance: {math.sqrt(pow(self.arena.ennemy_position.x - self.rolling_basis.odometrie.x,2)+pow(self.arena.ennemy_position.y - self.rolling_basis.odometrie.y,2)) if self.arena.ennemy_position is not None else 'None'}",
-        LogLevels.INFO,
+        LogLevels.DEBUG,
     )
 
     # For now, just stop if close. When updating, consider self.arena.check_collision_by_distances

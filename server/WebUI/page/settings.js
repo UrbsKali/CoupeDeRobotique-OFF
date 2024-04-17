@@ -29,5 +29,5 @@ let deccel_distance = document.querySelector("input[name='deccel_distance']");
 let motion_button = document.querySelector(".params > .send")
 
 motion_button.addEventListener("click", () => {
-    ws.send("cmd", "eval", `self.rolling_basis.set_motion_params(${x.value}, ${y.value}, ${z.value}, ${max_speed.value}, ${npd.value}, ${aea.value}, ${traj_precision.value}, ${correction.value}, ${accel_start_speed.value}, ${accel_distance.value}, ${deccel_end_speed.value}, ${deccel_distance.value})`);
+    ws.send("cmd", "eval", `self.rolling_basis.go_to(Point(${x.value}, ${y.value}), is_forward=True, max_speed=${max_speed.value}, next_position_delay=${npd.value}, action_error_auth=${aea.value}, traj_precision=${traj_precision.value}, correction_trajectory_speed=${correction.value}, acceleration_start_speed=${accel_start_speed.value}, acceleration_distance=${accel_distance.value}, deceleration_end_speed=${deccel_end_speed.value}, deceleration_distance=${deccel_distance.value})`);
 })
