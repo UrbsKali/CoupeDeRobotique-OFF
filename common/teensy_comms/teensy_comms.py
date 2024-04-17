@@ -221,7 +221,9 @@ class Teensy:
                         self.logger.log("Received a NACK")
                         if self.last_message != None:
                             self.send_bytes(self.last_message)
-                            self.logger.log(f"Sending back action : {self.last_message[0]}")
+                            self.logger.log(
+                                f"Sending back action : {self.last_message[0]}"
+                            )
                             self.last_message = None
                     else:
                         self.messagetype[msg[0]](msg[1:-1])
