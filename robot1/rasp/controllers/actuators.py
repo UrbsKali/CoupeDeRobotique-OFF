@@ -24,6 +24,7 @@ class Actuators(Teensy):
 
     class Command:  # values must correspond to the one defined on the teensy
         ServoGoTo = b"\x01"
+        StepperStep = b"\x02"
 
     def __str__(self) -> str:
         return self.__class__.__name__
@@ -33,9 +34,41 @@ class Actuators(Teensy):
     #########################
 
     @Logger
+    def stepper_step(
+        self, steps: int, number_of_steps: int, motor_pin_1: int, motor_pin_2: int, motor_pin_3: int, motor_pin_4: int
+    ) -> None:
+        """
+        Moves the stepper motor a specified number of steps. Note that the number of motor pin can change depending on the motor.
+        2 or 5 pins are common.
+
+        Args:
+            steps (int): The number of steps to move the motor.
+            number_of_steps (int): The total number of steps the motor can take in one revolution.
+            motor_pin_1 (int): The pin number for motor pin 1.
+            motor_pin_2 (int): The pin number for motor pin 2.
+            motor_pin_3 (int): The pin number for motor pin 3.
+            motor_pin_4 (int): The pin number for motor pin 4.
+
+        Returns:
+            None
+        """
+        msg = (
+            self.Command.StepperStep
+            + struct.pack("<b", steps)
+            + struct.pack("<B", number_of_steps)
+            + struct.pack("<B", motor_pin_1)
+            + struct.pack("<B", motor_pin_2)
+            + struct.pack("<B", motor_pin_3)
+            + struct.pack("<B", motor_pin_4)
+            # https://docs.python.org/3/library/struct.html#format-characters
+        )
+        self.send_bytes(msg)
+        
+
+    @Logger
     def update_servo(
         self, pin: int, angle: int, min_angle: int = 0, max_angle: int = 180
-    ):
+    )->None:
         """set angle to the servo at the given pin
 
         Args:

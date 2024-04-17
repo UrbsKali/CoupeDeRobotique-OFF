@@ -71,6 +71,7 @@ class CONFIG:
     ACTUATOR_TEENSY_SER = ACTUATORS_CONFIG["actuators_teensy_ser"]
     FRONT_GOD_HAND = ACTUATORS_CONFIG["front_god_hand"]
     MINIMUM_DELAY = ACTUATORS_CONFIG["minimum_delay"]
+    ELEVATOR = ACTUATORS_CONFIG["elevator"]
 
     # Lidar
     LIDAR_CONFIG = SPECIFIC_CONFIG["lidar"]
@@ -86,3 +87,4 @@ class CONFIG:
     STOP_TRESHOLD = SPECIFIC_CONFIG["stop_treshold"]
     MIN_STOP_ANGLE = SPECIFIC_CONFIG["min_stop_angle"]
     MAX_STOP_ANGLE = SPECIFIC_CONFIG["max_stop_angle"]
+    
