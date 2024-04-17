@@ -2,7 +2,6 @@
 import numpy as np
 import asyncio
 import math
-from acs import AntiCollisionMode
 
 # Import from common
 from config_loader import CONFIG
@@ -16,6 +15,7 @@ from logger import Logger, LogLevels
 
 # Import from local path
 from sensors import Lidar
+from brains.acs import AntiCollisionMode
 
 
 @Brain.task(process=False, run_on_start=False, refresh_rate=0.1)

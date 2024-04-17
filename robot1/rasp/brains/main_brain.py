@@ -1,11 +1,10 @@
 # External imports
 import asyncio
-from acs import AntiCollisionMode
 import time
-from config_loader import CONFIG
 import math
 
 # Import from common
+from config_loader import CONFIG
 from brain import Brain
 
 from WS_comms import WSmsg, WSclientRouteManager
@@ -16,6 +15,7 @@ from utils import Utils
 from GPIO import PIN
 
 # Import from local path
+from brains.acs import AntiCollisionMode
 from controllers import RollingBasis, Actuators
 from sensors import Lidar
 
