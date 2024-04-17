@@ -1,4 +1,5 @@
-let position_ws = new WebSocket(`ws://${host}:${port}/odometer?sender=${user}`);
+let wsm = new WebSocketManager();
+wsm.add_ws("odometer");
 let rob = document.querySelector(".rob")
 
 let x = 0
