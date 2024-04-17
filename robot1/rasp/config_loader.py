@@ -56,6 +56,10 @@ class CONFIG:
     WS_SENDER_NAME = SPECIFIC_WS_CONFIG["sender_name"]
     WS_SERVER_IP = SPECIFIC_WS_CONFIG["server_ip"]
 
+    # Jack
+    JACK_CONFIG = SPECIFIC_CONFIG["jack"]
+    JACK_PIN = JACK_CONFIG["pin"]
+
     # Rolling Basis
     ROLLING_BASIS_CONFIG = SPECIFIC_CONFIG["rolling_basis"]
     ROLLING_BASIS_TEENSY_SER = ROLLING_BASIS_CONFIG["rolling_basis_teensy_ser"]

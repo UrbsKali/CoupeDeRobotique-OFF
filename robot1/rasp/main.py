@@ -5,6 +5,7 @@ from WS_comms import WSclient, WSclientRouteManager, WSender, WSreceiver, WSmsg
 from logger import Logger, LogLevels
 from geometry import OrientedPoint
 from arena import MarsArena
+from GPIO import PIN
 
 # Import from local path
 from brains import MainBrain
@@ -85,6 +86,11 @@ if __name__ == "__main__":
         unit_distance=CONFIG.LIDAR_DISTANCES_UNIT,
         min_distance=CONFIG.LIDAR_MIN_DISTANCE_DETECTION,
     )
+
+    # Jack
+    jack_pin = PIN(CONFIG.JACK_PIN)
+    on_off_pin.setup("input_pulldown")
+
     # Robot
     rolling_basis = RollingBasis(logger=logger_rolling_basis)
     actuators = Actuators(logger=logger_actuators)
@@ -114,6 +120,7 @@ if __name__ == "__main__":
         rolling_basis=rolling_basis,
         lidar=lidar,
         arena=arena,
+        jack=jack_pin
     )
 
     """
