@@ -1,7 +1,8 @@
 # External imports
 import asyncio
+from acs import AntiCollisionMode
 import time
-
+from config_loader import CONFIG
 # Import from common
 from brain import Brain
 
@@ -41,6 +42,9 @@ class MainBrain(Brain):
 
         # Init the brain
         super().__init__(logger, self)
+        
+        # Init CONFIG
+        self.anticollision_mode : AntiCollisionMode = AntiCollisionMode(CONFIG.ANTICOLLISION_MODE)
 
     # Controllers functions
     from brains.controllers_brain import (
@@ -50,6 +54,7 @@ class MainBrain(Brain):
         close_god_hand,
         go_best_zone,
     )
+    
 
     # Sensors functions
     from brains.sensors_brain import compute_ennemy_position, pol_to_abs_cart
@@ -67,6 +72,8 @@ class MainBrain(Brain):
     """
         Tasks
     """
+    
+
 
     @Brain.task(process=False, run_on_start=True)
     async def start(self):

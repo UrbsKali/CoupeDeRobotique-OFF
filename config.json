@@ -64,6 +64,10 @@
   "robot1": {
     "log_level": 0,
     "print_log": true,
+    "stop_treshold": 20,
+    "anticollision_mode":2,
+    "min_stop_angle": 80,
+    "max_stop_angle": 180,
     "ws": {
       "sender_name": "rob",
       "server_ip": "192.168.0.104"
