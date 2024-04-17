@@ -55,58 +55,34 @@ async def zombie_mode(self):
     cmd = await self.ws_cmd.receiver.get()
 
     if cmd != WSmsg():
-        self.logger.log(f"New cmd received: {cmd}", LogLevels.INFO)
+        self.logger.log(
+            f"Zombie instruction {cmd.msg} received: {cmd.data}",
+            LogLevels.INFO,
+        )
 
-        # Handle it (implemented only for Go_To and Keep_Current_Position)
-        if cmd.msg == "go_to":
-            self.rolling_basis.clear_queue()
-            self.rolling_basis.go_to(
-                position=Point(cmd.data[0], cmd.data[1]),
-                max_speed=cmd.data[2],
-                next_position_delay=cmd.data[3],
-                action_error_auth=cmd.data[4],
-                traj_precision=cmd.data[5],
-                correction_trajectory_speed=cmd.data[6],
-                acceleration_start_speed=cmd.data[7],
-                acceleration_distance=cmd.data[8],
-                deceleration_end_speed=cmd.data[9],
-                deceleration_distance=cmd.data[10],
-            )
-        elif cmd.msg == "keep_current_position":
-            self.rolling_basis.clear_queue()
-            self.rolling_basis.keep_current_pos()
+    if cmd.msg == "eval":
 
-        elif cmd.msg == "set_pid":
-            self.rolling_basis.clear_queue()
-            self.rolling_basis.set_pid(Kp=cmd.data[0], Ki=cmd.data[1], Kd=cmd.data[2])
-        elif cmd.msg == "go_to_and_wait":
-            await self.rolling_basis.go_to_and_wait(
-                position=Point(cmd.data[0], cmd.data[1]),
-                timeout=cmd.data[2],
-                tolerance=cmd.data[3],
-            )
-        elif cmd.msg == "eval":
+        instructions = []
+        if isinstance(cmd.data, str):
+            instructions.append(cmd.data)
+        elif isinstance(cmd.data, list):
+            instructions = cmd.data
 
-            instructions = []
-            if isinstance(cmd.data, str):
-                instructions.append(cmd.data)
-            elif isinstance(cmd.data, list):
-                instructions = cmd.data
+        for instruction in instructions:
+            eval(instruction)
 
-            for instruction in instructions:
-                eval(instruction)
+    elif cmd.msg == "await_eval":
 
-        elif cmd.msg == "await_eval":
-            instructions = []
-            if isinstance(cmd.data, str):
-                instructions.append(cmd.data)
-            elif isinstance(cmd.data, list):
-                instructions = cmd.data
+        instructions = []
+        if isinstance(cmd.data, str):
+            instructions.append(cmd.data)
+        elif isinstance(cmd.data, list):
+            instructions = cmd.data
 
-            for instruction in instructions:
-                await eval(instruction)
-        else:
-            self.logger.log(
-                f"Command not implemented: {cmd.msg} / {cmd.data}",
-                LogLevels.WARNING,
-            )
+        for instruction in instructions:
+            await eval(instruction)
+    else:
+        self.logger.log(
+            f"Command not implemented: {cmd.msg} / {cmd.data}",
+            LogLevels.WARNING,
+        )
