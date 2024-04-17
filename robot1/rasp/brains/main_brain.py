@@ -79,6 +79,7 @@ class MainBrain(Brain):
         start_stage_time = Utils.get_ts()
         while 300 - Utils.time_since(start_stage_time) > 10:
             is_arrived: bool = False
+            self.deploy_god_hand()
             await self.open_god_hand()
             while not is_arrived:
                 self.logger.log("Sorting pickup zones...", LogLevels.INFO)
@@ -100,6 +101,7 @@ class MainBrain(Brain):
                     # Grab plants
                     await self.close_god_hand()
                     await asyncio.sleep(0.2)
+                    self.undeploy_god_hand()
                     # Account for removed plants
                     destination_plant_zone.take_plants(5)
                     # Step back
@@ -128,7 +130,11 @@ class MainBrain(Brain):
                         Point(10, 0), max_speed=50, relative=True
                     )
                     # Drop plants
+                    self.deploy_god_hand()
                     await self.open_god_hand()
                     await asyncio.sleep(0.2)
                     # Account for new plants
                     destination_plant_zone.drop_plants(5)
+                    await self.rolling_basis.go_to(
+                        Point(-10, 0), max_speed=50, relative=True
+                    )
