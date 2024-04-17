@@ -89,7 +89,7 @@ if __name__ == "__main__":
 
     # Jack
     jack_pin = PIN(CONFIG.JACK_PIN)
-    on_off_pin.setup("input_pulldown")
+    jack_pin.setup("input_pulldown")
 
     # Robot
     rolling_basis = RollingBasis(logger=logger_rolling_basis)

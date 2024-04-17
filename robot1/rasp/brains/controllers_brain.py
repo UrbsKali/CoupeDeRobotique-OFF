@@ -18,17 +18,13 @@ from controllers import RollingBasis, Actuators
 @Logger
 def deploy_god_hand(self):
     servo = CONFIG.FRONT_GOD_HAND["deployment_servo"]
-    self.actuators.update_servo(
-        self.actuators.update_servo(servo["pin"], servo["deploy_angle"])
-    )
+    self.actuators.update_servo(servo["pin"], servo["deploy_angle"])
 
 
 @Logger
 async def undeploy_god_hand(self):
     servo = CONFIG.FRONT_GOD_HAND["deployment_servo"]
-    self.actuators.update_servo(
-        self.actuators.update_servo(servo["pin"], servo["undeploy_angle"])
-    )
+    self.actuators.update_servo(servo["pin"], servo["undeploy_angle"])
 
 
 @Logger
