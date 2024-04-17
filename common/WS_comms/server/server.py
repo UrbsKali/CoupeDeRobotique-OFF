@@ -39,15 +39,8 @@ class WServer:
         while True:
             for route, manager in self.__route_managers.items():
                 for client_name, client_ws_connection in manager.clients.items():
-                    self.__logger.log(
-                        f"Ping client [{client_name}] on route [{route}]",
-                        LogLevels.DEBUG,
-                    )
                     try:
                         await client_ws_connection.ping()
-                        self.__logger.log(
-                            f"Ping client [{client_name}] success", LogLevels.DEBUG
-                        )
                         continue
                     except asyncio.TimeoutError:
                         self.__logger.log(
