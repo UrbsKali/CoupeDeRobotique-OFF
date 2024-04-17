@@ -58,9 +58,9 @@ class CONFIG:
 
     # Zombie mode
     ZOMBIE_MODE = SPECIFIC_CONFIG["zombie_mode"]
-    if ('-z' in sys.argv or '--zombie' in sys.argv):
+    if "-z" in sys.argv or "--zombie" in sys.argv:
         ZOMBIE_MODE = True
-    if ('-g' in sys.argv or '--game' in sys.argv):
+    if "-g" in sys.argv or "--game" in sys.argv:
         ZOMBIE_MODE = False
 
     # Jack

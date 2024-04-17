@@ -49,7 +49,9 @@ class MainBrain(Brain):
         self.anticollision_mode: AntiCollisionMode = AntiCollisionMode(
             CONFIG.ANTICOLLISION_MODE
         )
-        self.logger.log(f"Mode: {'zombie' if CONFIG.ZOMBIE_MODE else 'game'}", LogLevels.INFO)
+        self.logger.log(
+            f"Mode: {'zombie' if CONFIG.ZOMBIE_MODE else 'game'}", LogLevels.INFO
+        )
 
     # Controllers functions
     from brains.controllers_brain import (
