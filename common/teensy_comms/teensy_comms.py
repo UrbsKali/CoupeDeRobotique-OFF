@@ -217,10 +217,10 @@ class Teensy:
                     )
                     continue
             except Exception as e:
-                #self.logger.log(
+                # self.logger.log(
                 #    f"Device connection seems to be closed, teensy crashed ? [{e}]",
                 #    LogLevels.CRITICAL,
-                #)
+                # )
                 pass
 
             try:
