@@ -210,7 +210,8 @@ class RollingBasis(Teensy):
         self,
         position: Point,
         *,  # force keyword arguments
-        is_forward: bool = True,
+        forward: bool = True,
+        relative: bool = False,
         max_speed: int = 150,
         next_position_delay: int = 100,
         action_error_auth: int = 50,
@@ -226,7 +227,9 @@ class RollingBasis(Teensy):
 
         :param position: la position en X et Y (et theta)
         :type position: Point
-        :param is_forward: en avant (false) ou en arrière (true), defaults to False
+        :param forward: en avant (True) ou en arrière (False), defaults to True
+        :type direction: bool, optional
+        :param relative: en absolu (False) ou en relatif (True), defaults to False
         :type direction: bool, optional
         :param speed: Vitesse du déplacement, defaults to b'\x64'
         :type speed: bytes, optional
@@ -237,69 +240,27 @@ class RollingBasis(Teensy):
         :param traj_precision: la précision du déplacement, defaults to 50
         :type traj_precision: int, optional
         """
-        pos = Point(
-            position.x + self.position_offset.x, position.y + self.position_offset.y
+        pos = (
+            Point(
+                position.x + self.position_offset.x, position.y + self.position_offset.y
+            )
+            if relative
+            else Point(
+                math.cos(self.odometrie.theta) * position.x
+                - math.sin(self.odometrie.theta) * position.y
+                + self.position_offset.x
+                + self.odometrie.x,
+                math.sin(self.odometrie.theta) * position.x
+                + math.cos(self.odometrie.theta) * position.y
+                + self.position_offset.y
+                + self.odometrie.y,
+            )
         )
         msg = (
             Command.GO_TO_POINT.value
             + struct.pack("<f", pos.x)
             + struct.pack("<f", pos.y)
-            + struct.pack("<?", is_forward)
-            + struct.pack("<B", max_speed)
-            + struct.pack("<H", next_position_delay)
-            + struct.pack("<H", action_error_auth)
-            + struct.pack("<H", traj_precision)
-            + struct.pack("<B", correction_trajectory_speed)
-            + struct.pack("<B", acceleration_start_speed)
-            + struct.pack("<f", acceleration_distance)
-            + struct.pack("<B", deceleration_end_speed)
-            + struct.pack("<f", deceleration_distance)
-        )
-        # https://docs.python.org/3/library/struct.html#format-characters
-
-        return self.append_to_queue(Instruction(Command.GO_TO_POINT, msg))
-
-    @Logger
-    def go_to_relative(
-        self,
-        position: Point,
-        *,  # force keyword arguments
-        is_forward: bool = True,
-        max_speed: int = 150,
-        next_position_delay: int = 100,
-        action_error_auth: int = 50,
-        traj_precision: int = 50,
-        correction_trajectory_speed: int = 80,
-        acceleration_start_speed: int = 80,
-        acceleration_distance: float = 10,
-        deceleration_end_speed: int = 80,
-        deceleration_distance: float = 10,
-    ) -> int:
-        """
-        Va à la position donnée en paramètre, return l'id dans la queue de l'action
-
-        :param position: la position en X et Y (et theta)
-        :type position: Point
-        :param is_forward: en avant (false) ou en arrière (true), defaults to False
-        :type direction: bool, optional
-        :param speed: Vitesse du déplacement, defaults to b'\x64'
-        :type speed: bytes, optional
-        :param next_position_delay: delay avant la prochaine position, defaults to 100
-        :type next_position_delay: int, optional
-        :param action_error_auth: l'erreur autorisé dans le déplacement, defaults to 20
-        :type action_error_auth: int, optional
-        :param traj_precision: la précision du déplacement, defaults to 50
-        :type traj_precision: int, optional
-        """
-        pos = Point(
-            position.x + self.position_offset.x + self.odometrie.x,
-            position.y + self.position_offset.y + self.odometrie.y,
-        )
-        msg = (
-            Command.GO_TO_POINT.value
-            + struct.pack("<f", pos.x)
-            + struct.pack("<f", pos.y)
-            + struct.pack("<?", is_forward)
+            + struct.pack("<?", forward)
             + struct.pack("<B", max_speed)
             + struct.pack("<H", next_position_delay)
             + struct.pack("<H", action_error_auth)
@@ -321,7 +282,8 @@ class RollingBasis(Teensy):
         *,  # force keyword arguments
         tolerance: float = 5,
         timeout: float = -1,  # in seconds
-        is_forward: bool = True,
+        forward: bool = True,
+        relative: bool = False,
         max_speed: int = 150,
         next_position_delay: int = 100,
         action_error_auth: int = 50,
@@ -338,7 +300,7 @@ class RollingBasis(Teensy):
             position (Point): Target.
             tolerance (float): Distance to be within to return a success if not timed out.
             timeout (float): Max time to wait in s, -1 for no limit. Defaults to -1.
-            is_forward (bool, optional): _description_. Defaults to True.
+            forward (bool, optional): _description_. Defaults to True.
             max_speed (int, optional): _description_. Defaults to 150.
             next_position_delay (int, optional): _description_. Defaults to 100.
             action_error_auth (int, optional): _description_. Defaults to 50.
@@ -350,13 +312,14 @@ class RollingBasis(Teensy):
             deceleration_distance (float, optional): _description_. Defaults to 10.
 
         Returns:
-            int: 0 if finished normally, 1 if timed out, 2 if finished without timeout but not at targret position
+            int: 0 if finished normally, 1 if timed out, 2 if finished without timeout but not at target position
         """
 
         start_time = Utils.get_ts()
         queue_id = self.go_to(
             position,
-            is_forward=is_forward,
+            forward=forward,
+            relative=relative,
             max_speed=max_speed,
             next_position_delay=next_position_delay,
             action_error_auth=action_error_auth,
@@ -400,7 +363,7 @@ class RollingBasis(Teensy):
         self,
         position: Point,
         *,  # force keyword arguments
-        is_forward: bool = True,
+        forward: bool = True,
         max_speed: int = 150,
         next_position_delay: int = 100,
         action_error_auth: int = 50,
@@ -418,7 +381,7 @@ class RollingBasis(Teensy):
         msg = (
             Command.GET_ORIENTATION.value
             + struct.pack("<ff", pos.x, pos.y)
-            + struct.pack("<?", is_forward)
+            + struct.pack("<?", forward)
             + struct.pack("<B", max_speed)
             + struct.pack(
                 "<HHH", next_position_delay, action_error_auth, traj_precision
@@ -430,7 +393,7 @@ class RollingBasis(Teensy):
         )
         # https://docs.python.org/3/library/struct.html#format-characters
 
-        return self.append_to_queue(Instruction(Command.GET_ORIENTATION, msg))
+        self.append_to_queue(Instruction(Command.GET_ORIENTATION, msg))
 
     @Logger
     def curve_go_to(

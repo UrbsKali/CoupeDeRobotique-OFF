@@ -187,34 +187,41 @@ class Teensy:
         It will call the corresponding function
         """
         while True:
-            msg = self.read_bytes()
+            try:
+                msg = self.read_bytes()
 
-            if self.crc:
-                crc = msg[-5:-4]
-                msg = msg[:-5]
-                self._crc8.reset()
-                self._crc8.update(msg)
-                if self._crc8.digest() != crc:
-                    self.logger.log(
-                        f"Invalid CRC8, sending NACK ... [{crc}]", LogLevels.WARNING
-                    )
-                    self.send_bytes(b"\x7F")  # send NACK
+                if self.crc:
+                    crc = msg[-5:-4]
+                    msg = msg[:-5]
                     self._crc8.reset()
+                    self._crc8.update(msg)
+                    if self._crc8.digest() != crc:
+                        self.logger.log(
+                            f"Invalid CRC8, sending NACK ... [{crc}]", LogLevels.WARNING
+                        )
+                        self.send_bytes(b"\x7F")  # send NACK
+                        self._crc8.reset()
+                        continue
+                    self._crc8.reset()
+
+                else:
+                    msg = msg[:-4]
+
+                lenmsg = msg[-1]
+
+                if lenmsg > len(msg):
+                    self.logger.log(
+                        "Received Teensy message that does not match declared length "
+                        + msg.hex(sep=" "),
+                        LogLevels.WARNING,
+                    )
                     continue
-                self._crc8.reset()
-
-            else:
-                msg = msg[:-4]
-
-            lenmsg = msg[-1]
-
-            if lenmsg > len(msg):
+            except Exception as e:
                 self.logger.log(
-                    "Received Teensy message that does not match declared length "
-                    + msg.hex(sep=" "),
-                    LogLevels.WARNING,
+                    f"Device connection seems to be closed, teensy crashed ? [{e}]",
+                    LogLevels.CRITICAL,
                 )
-                continue
+
             try:
                 if msg[0] == 127:
                     self.logger.log("Received a NACK")

@@ -13,8 +13,9 @@ public:
     virtual inline byte get_id() {return 0;} // Return the id of the action (usefull for Com), not obligatory implemented on childs classes
     bool is_finished();
     
-    // Constructor
+    // Constructor / Destructor
     Action() = default;
+    virtual ~Action() = default;
 
     // Method(s)
     virtual void handle(Point current_point, Ticks current_ticks, Rolling_Basis_Ptrs *rolling_basis_ptrs) = 0;

@@ -11,7 +11,7 @@ struct msg_Go_To
     byte command = GO_TO;
     float x;
     float y;
-    bool is_forward;
+    bool forward;
     byte max_speed;
     uint16_t next_position_delay;
     uint16_t action_error_auth;
@@ -28,7 +28,7 @@ struct msg_Get_Orientation
     byte command = GET_ORIENTATION;
     float x;
     float y;
-    bool is_forward;
+    bool forward;
     byte max_speed;
     uint16_t next_position_delay; 
     uint16_t action_error_auth;
