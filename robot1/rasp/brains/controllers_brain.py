@@ -28,14 +28,12 @@ def undeploy_god_hand(self):
     self.actuators.update_servo(
         self.actuators.update_servo(servo["pin"], servo["open_angle"]))
 
-
 @Logger
 def open_god_hand(self):
-    for servo in CONFIG.FRONT_GOD_HAND["deployement_ser"]:
+    for servo in CONFIG.FRONT_GOD_HAND["deployement_servo"]:
         self.actuators.update_servo(servo["pin"], servo["open_angle"])
         time.sleep(0.1)  # Wait 100ms to avoid com overload
-
-
+        
 @Logger
 def close_god_hand(self):
     for servo in CONFIG.FRONT_GOD_HAND:
