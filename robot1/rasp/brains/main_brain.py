@@ -10,6 +10,7 @@ from geometry import OrientedPoint, Point
 from logger import Logger, LogLevels
 from arena import MarsArena
 from utils import Utils
+from GPIO import PIN
 
 # Import from local path
 from controllers import RollingBasis, Actuators
@@ -32,6 +33,7 @@ class MainBrain(Brain):
         rolling_basis: RollingBasis,
         lidar: Lidar,
         arena: MarsArena,
+        jack: PIN,
     ) -> None:
         # Camera data
         self.arucos = []
@@ -66,19 +68,29 @@ class MainBrain(Brain):
         Tasks
     """
 
-    @Brain.task(process=False, run_on_start=False, refresh_rate=5, timeout=2000)
-    async def test_hand(self):
-        self.logger.log("Open hand", LogLevels.INFO)
-        await self.open_god_hand()
-        await asyncio.sleep(5)
-        self.logger.log("Close hand", LogLevels.INFO)
-        await self.close_god_hand()
+    @Brain.task(process=False, run_on_start=True)
+    async def start(self):
+        # Check jack state
+        while self.jack.digital_read():
+            await asyncio.sleep(0.1)
+
+        await self.plant_stage()
+
+        # Compute nearest friendly drop zone
+        end_zones = self.arena.sort_drop_zone(self.rolling_basis.odometrie, maxi=100)
+        while end_zones is None or end_zones == []:
+            await asyncio.sleep(0.5)
+            end_zones = self.arena.sort_drop_zone(
+                self.rolling_basis.odometrie, maxi=100
+            )
+        await self.go_best_zone(end_zones, delta=0)
 
     @Brain.task(process=False, run_on_start=False, timeout=300)
     async def plant_stage(self):
         start_stage_time = Utils.get_ts()
         while 300 - Utils.time_since(start_stage_time) > 10:
             is_arrived: bool = False
+            self.deploy_god_hand()
             await self.open_god_hand()
             while not is_arrived:
                 self.logger.log("Sorting pickup zones...", LogLevels.INFO)
@@ -100,6 +112,7 @@ class MainBrain(Brain):
                     # Grab plants
                     await self.close_god_hand()
                     await asyncio.sleep(0.2)
+                    self.undeploy_god_hand()
                     # Account for removed plants
                     destination_plant_zone.take_plants(5)
                     # Step back
@@ -128,7 +141,11 @@ class MainBrain(Brain):
                         Point(10, 0), max_speed=50, relative=True
                     )
                     # Drop plants
+                    self.deploy_god_hand()
                     await self.open_god_hand()
                     await asyncio.sleep(0.2)
                     # Account for new plants
                     destination_plant_zone.drop_plants(5)
+                    await self.rolling_basis.go_to(
+                        Point(-10, 0), max_speed=50, relative=True
+                    )

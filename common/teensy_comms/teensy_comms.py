@@ -216,24 +216,27 @@ class Teensy:
                         LogLevels.WARNING,
                     )
                     continue
-            except Exception as e:
-                self.logger.log(
-                    f"Device connection seems to be closed, teensy crashed ? [{e}]",
-                    LogLevels.CRITICAL,
-                )
+                try:
+                    if msg[0] == 127:
+                        self.logger.log("Received a NACK")
+                        if self.last_message != None:
+                            self.send_bytes(self.last_message)
+                            self.logger.log(
+                                f"Sending back action : {self.last_message[0]}"
+                            )
+                            self.last_message = None
+                    else:
+                        self.messagetype[msg[0]](msg[1:-1])
+                except Exception as e:
+                    self.logger.log(
+                        "Received message handling crashed :\n" + str(e),
+                        LogLevels.ERROR,
+                    )
+                    time.sleep(0.5)
 
-            try:
-                if msg[0] == 127:
-                    self.logger.log("Received a NACK")
-                    if self.last_message != None:
-                        self.send_bytes(self.last_message)
-                        self.logger.log(f"Sending back action : {self.last_message[0]}")
-                        self.last_message = None
-                else:
-                    self.messagetype[msg[0]](msg[1:-1])
             except Exception as e:
-                self.logger.log(
-                    "Received message handling crashed :\n" + str(e),
-                    LogLevels.ERROR,
-                )
-                time.sleep(0.5)
+                # self.logger.log(
+                #    f"Device connection seems to be closed, teensy crashed ? [{e}]",
+                #    LogLevels.CRITICAL,
+                # )
+                pass
