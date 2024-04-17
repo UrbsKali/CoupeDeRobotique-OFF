@@ -31,7 +31,7 @@ class Arena:
         game_borders: Polygon = create_straight_rectangle(Point(0, 0), Point(200, 300)),
         zones: dict[str, MultiPolygon] | None = None,
     ):
-        self.l: Logger = logger
+        self.logger: Logger = logger
         self.game_borders: Polygon = game_borders
         self.game_borders_buffered: Polygon = self.game_borders.buffer(-10)
         self.safe_collision_distance: float = safe_collision_distance
@@ -144,35 +144,35 @@ class Arena:
             _type_: _description_
         """
         center: Point = zone.centroid
-
-        # Get the boundary (circle) of the disc of radius delta around the center
-        circle_delta = center.buffer(delta).boundary
-
-        # Compute the line from start_point to the center of the zone, then scale it by 2 to make sure it interesects
-        # the circle twice (unless start_point is inside the circle_delta, which will be checked)
-        line = scale(LineString([start_point, center]), xfact=2, yfact=2)
-
-        intersections = circle_delta.intersection(line)
-
-        # Check that we found at least 2 intersections, should always be ok unless start_point is inside circle_delta
-        # (therefore the scale function wasn't enough to reach the far away intersection)
-        # or the circle is a point (delta = 0)
-        print(f"Delta: {delta}, intersections: {intersections}")
-        if (
-            delta > 0
-            and (
-                not isinstance(intersections, MultiPoint)
-                or not len(intersections.geoms) == 2
-            )
-        ) or (delta == 0 and not isinstance(intersections, Point)):
-            return None
-
-        # Return closest or furthest intersection
-
+        if delta == 0:
+            self.logger.log(f"delta == 0, returning centroid of zone", LogLevels.DEBUG)
+            return center
         else:
-            if isinstance(intersections, Point):
-                return intersections
+
+            # Get the boundary (circle) of the disc of radius delta around the center
+            circle_delta = center.buffer(delta).boundary
+
+            if circle_delta.intersects(start_point):
+                self.logger.log(f"start_point is inside circle_delta", LogLevels.DEBUG)
+                return None
             else:
+
+                # Compute the line from start_point to the center of the zone, then scale it by more than 2 to make sure it intersect
+                # the circle twice (unless start_point is inside the circle_delta, or delta == 0, which have been checked)
+                line = scale(LineString([start_point, center]), xfact=3, yfact=3)
+
+                intersections = circle_delta.intersection(line)
+
+                self.logger.log(
+                    f"Computed intersections: {intersections}", LogLevels.DEBUG
+                )
+
+                assert (
+                    isinstance(intersections, MultiPoint)
+                    and len(intersections.geoms) == 2
+                ), "Should get exactly 2 intersections"
+
+                # Return closest or furthest intersection
                 if distance(start_point, intersections.geoms[0]) <= distance(
                     start_point, intersections.geoms[1]
                 ):

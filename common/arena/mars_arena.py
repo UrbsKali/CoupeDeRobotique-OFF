@@ -47,7 +47,6 @@ class MarsArena(Arena):
         origin = Point(0, 0)
         opposite_corner = Point(200, 300)
 
-        self.color = "yellow" if start_zone_id % 2 == 0 else "blue"
         self.start_zone_id = start_zone_id
 
         self.drop_zones: list[Plants_zone] = [
