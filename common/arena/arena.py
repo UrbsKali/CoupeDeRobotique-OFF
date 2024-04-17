@@ -86,6 +86,7 @@ class Arena:
         path: LineString,
         buffer_distance: float = 15,
         forbidden_zone_name: str = "forbidden",
+        buffer_around_ennemy: float = 25,
     ) -> bool:
         """this function checks if a given line (or series of connected lines) move can be made into the arena. It
         avoids collisions with the boarders and the forbidden area. takes into account the width and the length of
@@ -117,7 +118,16 @@ class Arena:
 
         # verify that the area touched isn't in the forbidden area
 
-        return not self.zone_intersects(forbidden_zone_name, geometry_to_check)
+        return not (
+            self.zone_intersects(forbidden_zone_name, geometry_to_check)
+            or (
+                self.ennemy_position.buffer(buffer_around_ennemy).intersects(
+                    geometry_to_check
+                )
+                if self.ennemy_position is not None
+                else False
+            )
+        )
 
     def compute_go_to_destination(
         self, start_point: Point, zone: Polygon, delta: float = 5, closer: bool = True
