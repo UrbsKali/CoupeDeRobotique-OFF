@@ -19,3 +19,15 @@ struct msg_Servo_Go_To
     byte pin;
     byte angle;
 };
+
+struct msg_Stepper_Go_To
+{
+    byte command = STEPPER_GO_TO;
+    int steps;    // Number of steps to turn, positive turn towrd direction,negative opposite one
+    int motor_pin_1;
+    int motor_pin_2;
+    int motor_pin_3;
+    int motor_pin_4; // 4 pins to control our stepper motor, can change to 2 or 5     
+    int direction;  // Direction of rotation
+    int number_of_steps;    // total number of steps this motor can take
+};
