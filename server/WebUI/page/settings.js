@@ -72,5 +72,4 @@ let send = document.querySelector("#send");
 send.addEventListener("click", () => {
     ws.send("cmd", "eval", `self.rolling_basis.set_pid(${kp.value}, ${ki.value}, ${kd.value})`);
     ws.send("cmd", "eval", `self.rolling_basis.go_to(Point(${x.value}, ${y.value}), forward=True, max_speed=${max_speed.value}, next_position_delay=${timeout.value}, action_error_auth=${allowed_error.value}, traj_precision=${precision.value}, correction_trajectory_speed=${correction_speed.value}, acceleration_start_speed=${start_speed.value}, acceleration_distance=${start_distance.value}, deceleration_end_speed=${end_speed.value}, deceleration_distance=${end_distance.value})`);
-
 })
