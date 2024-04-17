@@ -13,7 +13,7 @@
 #define Kd 0.0
 
 #define RIGHT_MOTOR_POWER_FACTOR 1.0
-#define LEFT_MOTOR_POWER_FACTOR 1.18
+#define LEFT_MOTOR_POWER_FACTOR 1.0
 
 // Default position
 #define START_X 0.0
@@ -52,18 +52,27 @@ Rolling_Basis_Ptrs rolling_basis_ptrs;
 /* Strat part */
 Com *com;
 
-Action *current_action = nullptr;
+Complex_Action *current_action = nullptr;
 
-void swap_action(Action *new_action)
+void swap_action(Complex_Action *new_action)
 {
   // implémentation des destructeurs manquante
   if (current_action == new_action)
   {
-    free(new_action);
+    com->print("1");
+    delete new_action;
+    com->print("2");
+    //free(new_action);
     return;
   }
   if (current_action != nullptr)
-    free(current_action);
+  {
+    com->print("A");
+    //free(current_action);
+    delete current_action;
+    com->print("B");
+  }
+    
   current_action = new_action;
 }
 
@@ -103,7 +112,7 @@ void get_orientation(byte *msg, byte size)
     &params
   );
 
-  swap_action(new_action);
+  //swap_action(new_action);
   com->print("swap action");
 }
 
@@ -332,7 +341,6 @@ void loop()
     pos_msg.y = rolling_basis_ptr->Y;
     pos_msg.theta = rolling_basis_ptr->THETA;
     com->send_msg((byte *)&pos_msg, sizeof(msg_Update_Position));
-
     counter = 0;
   }
 }
