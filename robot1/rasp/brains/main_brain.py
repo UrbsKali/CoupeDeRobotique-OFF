@@ -49,6 +49,7 @@ class MainBrain(Brain):
         self.anticollision_mode: AntiCollisionMode = AntiCollisionMode(
             CONFIG.ANTICOLLISION_MODE
         )
+        self.logger.log(f"Mode: {'zombie' if CONFIG.ZOMBIE_MODE else 'game'}", LogLevels.INFO)
 
     # Controllers functions
     from brains.controllers_brain import (
@@ -76,7 +77,7 @@ class MainBrain(Brain):
         Tasks
     """
 
-    @Brain.task(process=False, run_on_start=True)
+    @Brain.task(process=False, run_on_start=not CONFIG.ZOMBIE_MODE)
     async def start(self):
 
         self.logger.log(
@@ -131,7 +132,7 @@ class MainBrain(Brain):
         start_stage_time = Utils.get_ts()
         while 300 - Utils.time_since(start_stage_time) > 10:
             is_arrived: bool = False
-            self.deploy_god_hand()
+            await self.deploy_god_hand()
             await self.open_god_hand()
             while not is_arrived:
                 self.logger.log("Sorting pickup zones...", LogLevels.INFO)
@@ -153,7 +154,7 @@ class MainBrain(Brain):
                     # Grab plants
                     await self.close_god_hand()
                     await asyncio.sleep(0.2)
-                    self.undeploy_god_hand()
+                    await self.undeploy_god_hand()
                     # Account for removed plants
                     destination_plant_zone.take_plants(5)
                     # Step back
@@ -182,7 +183,7 @@ class MainBrain(Brain):
                         Point(10, 0), max_speed=50, relative=True
                     )
                     # Drop plants
-                    self.deploy_god_hand()
+                    await self.deploy_god_hand()
                     await self.open_god_hand()
                     await asyncio.sleep(0.2)
                     # Account for new plants

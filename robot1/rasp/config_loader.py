@@ -56,6 +56,13 @@ class CONFIG:
     WS_SENDER_NAME = SPECIFIC_WS_CONFIG["sender_name"]
     WS_SERVER_IP = SPECIFIC_WS_CONFIG["server_ip"]
 
+    # Zombie mode
+    ZOMBIE_MODE = SPECIFIC_CONFIG["zombie_mode"]
+    if ('-z' in sys.argv or '--zombie' in sys.argv):
+        ZOMBIE_MODE = True
+    if ('-g' in sys.argv or '--game' in sys.argv):
+        ZOMBIE_MODE = False
+
     # Jack
     JACK_CONFIG = SPECIFIC_CONFIG["jack"]
     JACK_PIN = JACK_CONFIG["pin"]

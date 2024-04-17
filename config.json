@@ -66,14 +66,15 @@
     "print_log": true,
     "stop_treshold": 20,
     "anticollision_mode": 2,
+    "zombie_mode": false,
     "min_stop_angle": 80,
     "max_stop_angle": 180,
     "ws": {
       "sender_name": "rob",
-      "server_ip": "192.168.0.104"
+      "server_ip": "rc.local"
     },
     "jack": {
-      "pin": 10
+      "pin": 15
     },
     "rolling_basis": {
       "rolling_basis_teensy_ser": 12675800,

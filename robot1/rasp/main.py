@@ -11,7 +11,6 @@ from GPIO import PIN
 from brains import MainBrain
 from controllers import RollingBasis, Actuators
 from sensors import Lidar
-import math
 
 if __name__ == "__main__":
     """
@@ -21,7 +20,7 @@ if __name__ == "__main__":
     logger_ws_client = Logger(
         identifier="ws_client",
         decorator_level=LogLevels.INFO,
-        print_log_level=LogLevels.CRITICAL,
+        print_log_level=LogLevels.WARNING,
         file_log_level=LogLevels.DEBUG,
     )
     logger_brain = Logger(
@@ -89,7 +88,7 @@ if __name__ == "__main__":
 
     # Jack
     jack_pin = PIN(CONFIG.JACK_PIN)
-    jack_pin.setup("input_pulldown")
+    jack_pin.setup("input_pulldown", reverse_state=True)
 
     # Robot
     rolling_basis = RollingBasis(logger=logger_rolling_basis)

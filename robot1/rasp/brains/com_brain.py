@@ -45,7 +45,7 @@ async def odometer_com(self):
         )
 
 
-@Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
+@Brain.task(process=False, run_on_start=CONFIG.ZOMBIE_MODE, refresh_rate=0.5)
 async def zombie_mode(self):
     """
     executes requests received by the server. Use Postman to send request to the server
