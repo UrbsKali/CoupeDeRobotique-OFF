@@ -79,8 +79,7 @@ class CONFIG:
     LIDAR_MIN_ANGLE = LIDAR_CONFIG["min_angle"]
     LIDAR_MAX_ANGLE = LIDAR_CONFIG["max_angle"]
     LIDAR_MIN_DISTANCE_DETECTION = LIDAR_CONFIG["min_distance_detection"]
-    
-    
+
     # Robot1 brain
     ANTICOLLISION_MODE = SPECIFIC_CONFIG["anticollision_mode"]
     STOP_TRESHOLD = SPECIFIC_CONFIG["stop_treshold"]
