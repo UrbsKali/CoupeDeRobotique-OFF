@@ -17,7 +17,7 @@ from logger import Logger, LogLevels
 from sensors import Lidar
 
 
-@Brain.task(process=False, run_on_start=True, refresh_rate=0.1)
+@Brain.task(process=False, run_on_start=False, refresh_rate=0.1)
 async def compute_ennemy_position(self):
     polars: np.ndarray = self.lidar.scan_to_polars()
     # self.logger.log(f"Polars ({polars.shape}): {polars.tolist()}", LogLevels.INFO)
@@ -77,4 +77,12 @@ def pol_to_abs_cart(self, polars: np.ndarray) -> MultiPoint:
             )
             for i in range(len(polars))
         ]
+    )
+
+
+@Brain.task(process=False, run_on_start=True, refresh_rate=2)
+async def print_odometer(self):
+    self.logger.log(
+        f"Odometer: {self.rolling_basis.odometrie}",
+        LogLevels.INFO,
     )

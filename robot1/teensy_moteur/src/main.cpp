@@ -7,13 +7,13 @@
 #define INACTIVE_DELAY 4000
 
 // PID
-#define MAX_PWM 200
+#define MAX_PWM 180
 #define Kp 3.0
 #define Ki 0.0
 #define Kd 0.0
 
 #define RIGHT_MOTOR_POWER_FACTOR 1.0
-#define LEFT_MOTOR_POWER_FACTOR 1.0
+#define LEFT_MOTOR_POWER_FACTOR 1.18
 
 // Default position
 #define START_X 0.0

@@ -13,6 +13,7 @@ class LogLevels(IntEnum):
     WARNING = 2
     ERROR = 3
     CRITICAL = 4
+    FATAL = 5
 
 
 class STYLES:
@@ -22,6 +23,7 @@ class STYLES:
         LogLevels.WARNING: Style.RESET_ALL + Back.YELLOW,
         LogLevels.ERROR: Style.RESET_ALL + Back.RED,
         LogLevels.CRITICAL: Style.RESET_ALL + Back.RED + Fore.YELLOW,
+        LogLevels.FATAL: Style.RESET_ALL + Back.RED + Fore.YELLOW,  # TODO: to update
     }
     RESET_ALL = Style.RESET_ALL
     DATE = Style.RESET_ALL + Fore.YELLOW
