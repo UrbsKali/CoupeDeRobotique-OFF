@@ -68,7 +68,7 @@ class MainBrain(Brain):
         Tasks
     """
 
-    @Brain.task(process=False, run_on_start=True)
+    @Brain.task(process=False, run_on_start=False)
     async def start(self):
         # Check jack state
         while self.jack.digital_read():
