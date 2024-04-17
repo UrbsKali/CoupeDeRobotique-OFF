@@ -98,7 +98,7 @@ void get_orientation(byte *msg, byte size)
     -1.0f,
     get_orientation_msg->deceleration_distance
   };
-  Direction dir = get_orientation_msg->is_forward ? forward : backward;
+  Direction dir = get_orientation_msg->forward ? forward : backward;
   Get_Orientation *new_action = new Get_Orientation(
     get_orientation_msg->x,
     get_orientation_msg->y, 
@@ -142,7 +142,7 @@ void go_to(byte *msg, byte size)
 
   Go_To *new_action = new Go_To(
     target_point, 
-    go_to_msg->is_forward ? forward : backward, 
+    go_to_msg->forward ? forward : backward,
     Speed_Driver_From_Distance(
       go_to_msg->max_speed,
       go_to_msg->correction_trajectory_speed,

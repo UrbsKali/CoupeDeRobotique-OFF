@@ -363,7 +363,7 @@ class RollingBasis(Teensy):
         self,
         position: Point,
         *,  # force keyword arguments
-        is_forward: bool = True,
+        forward: bool = True,
         max_speed: int = 150,
         next_position_delay: int = 100,
         action_error_auth: int = 50,
@@ -381,7 +381,7 @@ class RollingBasis(Teensy):
         msg = (
             Command.GET_ORIENTATION.value
             + struct.pack("<ff", pos.x, pos.y)
-            + struct.pack("<?", is_forward)
+            + struct.pack("<?", forward)
             + struct.pack("<B", max_speed)
             + struct.pack(
                 "<HHH", next_position_delay, action_error_auth, traj_precision
