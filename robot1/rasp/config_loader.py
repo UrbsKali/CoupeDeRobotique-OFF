@@ -70,6 +70,7 @@ class CONFIG:
     ACTUATORS_CONFIG = SPECIFIC_CONFIG["actuators"]
     ACTUATOR_TEENSY_SER = ACTUATORS_CONFIG["actuators_teensy_ser"]
     FRONT_GOD_HAND = ACTUATORS_CONFIG["front_god_hand"]
+    MINIMUM_DELAY = ACTUATORS_CONFIG["minimum_delay"]
 
     # Lidar
     LIDAR_CONFIG = SPECIFIC_CONFIG["lidar"]
