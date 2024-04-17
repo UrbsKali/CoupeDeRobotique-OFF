@@ -124,7 +124,7 @@
           {"pin":  4, "open_angle":  50, "close_angle":  30},
           {"pin":  5, "open_angle":  58, "close_angle":  38}
         ],
-        "deployment_servo": {"pin":6,"deploy_angle":60,"undeploy_angle":0}
+        "deployment_servo": {"pin":6,"deploy_angle":100,"undeploy_angle":70}
       }
     },
     "lidar": {
