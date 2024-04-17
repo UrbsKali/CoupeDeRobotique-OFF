@@ -26,33 +26,33 @@ body {
 }
 
 /* Utils */
-.make_center{
+.make_center {
     width: 100%;
     height: 100%;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 /* Component */
 
-.pilule{
+.pilule {
     background-color: var(--secondary);
     border-radius: var(--roundness);
     padding: 5px 15px;
     font-family: var(--font);
     font-weight: 500;
-    position: absolute;   
+    position: absolute;
     display: flex;
     flex-direction: row;
-    gap: 5px; 
+    gap: 5px;
     color: black;
     align-items: center;
     justify-content: center;
     font-size: medium !important;
 }
 
-.sushi{
+.sushi {
     background-color: white;
     border-radius: var(--roundness);
     padding: 20px;
@@ -73,7 +73,7 @@ body {
     padding: 20px;
 }
 
-.menu .item_menu{
+.item_menu {
     background-color: var(--secondary);
     border-radius: var(--roundness);
     font-family: var(--font);
@@ -88,23 +88,28 @@ body {
     color: black;
 }
 
-.menu .item_menu.active{
+.item_menu.active {
     background-color: var(--primary);
     color: white;
     font-family: var(--font);
 
-    i.icon{
+    i.icon {
         background-color: white;
     }
 }
 
-.menu .item_menu:hover{
+.item_menu:hover {
     background-color: var(--primary);
     color: white;
     font-family: var(--font);
 
-    i.icon{
+    i.icon {
         background-color: white;
     }
 }
 
+.row {
+    display: flex;
+    flex-direction: row;
+    gap: 25px;
+}
