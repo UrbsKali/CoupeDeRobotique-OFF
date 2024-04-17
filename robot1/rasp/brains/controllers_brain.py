@@ -19,7 +19,7 @@ from controllers import RollingBasis, Actuators
 def deploy_god_hand(self):
     servo = CONFIG.FRONT_GOD_HAND["deployment_servo"]
     self.actuators.update_servo(
-        self.actuators.update_servo(servo["pin"], servo["close_angle"])
+        self.actuators.update_servo(servo["pin"], servo["deploy_angle"])
     )
 
 
@@ -34,7 +34,7 @@ def undeploy_god_hand(self):
 @Logger
 def open_god_hand(self):
     for servo in CONFIG.FRONT_GOD_HAND["take_servo"]:
-        self.actuators.update_servo(servo["pin"], servo["deploy_angle"])
+        self.actuators.update_servo(servo["pin"], servo["open_angle"])
         time.sleep(0.1)  # Wait 100ms to avoid com overload
 
 @Logger
