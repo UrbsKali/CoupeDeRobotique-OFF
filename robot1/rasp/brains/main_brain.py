@@ -146,9 +146,16 @@ class MainBrain(Brain):
                 self.logger.log("Sorting pickup zones...", LogLevels.INFO)
                 plant_zones = self.arena.sort_pickup_zone(self.rolling_basis.odometrie)
                 self.logger.log("Going to best pickup zone...", LogLevels.INFO)
+
                 is_arrived, destination_plant_zone = await self.go_best_zone(
-                    plant_zones
+                    plant_zones, delta=20
                 )
+                await self.rolling_basis.go_to_and_wait(
+                    Point(10, 0),
+                    max_speed=20,
+                    relative=True,
+                )
+
                 self.logger.log(
                     (
                         f"Finished go_best_zone: " + "arrived"
@@ -166,7 +173,7 @@ class MainBrain(Brain):
                     # Account for removed plants
                     destination_plant_zone.take_plants(5)
                     # Step back
-                    await self.rolling_basis.go_to(
+                    await self.rolling_basis.go_to_and_wait(
                         Point(-15, 0),
                         forward=False,
                         relative=True,
@@ -178,7 +185,7 @@ class MainBrain(Brain):
                 plant_zones = self.arena.sort_drop_zone(self.rolling_basis.odometrie)
                 self.logger.log("Going to best drop zone...", LogLevels.INFO)
                 is_arrived, destination_plant_zone = await self.go_best_zone(
-                    plant_zones, delta=25
+                    plant_zones, delta=35
                 )
                 self.logger.log(
                     (
@@ -189,8 +196,8 @@ class MainBrain(Brain):
                     LogLevels.INFO,
                 )
                 if is_arrived and destination_plant_zone is not None:
-                    await self.rolling_basis.go_to(
-                        Point(10, 0), max_speed=50, relative=True
+                    await self.rolling_basis.go_to_and_wait(
+                        Point(10, 0), max_speed=20, relative=True
                     )
                     # Drop plants
                     await self.deploy_god_hand()
@@ -198,6 +205,6 @@ class MainBrain(Brain):
                     await asyncio.sleep(0.2)
                     # Account for new plants
                     destination_plant_zone.drop_plants(5)
-                    await self.rolling_basis.go_to(
-                        Point(-10, 0), max_speed=50, relative=True
+                    await self.rolling_basis.go_to_and_wait(
+                        Point(-10, 0), max_speed=20, relative=True
                     )

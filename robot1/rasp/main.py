@@ -93,6 +93,7 @@ if __name__ == "__main__":
     # Robot
     rolling_basis = RollingBasis(logger=logger_rolling_basis)
     rolling_basis.stop_and_clear_queue()
+    rolling_basis.set_pid(4.4, 0.0, 0.05)
     actuators = Actuators(logger=logger_actuators)
 
     # Arena
@@ -102,8 +103,8 @@ if __name__ == "__main__":
     )  # must be declared from external calculus interface or switch on the robot
 
     start_pos = OrientedPoint(
-        (0, 0),
-        0,
+        (22, 22),
+        3.14 / 2,
     )
 
     rolling_basis.set_odo(start_pos)
