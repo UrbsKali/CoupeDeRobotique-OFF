@@ -76,7 +76,8 @@ async def go_best_zone(self, plant_zones: list[Plants_zone], delta=15):
     if (
         destination_point != None
         and await self.rolling_basis.go_to_and_wait(
-            position=destination_point, timeout=30
+            position=destination_point, timeout=30,
+            **CONFIG.SPEED_PROFILES["cruise_speed"], **CONFIG.PRECISION_PROFILES["classic_precision"]
         )
         == 0
     ):

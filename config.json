@@ -87,13 +87,13 @@
           },
           "classic_precision": {
             "next_position_delay": 100,
-            "action_error_auth": 50,
-            "traj_precision": 50
+            "action_error_auth": 30,
+            "traj_precision": 30
           },
           "low_precision": {
             "next_position_delay": 100,
-            "action_error_auth": 100,
-            "traj_precision": 100
+            "action_error_auth": 60,
+            "traj_precision": 60
           }
         },
         "speed": {
