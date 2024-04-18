@@ -53,7 +53,7 @@ class Actuators(Teensy):
             # https://docs.python.org/3/library/struct.html#format-characters
             self.send_bytes(msg)
         else:
-            self.l.log(
+            self.logger.log(
                 f"you tried to write {angle}° on pin {pin} whereas angle must be between {min_angle} and {max_angle}°",
                 LogLevels.ERROR,
             )

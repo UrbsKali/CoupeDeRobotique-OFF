@@ -112,5 +112,5 @@ def pol_to_abs_cart(self, polars: np.ndarray) -> MultiPoint:
 async def print_odometer(self):
     self.logger.log(
         f"Odometer: {self.rolling_basis.odometrie}",
-        LogLevels.INFO,
+        LogLevels.DEBUG,
     )

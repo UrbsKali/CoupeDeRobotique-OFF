@@ -212,33 +212,15 @@ class RollingBasis(Teensy):
         *,  # force keyword arguments
         forward: bool = True,
         relative: bool = False,
-        max_speed: int = CONFIG.SPEED_PROFILES.get("cruise_speed", 150).get(
-            "max_speed"
-        ),
-        next_position_delay: int = CONFIG.SPEED_PROFILES.get(
-            "classic_precision", 100
-        ).get("next_position_delay"),
-        action_error_auth: int = CONFIG.SPEED_PROFILES.get("classic_precision", 50).get(
-            "next_position_delay"
-        ),
-        traj_precision: int = CONFIG.SPEED_PROFILES.get("classic_precision", 50).get(
-            "next_position_delay"
-        ),
-        correction_trajectory_speed: int = CONFIG.SPEED_PROFILES.get(
-            "cruise_speed", 150
-        ).get("correction_trajectory_speed"),
-        acceleration_start_speed: int = CONFIG.SPEED_PROFILES.get(
-            "cruise_speed", 150
-        ).get("acceleration_start_speed"),
-        acceleration_distance: float = CONFIG.SPEED_PROFILES.get(
-            "cruise_speed", 10
-        ).get("acceleration_distance"),
-        deceleration_end_speed: int = CONFIG.SPEED_PROFILES.get(
-            "cruise_speed", 150
-        ).get("deceleration_end_speed"),
-        deceleration_distance: float = CONFIG.SPEED_PROFILES.get("cruise_speed", 5).get(
-            "deceleration_distance"
-        ),
+        max_speed: int = 160,
+        next_position_delay: int = 100,
+        action_error_auth: int = 30,
+        traj_precision: int = 30,
+        correction_trajectory_speed: int = 160,
+        acceleration_start_speed: int = 160,
+        acceleration_distance: float = 0,
+        deceleration_end_speed: int = 160,
+        deceleration_distance: float = 0,
     ) -> int:
         """
         Va à la position donnée en paramètre, return l'id dans la queue de l'action
@@ -302,15 +284,15 @@ class RollingBasis(Teensy):
         timeout: float = -1,  # in seconds
         forward: bool = True,
         relative: bool = False,
-        max_speed: int = 150,
+        max_speed: int = 160,
         next_position_delay: int = 100,
-        action_error_auth: int = 50,
-        traj_precision: int = 50,
-        correction_trajectory_speed: int = 80,
-        acceleration_start_speed: int = 80,
-        acceleration_distance: float = 10,
-        deceleration_end_speed: int = 80,
-        deceleration_distance: float = 10,
+        action_error_auth: int = 30,
+        traj_precision: int = 30,
+        correction_trajectory_speed: int = 160,
+        acceleration_start_speed: int = 160,
+        acceleration_distance: float = 0,
+        deceleration_end_speed: int = 160,
+        deceleration_distance: float = 0,
     ) -> int:
         """Waits to go over timeout or finish the queue (by finishing movement or being interrupted)
 
