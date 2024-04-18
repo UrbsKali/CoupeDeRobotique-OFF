@@ -66,7 +66,7 @@ async def go_best_zone(self, plant_zones: list[Plants_zone], delta=15):
             zone=plant_zone.zone,
             delta=delta,
         )
-        print("Target:",destination_point)
+        print("Target:", destination_point)
         # if self.arena.enable_go_to_point(
         #     self.rolling_basis.odometrie,
         #     target,
@@ -75,7 +75,7 @@ async def go_best_zone(self, plant_zones: list[Plants_zone], delta=15):
         destination_point = target
         destination_plant_zone = plant_zone
         break
-    print("Destination:",destination_point)
+    print("Destination:", destination_point)
     if (
         destination_point != None
         and (
