@@ -24,18 +24,18 @@ yellow[2].addEventListener("click", function (event) {
 
 
 blue[0].addEventListener("click", function (event) {
+    console.log("click on blue n°" + 5);
+    wsm.send("cmd", "zone", 5);
+});
+
+blue[1].addEventListener("click", function (event) {
     console.log("click on blue n°" + 1);
     wsm.send("cmd", "zone", 1);
 });
 
-blue[1].addEventListener("click", function (event) {
+blue[2].addEventListener("click", function (event) {
     console.log("click on blue n°" + 3);
     wsm.send("cmd", "zone", 3);
-});
-
-blue[2].addEventListener("click", function (event) {
-    console.log("click on blue n°" + 5);
-    wsm.send("cmd", "zone", 5);
 });
 
 for (let i = 0; i < blue_pos.length; i++) {
