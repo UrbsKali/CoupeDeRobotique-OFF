@@ -42,13 +42,14 @@ class MainBrain(Brain):
         self.arucos = []
         self.green_objects = []
 
+        self.anticollision_mode: AntiCollisionMode = AntiCollisionMode(
+            CONFIG.ANTICOLLISION_MODE
+        )
+
         # Init the brain
         super().__init__(logger, self)
 
         # Init CONFIG
-        self.anticollision_mode: AntiCollisionMode = AntiCollisionMode(
-            CONFIG.ANTICOLLISION_MODE
-        )
         self.logger.log(
             f"Mode: {'zombie' if CONFIG.ZOMBIE_MODE else 'game'}", LogLevels.INFO
         )
@@ -63,7 +64,11 @@ class MainBrain(Brain):
     )
 
     # Sensors functions
-    from brains.sensors_brain import compute_ennemy_position, pol_to_abs_cart
+    from brains.sensors_brain import (
+        compute_ennemy_position,
+        pol_to_abs_cart,
+        get_angle_ennemy,
+    )
 
     """
         Secondary routines
