@@ -212,15 +212,33 @@ class RollingBasis(Teensy):
         *,  # force keyword arguments
         forward: bool = True,
         relative: bool = False,
-        max_speed: int = CONFIG.SPEED_PROFILES.get("cruise_speed", 150).get("max_speed"),
-        next_position_delay: int = CONFIG.SPEED_PROFILES.get("classic_precision", 100).get("next_position_delay"),
-        action_error_auth: int = CONFIG.SPEED_PROFILES.get("classic_precision", 50).get("next_position_delay"),
-        traj_precision: int = CONFIG.SPEED_PROFILES.get("classic_precision", 50).get("next_position_delay"),
-        correction_trajectory_speed: int = CONFIG.SPEED_PROFILES.get("cruise_speed", 150).get("correction_trajectory_speed"),
-        acceleration_start_speed: int = CONFIG.SPEED_PROFILES.get("cruise_speed", 150).get("acceleration_start_speed"),
-        acceleration_distance: float = CONFIG.SPEED_PROFILES.get("cruise_speed", 10).get("acceleration_distance"),
-        deceleration_end_speed: int = CONFIG.SPEED_PROFILES.get("cruise_speed", 150).get("deceleration_end_speed"),
-        deceleration_distance: float = CONFIG.SPEED_PROFILES.get("cruise_speed", 5).get("deceleration_distance")
+        max_speed: int = CONFIG.SPEED_PROFILES.get("cruise_speed", 150).get(
+            "max_speed"
+        ),
+        next_position_delay: int = CONFIG.SPEED_PROFILES.get(
+            "classic_precision", 100
+        ).get("next_position_delay"),
+        action_error_auth: int = CONFIG.SPEED_PROFILES.get("classic_precision", 50).get(
+            "next_position_delay"
+        ),
+        traj_precision: int = CONFIG.SPEED_PROFILES.get("classic_precision", 50).get(
+            "next_position_delay"
+        ),
+        correction_trajectory_speed: int = CONFIG.SPEED_PROFILES.get(
+            "cruise_speed", 150
+        ).get("correction_trajectory_speed"),
+        acceleration_start_speed: int = CONFIG.SPEED_PROFILES.get(
+            "cruise_speed", 150
+        ).get("acceleration_start_speed"),
+        acceleration_distance: float = CONFIG.SPEED_PROFILES.get(
+            "cruise_speed", 10
+        ).get("acceleration_distance"),
+        deceleration_end_speed: int = CONFIG.SPEED_PROFILES.get(
+            "cruise_speed", 150
+        ).get("deceleration_end_speed"),
+        deceleration_distance: float = CONFIG.SPEED_PROFILES.get("cruise_speed", 5).get(
+            "deceleration_distance"
+        ),
     ) -> int:
         """
         Va à la position donnée en paramètre, return l'id dans la queue de l'action

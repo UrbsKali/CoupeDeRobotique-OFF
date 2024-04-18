@@ -68,13 +68,13 @@
     "anticollision_mode": 2,
     "zombie_mode": false,
     "min_stop_angle": 80,
-    "max_stop_angle": 180,
+    "max_stop_angle": 50,
     "ws": {
       "sender_name": "rob",
       "server_ip": "rc.local"
     },
     "jack": {
-      "pin": 15
+      "pin": 23
     },
     "rolling_basis": {
       "rolling_basis_teensy_ser": 12675800,
