@@ -43,6 +43,20 @@ async def close_god_hand(self):
         self.actuators.update_servo(servo["pin"], servo["close_angle"])
 
 
+async def god_hand_demo(self):
+    while True:
+        await self.undeploy_god_hand()
+        await asyncio.sleep(1)
+        await self.deploy_god_hand()
+        await asyncio.sleep(1)
+        await self.open_god_hand()
+        await asyncio.sleep(1)
+        await self.close_god_hand()
+        await asyncio.sleep(1)
+        await self.undeploy_god_hand()
+        await asyncio.sleep(1)
+
+
 async def go_best_zone(self, plant_zones: list[Plants_zone], delta=15):
     destination_point = None
     destination_plant_zone = None

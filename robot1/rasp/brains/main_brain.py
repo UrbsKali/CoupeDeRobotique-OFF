@@ -61,6 +61,7 @@ class MainBrain(Brain):
         open_god_hand,
         close_god_hand,
         go_best_zone,
+        god_hand_demo,
     )
 
     # Sensors functions
