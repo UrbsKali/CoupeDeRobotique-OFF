@@ -102,7 +102,7 @@ if __name__ == "__main__":
     )  # must be declared from external calculus interface or switch on the robot
 
     start_pos = OrientedPoint(
-        (0,0),
+        (0, 0),
         0,
     )
 
