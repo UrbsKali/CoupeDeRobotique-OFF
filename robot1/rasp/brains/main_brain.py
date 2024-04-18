@@ -156,7 +156,7 @@ class MainBrain(Brain):
                     timeout=10,
                     **CONFIG.SPEED_PROFILES["low_speed"],
                     **CONFIG.PRECISION_PROFILES["high_precision"],
-                    relative=True
+                    relative=True,
                 )
 
                 self.logger.log(

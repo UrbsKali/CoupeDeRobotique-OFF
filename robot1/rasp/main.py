@@ -104,7 +104,7 @@ if __name__ == "__main__":
 
     start_pos = OrientedPoint.from_Point(
         arena.drop_zones[2].zone.centroid,
-        3.14/2,
+        3.14 / 2,
     )
 
     rolling_basis.set_odo(start_pos)

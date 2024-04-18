@@ -332,9 +332,8 @@ class RollingBasis(Teensy):
         )
 
         while (
-            (timeout<0 or Utils.time_since(start_time) < timeout)
-            and self.queue.last_deleted_id < queue_id
-        ):
+            timeout < 0 or Utils.time_since(start_time) < timeout
+        ) and self.queue.last_deleted_id < queue_id:
             await asyncio.sleep(0.2)
 
         if Utils.time_since(start_time) >= timeout:
