@@ -2,7 +2,9 @@ let wsm = new WebSocketManager();
 wsm.add_ws("odometer");
 wsm.add_handler("odometer", (event) => {
         data = JSON.parse(event.data);
-        [x, y, theta] = 0, 0, 0
+        x = data[0]
+        y = data[1]
+        theta = data[2]
         parse_pos()
         set_rob_pos()
     }
