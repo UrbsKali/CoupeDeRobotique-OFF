@@ -131,16 +131,16 @@ class MainBrain(Brain):
             end_zones = self.arena.sort_drop_zone(
                 self.rolling_basis.odometrie, maxi=100
             )
-        await self.go_best_zone(end_zones, delta=0)
+        await self.go_best_zone(end_zones, delta=5)
         await self.deploy_god_hand()
         await self.open_god_hand()
 
         self.logger.log(f"Game over", LogLevels.INFO)
 
-    @Brain.task(process=False, run_on_start=False, timeout=300)
+    @Brain.task(process=False, run_on_start=False, timeout=85)
     async def plant_stage(self):
         start_stage_time = Utils.get_ts()
-        while 300 - Utils.time_since(start_stage_time) > 10:
+        while 100 - Utils.time_since(start_stage_time) > 15:
             await asyncio.sleep(0.1)
             is_arrived: bool = False
             await self.deploy_god_hand()
