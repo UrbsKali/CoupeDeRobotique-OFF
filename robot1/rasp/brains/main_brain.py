@@ -139,6 +139,7 @@ class MainBrain(Brain):
     async def plant_stage(self):
         start_stage_time = Utils.get_ts()
         while 300 - Utils.time_since(start_stage_time) > 10:
+            await asyncio.sleep(0.1)
             is_arrived: bool = False
             await self.deploy_god_hand()
             await self.open_god_hand()
