@@ -104,7 +104,7 @@ if __name__ == "__main__":
 
     start_pos = OrientedPoint(
         (22, 22),
-        3.14/2,
+        3.14 / 2,
     )
 
     rolling_basis.set_odo(start_pos)
