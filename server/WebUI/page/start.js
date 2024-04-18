@@ -13,7 +13,7 @@ let offset_y = 0;
 
 yellow[0].addEventListener("click", function (event) {
     console.log("click on yellow n°" + 0);
-    wsm.send("cmd", "zone", 2);
+    wsm.send("cmd", "zone", 0);
 });
 
 yellow[1].addEventListener("click", function (event) {
@@ -23,13 +23,13 @@ yellow[1].addEventListener("click", function (event) {
 
 yellow[2].addEventListener("click", function (event) {
     console.log("click on yellow n°" + 2);
-    wsm.send("cmd", "zone", 0);
+    wsm.send("cmd", "zone", 2);
 });
 
 
 blue[0].addEventListener("click", function (event) {
     console.log("click on blue n°" + 3);
-    wsm.send("cmd", "zone", 5);
+    wsm.send("cmd", "zone", 3);
 });
 
 blue[1].addEventListener("click", function (event) {
@@ -39,7 +39,7 @@ blue[1].addEventListener("click", function (event) {
 
 blue[2].addEventListener("click", function (event) {
     console.log("click on blue n°" + 5);
-    wsm.send("cmd", "zone", 3);
+    wsm.send("cmd", "zone", 5);
 });
 
 for (let i = 0; i < blue_pos.length; i++) {
