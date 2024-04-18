@@ -17,8 +17,16 @@ from logger import Logger, LogLevels
 from sensors import Lidar
 from brains.acs import AntiCollisionMode
 
+def get_angle_ennemy(self):
+    return math.degrees(
+        math.atan(
+            (self.arena.ennemy_position.x - self.rolling_basis.odometrie.x)
+            / (self.arena.ennemy_position.y - self.rolling_basis.odometrie.y)
+        )
+        - self.rolling_basis.odometrie.theta
+    )
 
-@Brain.task(process=False, run_on_start=False, refresh_rate=0.1)
+@Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
 async def compute_ennemy_position(self):
     polars: np.ndarray = self.lidar.scan_to_polars()
     # self.logger.log(f"Polars ({polars.shape}): {polars.tolist()}", LogLevels.INFO)
@@ -52,36 +60,27 @@ async def compute_ennemy_position(self):
         else nearest_points(self.rolling_basis.odometrie, obstacles)[1]
     )
 
-    def get_angle_ennemy(self):
-        return math.degrees(
-            math.atan(
-                (self.arena.ennemy_position.x - self.rolling_basis.odometrie.x)
-                / (self.arena.ennemy_position.y - self.rolling_basis.odometrie.y)
-            )
-            - self.rolling_basis.odometrie.theta
-        )
-
     self.logger.log(
-        f"Ennemy position computed: {self.arena.ennemy_position if self.arena.ennemy_position is not None else 'None'}, at angle: {get_angle_ennemy() if self.arena.ennemy_position is not None else 'None'} and distance: {math.sqrt(pow(self.arena.ennemy_position.x - self.rolling_basis.odometrie.x,2)+pow(self.arena.ennemy_position.y - self.rolling_basis.odometrie.y,2)) if self.arena.ennemy_position is not None else 'None'}",
-        LogLevels.DEBUG,
+        f"Ennemy position computed: {self.arena.ennemy_position if self.arena.ennemy_position is not None else 'None'}, at angle: {self.get_angle_ennemy() if self.arena.ennemy_position is not None else 'None'} and distance: {math.sqrt(pow(self.arena.ennemy_position.x - self.rolling_basis.odometrie.x,2)+pow(self.arena.ennemy_position.y - self.rolling_basis.odometrie.y,2)) if self.arena.ennemy_position is not None else 'None'}",
+        LogLevels.INFO,
     )
 
     # For now, just stop if close. When updating, consider self.arena.check_collision_by_distances
     if (
-        self.anticollison_mode != AntiCollisionMode.DISABLED
+        self.anticollision_mode != AntiCollisionMode.DISABLED
         and self.arena.ennemy_position is not None
     ):
         if (
             self.rolling_basis.odometrie.distance(self.arena.ennemy_position)
             < CONFIG.STOP_TRESHOLD
         ):
-            if self.anticollison_mode == AntiCollisionMode.CIRCULAR:
+            if self.anticollision_mode == AntiCollisionMode.CIRCULAR:
                 self.logger.log(
                     "ACS triggered, performing emergency stop", LogLevels.WARNING
                 )
                 self.rolling_basis.stop_and_clear_queue()
-            if self.anticollison_mode == AntiCollisionMode.FRONTAL:
-                if abs(get_angle_ennemy()) < CONFIG.MAX_STOP_ANGLE:
+            if self.anticollision_mode == AntiCollisionMode.FRONTAL:
+                if abs(self.get_angle_ennemy()) < CONFIG.MAX_STOP_ANGLE:
                     self.logger.log(
                         "ACS triggered, performing emergency stop", LogLevels.WARNING
                     )
