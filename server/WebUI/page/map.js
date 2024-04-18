@@ -1,32 +1,36 @@
 let wsm = new WebSocketManager();
 wsm.add_ws("odometer");
 wsm.add_handler("odometer", (event) => {
-        data = JSON.parse(event.data);
-        x = data[0]
-        y = data[1]
-        theta = data[2]
-        parse_pos()
-        set_rob_pos()
-    }
-)
+    let data = JSON.parse(event.data);
+    x = data[0];
+    y = data[1];
+    theta = data[2];
+    parse_pos();
+    set_rob_pos();
+});
 
-let rob = document.querySelector(".rob")
+let rob = document.querySelector(".rob");
 
-let x = 0
-let y = 0
-let theta = 0
+let x = 0, y = 0, theta = 0;
 
-// Dimension en pixel : 1489 x 1000 px
-// Dimension en mètre : 3 x 2 m
-// en X : 1 m = 496.33 px | 1cm = 4.96 px
-// en Y : 1 m = 500 px    | 1cm = 5 px
 function parse_pos() {
-    x = Math.min(parseFloat(x) * 4.9633, 300 * 4.9633)
-    y = Math.min(parseFloat(y) * 5.0, 200 * 5)
-    theta = parseFloat(theta) * 180 / Math.PI
+    x = Math.min(parseFloat(x) * 4.9633, 1489); // Max width in pixels, adjusted to actual width
+    y = Math.min(parseFloat(y) * 5.0, 1000); // Max height in pixels, adjusted to actual height
+    theta = parseFloat(theta) * 180 / Math.PI; // Convert radians to degrees
 }
 
 function set_rob_pos() {
-    rob.style.transformOrigin = "top left"
-    rob.style.transform = `translate(${x}px, ${y}px) rotate(${theta}deg)`
+    if (rob) {
+        rob.style.transformOrigin = "top left";
+        rob.style.transform = `translate(${x}px, ${y}px) rotate(${theta}deg)`;
+    } else {
+        console.error('Robot element not found.');
+    }
 }
+
+let buttons = document.querySelectorAll(".button");
+buttons.forEach(button => {
+    button.addEventListener("click", () => {
+        button_click_effect(button);
+    });
+});
