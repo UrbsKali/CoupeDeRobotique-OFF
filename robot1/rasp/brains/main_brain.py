@@ -132,6 +132,8 @@ class MainBrain(Brain):
                 self.rolling_basis.odometrie, maxi=100
             )
         await self.go_best_zone(end_zones, delta=0)
+        await self.deploy_god_hand()
+        await self.open_god_hand()
 
         self.logger.log(f"Game over", LogLevels.INFO)
 
