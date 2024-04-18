@@ -59,6 +59,7 @@ async def god_hand_demo(self):
 
 async def go_best_zone(self, plant_zones: list[Plants_zone], delta=15):
     destination_point = None
+    print(destination_point)
     destination_plant_zone = None
     for plant_zone in plant_zones:
         target = self.arena.compute_go_to_destination(
@@ -73,6 +74,7 @@ async def go_best_zone(self, plant_zones: list[Plants_zone], delta=15):
             destination_point = target
             destination_plant_zone = plant_zone
             break
+    print(destination_point)
     if (
         destination_point != None
         and (

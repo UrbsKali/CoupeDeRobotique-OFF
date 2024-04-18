@@ -102,9 +102,9 @@ if __name__ == "__main__":
         start_zone_id, logger=logger_arena
     )  # must be declared from external calculus interface or switch on the robot
 
-    start_pos = OrientedPoint(
-        (22, 22),
-        3.14 / 2,
+    start_pos = OrientedPoint.from_Point(
+        arena.drop_zones[2].zone.centroid,
+        3.14/2,
     )
 
     rolling_basis.set_odo(start_pos)

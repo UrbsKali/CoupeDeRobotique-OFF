@@ -148,12 +148,15 @@ class MainBrain(Brain):
                 self.logger.log("Going to best pickup zone...", LogLevels.INFO)
 
                 is_arrived, destination_plant_zone = await self.go_best_zone(
-                    plant_zones, delta=20
+                    plant_zones,
+                    delta=20,
                 )
                 await self.rolling_basis.go_to_and_wait(
                     Point(10, 0),
-                    max_speed=20,
-                    relative=True,
+                    timeout=10,
+                    **CONFIG.SPEED_PROFILES["low_speed"],
+                    **CONFIG.PRECISION_PROFILES["high_precision"],
+                    relative=True
                 )
 
                 self.logger.log(
@@ -174,8 +177,11 @@ class MainBrain(Brain):
                     destination_plant_zone.take_plants(5)
                     # Step back
                     await self.rolling_basis.go_to_and_wait(
-                        Point(-15, 0),
+                        Point(-20, 0),
+                        timeout=10,
                         forward=False,
+                        **CONFIG.SPEED_PROFILES["cruise_speed"],
+                        **CONFIG.PRECISION_PROFILES["classic_precision"],
                         relative=True,
                     )
 
@@ -185,7 +191,7 @@ class MainBrain(Brain):
                 plant_zones = self.arena.sort_drop_zone(self.rolling_basis.odometrie)
                 self.logger.log("Going to best drop zone...", LogLevels.INFO)
                 is_arrived, destination_plant_zone = await self.go_best_zone(
-                    plant_zones, delta=35
+                    plant_zones, delta=20
                 )
                 self.logger.log(
                     (
@@ -206,5 +212,10 @@ class MainBrain(Brain):
                     # Account for new plants
                     destination_plant_zone.drop_plants(5)
                     await self.rolling_basis.go_to_and_wait(
-                        Point(-10, 0), max_speed=20, relative=True
+                        Point(-20, 0),
+                        timeout=10,
+                        forward=False,
+                        **CONFIG.SPEED_PROFILES["low_speed"],
+                        **CONFIG.PRECISION_PROFILES["high_precision"],
+                        relative=True,
                     )
