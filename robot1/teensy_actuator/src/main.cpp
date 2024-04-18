@@ -58,6 +58,7 @@ void setup()
 
   // only the messages received by the teensy are listed here
   functions[SERVO_GO_TO] = &call_servo_go_to;
+  functions[STEPPER_STEP] = &call_stepper_step;
 
   Serial.begin(115200);
 }
