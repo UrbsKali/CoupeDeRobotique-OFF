@@ -148,8 +148,7 @@ class MainBrain(Brain):
                 self.logger.log("Going to best pickup zone...", LogLevels.INFO)
 
                 is_arrived, destination_plant_zone = await self.go_best_zone(
-                    plant_zones,
-                    delta=20
+                    plant_zones, delta=20
                 )
                 await self.rolling_basis.go_to_and_wait(
                     Point(10, 0),
