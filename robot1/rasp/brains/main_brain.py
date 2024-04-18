@@ -167,7 +167,9 @@ class MainBrain(Brain):
                     destination_plant_zone.take_plants(5)
                     # Step back
                     await self.rolling_basis.go_to(
-                        Point(-15, 0), forward=False, relative=True,
+                        Point(-15, 0),
+                        forward=False,
+                        relative=True,
                     )
 
             is_arrived = False
