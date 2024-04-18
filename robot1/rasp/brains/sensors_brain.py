@@ -17,6 +17,7 @@ from logger import Logger, LogLevels
 from sensors import Lidar
 from brains.acs import AntiCollisionMode
 
+
 def get_angle_ennemy(self):
     return math.degrees(
         math.atan(
@@ -25,6 +26,7 @@ def get_angle_ennemy(self):
         )
         - self.rolling_basis.odometrie.theta
     )
+
 
 @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
 async def compute_ennemy_position(self):

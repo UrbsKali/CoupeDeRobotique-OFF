@@ -64,7 +64,11 @@ class MainBrain(Brain):
     )
 
     # Sensors functions
-    from brains.sensors_brain import compute_ennemy_position, pol_to_abs_cart, get_angle_ennemy
+    from brains.sensors_brain import (
+        compute_ennemy_position,
+        pol_to_abs_cart,
+        get_angle_ennemy,
+    )
 
     """
         Secondary routines
