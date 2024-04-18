@@ -98,19 +98,19 @@
         },
         "speed": {
           "high_speed": {
-            "max_speed": 200,
-            "correction_trajectory_speed": 150,
-            "acceleration_start_speed": 120,
+            "max_speed": 180,
+            "correction_trajectory_speed": 160,
+            "acceleration_start_speed": 160,
             "acceleration_distance": 15,
-            "deceleration_end_speed": 150,
+            "deceleration_end_speed": 160,
             "deceleration_distance": 8
           },
           "cruise_speed": {
-            "max_speed": 150,
-            "acceleration_start_speed": 120,
-            "acceleration_distance": 5,
-            "deceleration_end_speed": 120,
-            "deceleration_distance": 10
+            "max_speed": 160,
+            "acceleration_start_speed": 160,
+            "acceleration_distance": 0,
+            "deceleration_end_speed": 160,
+            "deceleration_distance": 0
           },
           "low_speed": {
             "max_speed": 120,

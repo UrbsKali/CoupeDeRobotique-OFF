@@ -59,18 +59,14 @@ void swap_action(Complex_Action *new_action)
   // implémentation des destructeurs manquante
   if (current_action == new_action)
   {
-    com->print("1");
     delete new_action;
-    com->print("2");
     //free(new_action);
     return;
   }
   if (current_action != nullptr)
   {
-    com->print("A");
     //free(current_action);
     delete current_action;
-    com->print("B");
   }
     
   current_action = new_action;
@@ -121,6 +117,12 @@ void go_to(byte *msg, byte size)
   msg_Go_To *go_to_msg = (msg_Go_To *)msg;
   Point target_point(go_to_msg->x, go_to_msg->y, 0.0f);
   com->print("go_to");
+
+  com->print(String(go_to_msg->x).c_str());
+  com->print(String(go_to_msg->y).c_str());
+  com->print(String(go_to_msg->next_position_delay).c_str());
+  com->print(String(go_to_msg->action_error_auth).c_str());
+  com->print(String(go_to_msg->traj_precision).c_str());
 
   Precision_Params params{
       go_to_msg->next_position_delay,
