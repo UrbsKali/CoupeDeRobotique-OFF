@@ -244,7 +244,7 @@ class RollingBasis(Teensy):
             Point(
                 position.x + self.position_offset.x, position.y + self.position_offset.y
             )
-            if relative
+            if not relative
             else Point(
                 math.cos(self.odometrie.theta) * position.x
                 - math.sin(self.odometrie.theta) * position.y
