@@ -16,6 +16,7 @@ from geometry import (
     scale,
     OrientedPoint,
     rad,
+    nearest_points,
 )
 from logger import Logger, LogLevels
 import numpy as np
@@ -149,13 +150,14 @@ class Arena:
             return center
         else:
 
-            # Get the boundary (circle) of the disc of radius delta around the center
-            circle_delta = center.buffer(delta).boundary
+            disc_delta = center.buffer(delta)
 
-            if circle_delta.intersects(start_point):
+            if disc_delta.intersects(start_point):
                 self.logger.log(f"start_point is inside circle_delta", LogLevels.DEBUG)
                 return None
             else:
+                # Get the boundary (circle) of the disc of radius delta around the center
+                circle_delta = disc_delta.boundary
 
                 # Compute the line from start_point to the center of the zone, then scale it by more than 2 to make sure it intersect
                 # the circle twice (unless start_point is inside the circle_delta, or delta == 0, which have been checked)
@@ -173,12 +175,17 @@ class Arena:
                 ), "Should get exactly 2 intersections"
 
                 # Return closest or furthest intersection
-                if distance(start_point, intersections.geoms[0]) <= distance(
-                    start_point, intersections.geoms[1]
-                ):
-                    return intersections.geoms[0] if closer else intersections.geoms[1]
+                if closer:
+                    return nearest_points(start_point, intersections)[1]
+
+                # No clean way in case 'further' point
                 else:
-                    return intersections.geoms[1] if closer else intersections.geoms[0]
+                    if distance(start_point, intersections.geoms[0]) <= distance(
+                        start_point, intersections.geoms[1]
+                    ):
+                        return intersections.geoms[1]
+                    else:
+                        return intersections.geoms[0]
 
     def check_collision_by_distances(
         self, distances_to_check: list[float], pos_robot: OrientedPoint
