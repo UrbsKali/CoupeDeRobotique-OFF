@@ -52,10 +52,10 @@ async def odometer_com(self):
         self.logger.log(f"Message received on [Odometer]: {message}.", LogLevels.DEBUG)
         self.rob_pos = OrientedPoint(message.data[0], message.data[1], message.data[2])
 
-        if self.ws_odometer.get_client("webui") is not None:
+        if self.ws_odometer.get_client("WebUI") is not None:
             await self.ws_odometer.sender.send(
                 WSmsg(sender="server", msg=message.msg, data=message.data),
-                clients=self.ws_odometer.get_client("webui"),
+                clients=self.ws_odometer.get_client("WebUI"),
             )
 
 
