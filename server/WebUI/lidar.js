@@ -26,8 +26,9 @@ for (let i = 0; i < 270 * 3; i++) {
     lidarData.push(5);
 }
 
-let lidar = ws_connect("lidar");
-lidar.onmessage = function (event) {
+let lidar = new WebSocketManager();
+lidar.add_ws("lidar")
+lidar.add_handler("lidar", (event) => {
     if (event.data.startsWith("new$=$") || event.data.startsWith("current$=$")) {
         let data = event.data.split("$=$")[1].split(",");
         for (let i = 0; i < data.length; i++) {
@@ -35,7 +36,7 @@ lidar.onmessage = function (event) {
         }
         draw();
     }
-}
+})
 
 function toggle_alt_design() {
     alt_design = !alt_design;
