@@ -35,7 +35,7 @@ class Actuators(Teensy):
 
     @Logger
     def stepper_step(
-        self, steps: int, number_of_steps: int, pin_dir: int, pin_step: int
+        self, steps: int,pin_dir: int, pin_step: int
     ) -> None:
         """
         Moves the stepper motor a specified number of steps. Note that the number of motor pin can change depending on the motor.
@@ -55,7 +55,6 @@ class Actuators(Teensy):
         msg = (
             self.Command.StepperStep
             + struct.pack("<b", steps)
-            + struct.pack("<B", number_of_steps)
             + struct.pack("<B", pin_dir)
             + struct.pack("<B", pin_step)
             # https://docs.python.org/3/library/struct.html#format-characters
