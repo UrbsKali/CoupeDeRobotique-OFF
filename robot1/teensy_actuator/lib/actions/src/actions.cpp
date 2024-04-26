@@ -38,9 +38,7 @@ void servo_go_to(Servo *servo, int angle)
     servo->write(angle);
 }
 
-void stepper_go_to(Stepper* stepper, int steps)
+void stepper_step(Bonezegei_A4988* stepper, int steps)
 {
-    stepper.step(steps);
+    stepper->step(stepper->_dir, steps);
 }
-
-

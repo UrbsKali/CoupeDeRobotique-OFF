@@ -155,11 +155,8 @@
         "elevator":{
           "up_steps": 1000,
           "down_steps": -1000,
-          "number_of_steps": 100,
-          "stepper_pin_1": 7,
-          "stepper_pin_2": 8,
-          "stepper_pin_3": 9,
-          "stepper_pin_4": 10
+          "pin_dir": 8,
+          "pin_step": 9
         }
       }
     },

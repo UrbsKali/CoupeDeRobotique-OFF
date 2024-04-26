@@ -25,8 +25,6 @@ struct msg_Stepper_Go_To
     byte command = STEPPER_STEP;
     int steps;           // Number of steps to turn, positive or negative define direction
     int number_of_steps; // total number of steps this motor can take
-    int motor_pin_1;
-    int motor_pin_2;
-    int motor_pin_3;
-    int motor_pin_4;     // 4 pins to control our stepper motor, can change to 2 or 5     
+    int pin_dir;         // pin to which the direction pin is connected
+    int pin_step;        // pin to which the step pin is connected   
 };
