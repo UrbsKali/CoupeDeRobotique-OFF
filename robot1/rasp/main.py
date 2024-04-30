@@ -1,7 +1,7 @@
 from config_loader import CONFIG
 
 # Import from common
-from WS_comms import WSclient, WSclientRouteManager, WSender, WSreceiver, WSmsg
+from WS_comms import WServer, WServerRouteManager, WSender, WSreceiver, WSmsg
 from logger import Logger, LogLevels
 from geometry import OrientedPoint
 from arena import MarsArena
@@ -17,10 +17,10 @@ if __name__ == "__main__":
     ###--- Initialization ---###
     """
     # Loggers
-    logger_ws_client = Logger(
-        identifier="ws_client",
+    logger_ws_server = Logger(
+        identifier="ws_server",
         decorator_level=LogLevels.INFO,
-        print_log_level=LogLevels.FATAL,
+        print_log_level=LogLevels.DEBUG,
         file_log_level=LogLevels.DEBUG,
     )
     logger_brain = Logger(
@@ -55,26 +55,30 @@ if __name__ == "__main__":
     )
 
     # Websocket server
-    ws_client = WSclient(
-        logger=logger_ws_client, host=CONFIG.WS_SERVER_IP, port=CONFIG.WS_PORT
+    ws_server = WServer(
+        logger=logger_ws_server,
+        host=CONFIG.WS_HOSTNAME,
+        port=CONFIG.WS_PORT,
+        ping_pong_clients_interval=CONFIG.WS_PING_PONG_INTERVAL
     )
+
     # Routes
-    ws_cmd = WSclientRouteManager(
+    ws_cmd = WServerRouteManager(
         WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME)
     )
-    ws_pami = WSclientRouteManager(
+    ws_pami = WServerRouteManager(
         WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME)
     )
     # Sensors
-    ws_lidar = WSclientRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
-    ws_odometer = WSclientRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
-    ws_camera = WSclientRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
+    ws_lidar = WServerRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
+    ws_odometer = WServerRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
+    ws_camera = WServerRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
     # Add routes
-    ws_client.add_route_handler(CONFIG.WS_CMD_ROUTE, ws_cmd)
-    ws_client.add_route_handler(CONFIG.WS_PAMI_ROUTE, ws_pami)
-    ws_client.add_route_handler(CONFIG.WS_LIDAR_ROUTE, ws_lidar)
-    ws_client.add_route_handler(CONFIG.WS_ODOMETER_ROUTE, ws_odometer)
-    ws_client.add_route_handler(CONFIG.WS_CAMERA_ROUTE, ws_camera)
+    ws_server.add_route_handler(CONFIG.WS_CMD_ROUTE, ws_cmd)
+    ws_server.add_route_handler(CONFIG.WS_PAMI_ROUTE, ws_pami)
+    ws_server.add_route_handler(CONFIG.WS_LIDAR_ROUTE, ws_lidar)
+    ws_server.add_route_handler(CONFIG.WS_ODOMETER_ROUTE, ws_odometer)
+    ws_server.add_route_handler(CONFIG.WS_CAMERA_ROUTE, ws_camera)
 
     # Lidar
     lidar = Lidar(

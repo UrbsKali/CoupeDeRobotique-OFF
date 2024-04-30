@@ -17,7 +17,7 @@ def load_json_file(file_path):
 class CONFIG:
     # TO CONFIG !
     RELATIVE_ROOT_PATH = os.path.join("..", "..")
-    SPECIFIC_CONFIG_KEY = "robot1"
+    SPECIFIC_CONFIG_KEY = "rob"
     GENERAL_CONFIG_KEY = "general"
 
     # Directory path (dont't touch)
@@ -51,10 +51,13 @@ class CONFIG:
 
     # Specific config
     SPECIFIC_CONFIG = CONFIG_STORE[SPECIFIC_CONFIG_KEY]
+
+    # Specific ws config
     SPECIFIC_WS_CONFIG = SPECIFIC_CONFIG["ws"]
 
     WS_SENDER_NAME = SPECIFIC_WS_CONFIG["sender_name"]
-    WS_SERVER_IP = SPECIFIC_WS_CONFIG["server_ip"]
+    WS_HOSTNAME = SPECIFIC_WS_CONFIG["hostname"]
+    WS_PING_PONG_INTERVAL = int(SPECIFIC_WS_CONFIG["ping_pong_interval"])
 
     # Zombie mode
     ZOMBIE_MODE = SPECIFIC_CONFIG["zombie_mode"]

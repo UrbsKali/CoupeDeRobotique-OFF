@@ -61,17 +61,19 @@
       "camera_pickup_zone_min_area": 1
     }
   },
-  "robot1": {
+  "rob": {
+    "ws": {
+      "sender_name": "rob",
+      "hostname": "0.0.0.0",
+      "ping_pong_interval": 1
+    },
+
     "log_level": 0,
     "print_log": true,
     "stop_treshold": 50,
     "anticollision_mode": 2,
     "zombie_mode": false,
     "max_stop_angle": 50,
-    "ws": {
-      "sender_name": "rob",
-      "server_ip": "rc.local"
-    },
     "jack": {
       "pin": 23
     },
