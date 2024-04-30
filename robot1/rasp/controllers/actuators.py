@@ -43,11 +43,8 @@ class Actuators(Teensy):
 
         Args:
             steps (int): The number of steps to move the motor.
-            number_of_steps (int): The total number of steps the motor can take in one revolution.
-            motor_pin_1 (int): The pin number for motor pin 1.
-            motor_pin_2 (int): The pin number for motor pin 2.
-            motor_pin_3 (int): The pin number for motor pin 3.
-            motor_pin_4 (int): The pin number for motor pin 4.
+            pin_dir (int): The pin number of the direction pin.
+            pin_step (int): The pin number of the step pin.
 
         Returns:
             None
