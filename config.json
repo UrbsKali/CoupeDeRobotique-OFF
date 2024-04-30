@@ -68,6 +68,8 @@
       "ping_pong_interval": 1
     },
 
+    "team": "b",
+
     "log_level": 0,
     "print_log": true,
     "stop_treshold": 50,

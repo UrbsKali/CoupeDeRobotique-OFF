@@ -63,22 +63,14 @@ if __name__ == "__main__":
     )
 
     # Routes
-    ws_cmd = WServerRouteManager(
-        WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME)
-    )
-    ws_pami = WServerRouteManager(
-        WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME)
-    )
-    # Sensors
-    ws_lidar = WServerRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
-    ws_odometer = WServerRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
-    ws_camera = WServerRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
+    ws_cmd = WServerRouteManager(WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME))
+    ws_pami = WServerRouteManager(WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME))
+    ws_log = WServerRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
+
     # Add routes
     ws_server.add_route_handler(CONFIG.WS_CMD_ROUTE, ws_cmd)
     ws_server.add_route_handler(CONFIG.WS_PAMI_ROUTE, ws_pami)
-    ws_server.add_route_handler(CONFIG.WS_LIDAR_ROUTE, ws_lidar)
-    ws_server.add_route_handler(CONFIG.WS_ODOMETER_ROUTE, ws_odometer)
-    ws_server.add_route_handler(CONFIG.WS_CAMERA_ROUTE, ws_camera)
+    ws_server.add_route_handler(CONFIG.WS_LOG_ROUTE, ws_log)
 
     # Lidar
     lidar = Lidar(
@@ -94,24 +86,28 @@ if __name__ == "__main__":
     jack_pin = PIN(CONFIG.JACK_PIN)
     jack_pin.setup("input_pulldown", reverse_state=True)
 
-    # Robot
+    # Rolling Basis
     rolling_basis = RollingBasis(logger=logger_rolling_basis)
     rolling_basis.stop_and_clear_queue()
     rolling_basis.set_pid(4.4, 0.0, 0.05)
+
+    # Actuators
     actuators = Actuators(logger=logger_actuators)
 
     # Arena
-    start_zone_id = 0
-    arena = MarsArena(
-        start_zone_id, logger=logger_arena
-    )  # must be declared from external calculus interface or switch on the robot
+    if CONFIG.TEAM == "b":
+        start_zone_id = 3
+    else:
+        start_zone_id = 0
+    arena = MarsArena(start_zone_id=start_zone_id, logger=logger_arena)
 
-    start_pos = OrientedPoint(
-        (22, 22),
-        3.14 / 2,
+    # Set start position
+    rolling_basis.set_odo(
+        OrientedPoint.from_Point(
+            arena.zones["home"].centroid,
+            math.pi / 2 if start_zone_id <= 2 else -math.pi / 2,
+        )
     )
-
-    rolling_basis.set_odo(start_pos)
     logger_brain.log(f"Start position: {start_pos}", LogLevels.INFO)
 
     # Brain

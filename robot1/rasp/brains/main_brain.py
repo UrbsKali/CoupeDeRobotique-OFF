@@ -87,43 +87,21 @@ class MainBrain(Brain):
 
     @Brain.task(process=False, run_on_start=not CONFIG.ZOMBIE_MODE)
     async def start(self):
-
-        self.logger.log(
-            f"Game start, waiting for start info from RC...", LogLevels.INFO
-        )
-        # Wait for RC start info
-        zone = await self.ws_cmd.receiver.get()
-        while zone == WSmsg() and zone.msg != "zone":
-            zone = await self.ws_cmd.receiver.get()
-            await asyncio.sleep(0.2)
-
-        start_zone_id = zone.data
-        self.logger.log(
-            f"Got start zone: {start_zone_id}, re-initializing arena and resetting odo...",
-            LogLevels.INFO,
-        )
-
-        self.arena = MarsArena(start_zone_id=start_zone_id, logger=self.arena.logger)
-
-        self.rolling_basis.set_odo(
-            OrientedPoint.from_Point(
-                self.arena.zones["home"].centroid,
-                math.pi / 2 if start_zone_id <= 2 else -math.pi / 2,
-            )
-        )
-
-        self.logger.log(f"Waiting for jack trigger...", LogLevels.INFO)
+        self.logger.log("Game start, waiting for jack trigger...", LogLevels.INFO)
 
         # Check jack state
         while self.jack.digital_read():
             await asyncio.sleep(0.1)
 
-        self.logger.log(f"Starting plant stage...", LogLevels.INFO)
+        # Plant Stage
+        self.logger.log("Starting plant stage...", LogLevels.INFO)
         await self.plant_stage()
 
+        # End game, return to home
         self.logger.log(
-            f"Finished game, returning to a friendly drop zone...", LogLevels.INFO
+            "Finished game, returning to a friendly drop zone...", LogLevels.INFO
         )
+        # TODO: retourner dans une zone différente de la zone de départ
         # Compute nearest friendly drop zone
         end_zones = self.arena.sort_drop_zone(self.rolling_basis.odometrie, maxi=100)
         while end_zones is None or end_zones == []:
