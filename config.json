@@ -105,17 +105,19 @@
             "deceleration_distance": 8
           },
           "cruise_speed": {
-            "max_speed": 160,
+            "max_speed": 180,
+            "correction_trajectory_speed": 160,
             "acceleration_start_speed": 160,
-            "acceleration_distance": 0,
+            "acceleration_distance": 15,
             "deceleration_end_speed": 160,
-            "deceleration_distance": 0
+            "deceleration_distance": 5
           },
           "low_speed": {
-            "max_speed": 140,
-            "acceleration_start_speed": 140,
+            "max_speed": 120,
+            "correction_trajectory_speed": 120,
+            "acceleration_start_speed": 120,
             "acceleration_distance": 0,
-            "deceleration_end_speed": 140,
+            "deceleration_end_speed": 120,
             "deceleration_distance": 0
           }
         }

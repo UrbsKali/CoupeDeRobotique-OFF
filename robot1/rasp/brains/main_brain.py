@@ -131,34 +131,35 @@ class MainBrain(Brain):
             end_zones = self.arena.sort_drop_zone(
                 self.rolling_basis.odometrie, maxi=100
             )
-        await self.go_best_zone(end_zones, delta=0)
+        await self.go_best_zone(end_zones, delta=5)
         await self.deploy_god_hand()
         await self.open_god_hand()
 
         self.logger.log(f"Game over", LogLevels.INFO)
 
-    @Brain.task(process=False, run_on_start=False, timeout=300)
+    @Brain.task(process=False, run_on_start=False, timeout=85)
     async def plant_stage(self):
         start_stage_time = Utils.get_ts()
-        while 300 - Utils.time_since(start_stage_time) > 10:
+        while 100 - Utils.time_since(start_stage_time) > 15:
             await asyncio.sleep(0.1)
             is_arrived: bool = False
             await self.deploy_god_hand()
             await self.open_god_hand()
             while not is_arrived:
+                await asyncio.sleep(0.2)
                 self.logger.log("Sorting pickup zones...", LogLevels.INFO)
                 plant_zones = self.arena.sort_pickup_zone(self.rolling_basis.odometrie)
                 self.logger.log("Going to best pickup zone...", LogLevels.INFO)
 
                 is_arrived, destination_plant_zone = await self.go_best_zone(
                     plant_zones,
-                    delta=20,
+                    delta=30,
                 )
                 await self.rolling_basis.go_to_and_wait(
-                    Point(10, 0),
+                    Point(20, 0),
                     timeout=10,
                     **CONFIG.SPEED_PROFILES["low_speed"],
-                    **CONFIG.PRECISION_PROFILES["high_precision"],
+                    **CONFIG.PRECISION_PROFILES["classic_precision"],
                     relative=True,
                 )
 
@@ -205,9 +206,6 @@ class MainBrain(Brain):
                     LogLevels.INFO,
                 )
                 if is_arrived and destination_plant_zone is not None:
-                    await self.rolling_basis.go_to_and_wait(
-                        Point(10, 0), max_speed=20, relative=True
-                    )
                     # Drop plants
                     await self.deploy_god_hand()
                     await self.open_god_hand()
@@ -219,6 +217,6 @@ class MainBrain(Brain):
                         timeout=10,
                         forward=False,
                         **CONFIG.SPEED_PROFILES["low_speed"],
-                        **CONFIG.PRECISION_PROFILES["high_precision"],
+                        **CONFIG.PRECISION_PROFILES["classic_precision"],
                         relative=True,
                     )
