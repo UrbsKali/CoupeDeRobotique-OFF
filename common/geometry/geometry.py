@@ -4,6 +4,7 @@ from shapely import (
     Polygon,
     MultiPolygon,
     LineString,
+    LinearRing,
     BufferCapStyle,
     BufferJoinStyle,
     Geometry,

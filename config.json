@@ -161,5 +161,9 @@
       "max_angle": 3.926991,
       "min_distance_detection": 5.0
     }
+  },
+  "arena" : {
+    "border_buffer" : 10,
+    "ennemy_buffer" : 25
   }
 }

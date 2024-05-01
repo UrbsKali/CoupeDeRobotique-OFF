@@ -31,12 +31,16 @@ class Arena:
         safe_collision_distance: float = 30,
         game_borders: Polygon = create_straight_rectangle(Point(0, 0), Point(200, 300)),
         zones: dict[str, MultiPolygon] | None = None,
+        border_buffer: float = 10,
+        ennemy_buffer: float = 25,
     ):
         self.logger: Logger = logger
         self.game_borders: Polygon = game_borders
         self.game_borders_buffered: Polygon = self.game_borders.buffer(-10)
         self.safe_collision_distance: float = safe_collision_distance
         self.ennemy_position: Point | None = None
+        self.border_buffer = border_buffer
+        self.ennemy_buffer = ennemy_buffer
 
         if zones is not None:
             self.zones = zones
@@ -75,19 +79,16 @@ class Arena:
         self,
         start: Point,
         target: Point,
-        buffer_distance: float = 15,
         forbidden_zone_name: str = "forbidden",
     ) -> bool:
         return self.enable_go_on_path(
-            LineString([start, target]), buffer_distance, forbidden_zone_name
+            LineString([start, target]), forbidden_zone_name=forbidden_zone_name
         )
 
     def enable_go_on_path(
         self,
         path: LineString,
-        buffer_distance: float = 15,
         forbidden_zone_name: str = "forbidden",
-        buffer_around_ennemy: float = 25,
     ) -> bool:
         """this function checks if a given line (or series of connected lines) move can be made into the arena. It
         avoids collisions with the boarders and the forbidden area. takes into account the width and the length of
@@ -108,21 +109,16 @@ class Arena:
         # define the area touched by the buffer, for example the sides of a robot moving
 
         geometry_to_check = (
-            path.buffer(buffer_distance) if buffer_distance > 0 else path
+            path.buffer(self.border_buffer) if self.border_buffer > 0 else path
         )
-        # Important to check buffer_distance > 0, otherwise the geometry can become a polygon without surface that never
-        # intersects with anything
-
-        # verify that the area touched is in the arena and do not collide with boarders
-        if not self.game_borders.contains(geometry_to_check):
+        
+        if not self.contains(geometry_to_check):
             return False
-
-        # verify that the area touched isn't in the forbidden area
 
         return not (
             self.zone_intersects(forbidden_zone_name, geometry_to_check)
             or (
-                self.ennemy_position.buffer(buffer_around_ennemy).intersects(
+                self.ennemy_position.buffer(self.ennemy_buffer).intersects(
                     geometry_to_check
                 )
                 if self.ennemy_position is not None

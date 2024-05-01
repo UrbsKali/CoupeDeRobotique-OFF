@@ -19,6 +19,7 @@ class CONFIG:
     RELATIVE_ROOT_PATH = os.path.join("..", "..")
     SPECIFIC_CONFIG_KEY = "robot1"
     GENERAL_CONFIG_KEY = "general"
+    ARENA_CONFIG_KEY = "arena"
 
     # Directory path (dont't touch)
     ROOT_DIR = os.path.abspath(RELATIVE_ROOT_PATH)
@@ -91,3 +92,6 @@ class CONFIG:
     ANTICOLLISION_MODE = SPECIFIC_CONFIG["anticollision_mode"]
     STOP_TRESHOLD = SPECIFIC_CONFIG["stop_treshold"]
     MAX_STOP_ANGLE = SPECIFIC_CONFIG["max_stop_angle"]
+    
+    # arena
+    ARENA_CONFIG = CONFIG_STORE[ARENA_CONFIG_KEY]
