@@ -38,9 +38,7 @@ class MainBrain(Brain):
         arena: MarsArena,
         jack: PIN,
     ) -> None:
-        # Camera data
-        self.arucos = []
-        self.green_objects = []
+
         self.team = arena.team
         self.rolling_basis: RollingBasis
         self.arena: MarsArena
