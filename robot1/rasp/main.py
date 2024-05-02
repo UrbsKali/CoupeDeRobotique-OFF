@@ -103,7 +103,10 @@ if __name__ == "__main__":
     # Arena
     start_zone_id = 0
     arena = MarsArena(
-        start_zone_id, logger=logger_arena,border_buffer=CONFIG.ARENA_CONFIG["border_buffer"], config_buffer = CONFIG.ARENA_CONFIG["robot_buffer"]
+        start_zone_id,
+        logger=logger_arena,
+        border_buffer=CONFIG.ARENA_CONFIG["border_buffer"],
+        config_buffer=CONFIG.ARENA_CONFIG["robot_buffer"],
     )  # must be declared from external calculus interface or switch on the robot
 
     start_pos = OrientedPoint.from_Point(
