@@ -38,10 +38,6 @@ class MainBrain(Brain):
         arena: MarsArena,
         jack: PIN,
     ) -> None:
-        # Camera data
-        self.arucos = []
-        self.green_objects = []
-
         self.anticollision_mode: AntiCollisionMode = AntiCollisionMode(
             CONFIG.ANTICOLLISION_MODE
         )
@@ -61,30 +57,22 @@ class MainBrain(Brain):
         open_god_hand,
         close_god_hand,
         go_best_zone,
-        god_hand_demo,
+        god_hand_demo
     )
 
     # Sensors functions
     from brains.sensors_brain import (
         compute_ennemy_position,
         pol_to_abs_cart,
-        get_angle_ennemy,
+        get_angle_ennemy
     )
 
-    """
-        Secondary routines
-    """
-
-    """ Subprocess routines """
-    # ...
-
-    """ Main process routines """
-    from brains.com_brain import camera_com, odometer_com, zombie_mode
+   # Com functions
+    from brains.com_brain import zombie_mode
 
     """
         Tasks
     """
-
     @Brain.task(process=False, run_on_start=not CONFIG.ZOMBIE_MODE)
     async def start(self):
         self.logger.log("Game start, waiting for jack trigger...", LogLevels.INFO)
