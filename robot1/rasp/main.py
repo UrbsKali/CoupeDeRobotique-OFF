@@ -1,5 +1,7 @@
 from config_loader import CONFIG
 
+import math
+
 # Import from common
 from WS_comms import WServer, WServerRouteManager, WSender, WSreceiver, WSmsg
 from logger import Logger, LogLevels
@@ -26,31 +28,31 @@ if __name__ == "__main__":
     logger_brain = Logger(
         identifier="brain",
         decorator_level=LogLevels.INFO,
-        print_log_level=LogLevels.INFO,
+        print_log_level=LogLevels.DEBUG,
         file_log_level=LogLevels.DEBUG,
     )
     logger_rolling_basis = Logger(
         identifier="rolling_basis",
         decorator_level=LogLevels.INFO,
-        print_log_level=LogLevels.INFO,
+        print_log_level=LogLevels.DEBUG,
         file_log_level=LogLevels.DEBUG,
     )
     logger_actuators = Logger(
         identifier="actuators",
         decorator_level=LogLevels.INFO,
-        print_log_level=LogLevels.INFO,
+        print_log_level=LogLevels.DEBUG,
         file_log_level=LogLevels.DEBUG,
     )
     logger_arena = Logger(
         identifier="arena",
         decorator_level=LogLevels.INFO,
-        print_log_level=LogLevels.INFO,
+        print_log_level=LogLevels.DEBUG,
         file_log_level=LogLevels.DEBUG,
     )
     logger_lidar = Logger(
         identifier="lidar",
         decorator_level=LogLevels.INFO,
-        print_log_level=LogLevels.FATAL,
+        print_log_level=LogLevels.CRITICAL,
         file_log_level=LogLevels.DEBUG,
     )
 
@@ -95,16 +97,15 @@ if __name__ == "__main__":
     actuators = Actuators(logger=logger_actuators)
 
     # Arena
-    start_zone_id = 3 if CONFIG.TEAM == "b" else 0
+    start_zone_id = 0 if CONFIG.TEAM == "y" else 3
     arena = MarsArena(start_zone_id=start_zone_id, logger=logger_arena)
 
     # Set start position
-    rolling_basis.set_odo(
-        OrientedPoint.from_Point(
+    start_pos=OrientedPoint.from_Point(
             arena.zones["home"].centroid,
             math.pi / 2 if start_zone_id <= 2 else -math.pi / 2,
         )
-    )
+    rolling_basis.set_odo(start_pos)
     logger_brain.log(f"Start position: {start_pos}", LogLevels.INFO)
 
     # Brain
@@ -112,9 +113,7 @@ if __name__ == "__main__":
         actuators=actuators,
         logger=logger_brain,
         ws_cmd=ws_cmd,
-        ws_lidar=ws_lidar,
-        ws_odometer=ws_odometer,
-        ws_camera=ws_camera,
+        ws_pami=ws_pami,
         rolling_basis=rolling_basis,
         lidar=lidar,
         arena=arena,
@@ -126,6 +125,6 @@ if __name__ == "__main__":
     """
     # Add background tasks, in format ws_server.add_background_task(func, func_params)
     for routine in brain.get_tasks():
-        ws_client.add_background_task(routine)
+        ws_server.add_background_task(routine)
 
-    ws_client.run()
+    ws_server.run()
