@@ -89,13 +89,14 @@ class MainBrain(Brain):
     @Brain.task(process=False, run_on_start=not CONFIG.ZOMBIE_MODE)
     async def start(self):
 
-        
         if CONFIG.ZONE_SWITCH_CONFIG["activated"]:
             if self.zone_switch.digital_read():
                 start_zone_id = CONFIG.ZONE_SWITCH_CONFIG["zone_on"]
             else:
                 start_zone_id = CONFIG.ZONE_SWITCH_CONFIG["zone_off"]
-            self.logger.log(f"Game start, zone choosed by switch : {start_zone_id}", LogLevels.INFO)
+            self.logger.log(
+                f"Game start, zone choosed by switch : {start_zone_id}", LogLevels.INFO
+            )
         else:
             self.logger.log(
                 f"Game start, waiting for start info from RC...", LogLevels.INFO
