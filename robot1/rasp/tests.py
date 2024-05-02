@@ -58,6 +58,44 @@ def test_enable_go_to():
     plt.legend()
     plt.show()
 
+def test_compute_go_to():
+        # Display the required points in the graph
+    x_start = []
+    y_start = []
+    x_stop = []
+    y_stop = []
+    logger = Logger()
+    arena = MarsArena(
+        1,
+        logger,
+        border_buffer=CONFIG.ARENA_CONFIG["border_buffer"],
+        robot_buffer=CONFIG.ARENA_CONFIG["robot_buffer"],
+    )
+    arena.zones["forbidden"]= None
+    start = Point(100,150)
+    for i in range(len(arena.drop_zones)):
+        stop = arena.compute_go_to_destination(start, arena.drop_zones[i].zone)
+        x_start.append(start.x)
+        y_start.append(start.y)
+        x_stop.append(stop.x)
+        y_stop.append(stop.y)
+        
+        if arena.enable_go_to_point(start,stop):
+            plt.plot([start.y, stop.y], [start.x, stop.x], color="green")
+        else:
+            plt.plot([start.y, stop.y], [start.x, stop.x], color="red")
+        
+    plt.scatter(y_start, x_start, color="blue", label="Start")
+    plt.scatter(y_stop, x_stop, color="red", label="Stop")
+    plt.xlim(0, 300)
+    plt.ylim(200, 0)
+    plt.xlabel("Y")
+    plt.ylabel("X")
+    plt.title("Check Go_To auto_delta")
+    plt.legend()
+    plt.show()
 
 if __name__ == "__main__":
-    test_enable_go_to()
+    #test_enable_go_to()
+    test_compute_go_to()
+    

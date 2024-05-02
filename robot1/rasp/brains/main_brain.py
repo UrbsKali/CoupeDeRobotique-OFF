@@ -140,7 +140,7 @@ class MainBrain(Brain):
             end_zones = self.arena.sort_drop_zone(
                 self.rolling_basis.odometrie, maxi=100
             )
-        await self.go_best_zone(end_zones, delta=5)
+        await self.go_best_zone(end_zones)
         await self.deploy_god_hand()
         await self.open_god_hand()
 

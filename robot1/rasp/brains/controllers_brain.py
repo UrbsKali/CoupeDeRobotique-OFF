@@ -57,14 +57,13 @@ async def god_hand_demo(self):
         await asyncio.sleep(1)
 
 
-async def go_best_zone(self, plant_zones: list[Plants_zone], delta=15):
+async def go_best_zone(self, plant_zones: list[Plants_zone]):
     destination_point = None
     destination_plant_zone = None
     for plant_zone in plant_zones:
         target = self.arena.compute_go_to_destination(
             start_point=self.rolling_basis.odometrie,
             zone=plant_zone.zone,
-            delta=delta,
         )
         print("Target:", destination_point)
         # if self.arena.enable_go_to_point(

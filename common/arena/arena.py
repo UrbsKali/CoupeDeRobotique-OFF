@@ -57,8 +57,12 @@ class Arena:
         prepare(self.game_borders_buffered)
         for zone in self.zones.values():
             prepare(zone)
+            
+    def valide_position(self, pos: Point) -> bool:
+        pos = pos.buffer(self.robot_buffer)
+        return self.game_borders.buffer(-0.01).contains(pos)
 
-    def contains(self, element: Geometry) -> bool:
+    def contains(self, element: Geometry,buffered_zone = False) -> bool:
         """Check if a point is in the arena bounds
 
         Args:
@@ -67,13 +71,14 @@ class Arena:
         Returns:
             bool: True if the element is entirely in the arena, False otherwise
         """
+        if buffered_zone : return self.game_borders_buffered.contains(element)
         return self.game_borders.contains(element)
 
     def zone_intersects(self, zone_name: str, element: Geometry) -> bool:
 
         if zone_name not in self.zones:
             raise ValueError("Tried to check intersection with unknown zone in arena")
-
+        if self.zones[zone_name] is None :return False
         return self.zones[zone_name].intersects(element)
 
     def enable_go_to_point(
@@ -128,7 +133,7 @@ class Arena:
         )
 
     def compute_go_to_destination(
-        self, start_point: Point, zone: Polygon, delta: float = 5, closer: bool = True
+        self, start_point: Point, zone: Polygon, delta: float = 0,
     ) -> Point | None:
         """_summary_
 
@@ -141,14 +146,38 @@ class Arena:
         Returns:
             _type_: _description_
         """
+        borders = self.game_borders
         center: Point = zone.centroid
         if delta == 0:
-            self.logger.log(f"delta == 0, returning centroid of zone", LogLevels.DEBUG)
-            return center
-        else:
+            self.logger.log(f"delta == 0, returning as close as the centroid of zone as possible to avoid collision with the border", LogLevels.DEBUG)
+            if self.valide_position(center):
+                return center
+            else:
+                projected_point = borders.exterior.interpolate(borders.exterior.project(center))
+                x = center.x
+                y=center.y
+                if abs(y-projected_point.y)<0.1:
+                    if projected_point.x-x<0 : x = x + (self.robot_buffer-center.distance(projected_point)+0.1)
+                    else : x = x - (self.robot_buffer-center.distance(projected_point)+0.1)
+                else:
+                    if projected_point.y-y>0 : y = y - (self.robot_buffer-center.distance(projected_point)+0.1)
+                    else : y = y + (self.robot_buffer-center.distance(projected_point)+0.1)
+                center = Point(x,y)
+                if not self.valide_position(center):
+                    projected_point = borders.exterior.interpolate(borders.exterior.project(center))
+                    if abs(y-projected_point.y)<0.1:
+                        if projected_point.x-x<0 : x = x + (self.robot_buffer-center.distance(projected_point)+0.1)
+                        else : x = x - (self.robot_buffer-center.distance(projected_point)+0.1)
+                    else:
+                        if projected_point.y-y>0 : y = y - (self.robot_buffer-center.distance(projected_point)+0.1)
+                        else : y= y + (self.robot_buffer-center.distance(projected_point)+0.1)
+                return Point(x,y)
 
-            disc_delta = center.buffer(delta)
-
+                
+        if delta != 0:
+            abs_delta = abs(delta)
+            disc_delta = center.buffer(abs_delta)
+            
             if disc_delta.intersects(start_point):
                 self.logger.log(f"start_point is inside circle_delta", LogLevels.DEBUG)
                 return None
@@ -172,7 +201,7 @@ class Arena:
                 ), "Should get exactly 2 intersections"
 
                 # Return closest or furthest intersection
-                if closer:
+                if delta>0:
                     return nearest_points(start_point, intersections)[1]
 
                 # No clean way in case 'further' point
@@ -183,7 +212,8 @@ class Arena:
                         return intersections.geoms[1]
                     else:
                         return intersections.geoms[0]
-
+                    
+        
     def check_collision_by_distances(
         self, distances_to_check: list[float], pos_robot: OrientedPoint
     ):
