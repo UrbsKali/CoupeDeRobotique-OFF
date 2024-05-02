@@ -213,28 +213,47 @@ class MainBrain(Brain):
         # Closest pickup zone
         pickup_target: Plants_zone = self.arena.pickup_zones[0 if in_yellow_team else 4]
 
+        self.logger.log(
+            f"Going to pickup zone {0 if in_yellow_team else 4}", LogLevels.INFO
+        )
         await self.go_and_pickup(pickup_target)
 
         drop_target: Plants_zone = self.arena.drop_zones[0 if in_yellow_team else 3]
 
+        self.logger.log(
+            f"Going to drop zone {0 if in_yellow_team else 3}", LogLevels.INFO
+        )
         await self.go_and_drop(drop_target)
 
         # Next pickup zone
-        pickup_target: Plants_zone = self.arena.pickup_zones[1 if in_yellow_team else 3]
+        pickup_target = self.arena.pickup_zones[1 if in_yellow_team else 3]
 
+        self.logger.log(
+            f"Going to pickup zone {1 if in_yellow_team else 3}", LogLevels.INFO
+        )
         await self.go_and_pickup(pickup_target)
 
-        drop_target: Plants_zone = self.arena.drop_zones[2 if in_yellow_team else 5]
+        drop_target = self.arena.drop_zones[2 if in_yellow_team else 5]
 
+        self.logger.log(
+            f"Going to drop zone {2 if in_yellow_team else 5}", LogLevels.INFO
+        )
         await self.go_and_drop(drop_target)
 
         # Next pickup zone
-        pickup_target: Plants_zone = self.arena.pickup_zones[2 if in_yellow_team else 5]
+        pickup_target = self.arena.pickup_zones[2 if in_yellow_team else 5]
 
+        self.logger.log(
+            f"Going to pickup zone {2 if in_yellow_team else 5}", LogLevels.INFO
+        )
         await self.go_and_pickup(pickup_target)
 
-        drop_target: Plants_zone = self.arena.drop_zones[2 if in_yellow_team else 5]
+        drop_target = self.arena.drop_zones[2 if in_yellow_team else 5]
 
+        self.logger.log(
+            f"Going to final drop zone (modified distances) {2 if in_yellow_team else 5}",
+            LogLevels.INFO,
+        )
         await self.go_and_drop(
             drop_target, distance_from_zone=15, distance_final_approach=10
         )
