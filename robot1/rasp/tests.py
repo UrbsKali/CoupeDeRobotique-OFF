@@ -13,7 +13,12 @@ def test_enable_go_to():
     # Assuming CONFIG, Logger, MarsArena, and other necessary imports are present
 
     logger = Logger()
-    arena = MarsArena(1, logger, border_buffer=CONFIG.ARENA_CONFIG["border_buffer"], robot_buffer=CONFIG.ARENA_CONFIG["robot_buffer"])
+    arena = MarsArena(
+        1,
+        logger,
+        border_buffer=CONFIG.ARENA_CONFIG["border_buffer"],
+        robot_buffer=CONFIG.ARENA_CONFIG["robot_buffer"],
+    )
 
     # Display the required points in the graph
     x_start = []

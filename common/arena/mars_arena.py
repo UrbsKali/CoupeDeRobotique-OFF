@@ -33,7 +33,9 @@ class Plants_zone:
 class MarsArena(Arena):
     """Represent the arena of the CDR 2023-2024"""
 
-    def __init__(self, start_zone_id: int, logger: Logger,*,border_buffer,robot_buffer):
+    def __init__(
+        self, start_zone_id: int, logger: Logger, *, border_buffer, robot_buffer
+    ):
         """
         Generate the arena of the CDR 2023-2024
 
@@ -43,7 +45,7 @@ class MarsArena(Arena):
         """
         if not (0 <= start_zone_id <= 5):
             raise ValueError("start_zone must be between 0 and 5")
-        
+
         origin = Point(0, 0)
         opposite_corner = Point(200, 300)
 
