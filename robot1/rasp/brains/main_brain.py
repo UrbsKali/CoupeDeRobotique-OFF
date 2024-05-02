@@ -141,11 +141,12 @@ class MainBrain(Brain):
             # Step back
             if (
                 await self.rolling_basis.go_to_and_wait(
-                    Point(-distance_final_approach, 0),
+                    Point(-100, 0),
+                    timeout=10,
                     forward=False,
-                    relative=True,
                     **CONFIG.SPEED_PROFILES["cruise_speed"],
                     **CONFIG.PRECISION_PROFILES["classic_precision"],
+                    relative=True,
                 )
                 != 0
             ):
@@ -197,7 +198,12 @@ class MainBrain(Brain):
             # Step back
             if (
                 await self.rolling_basis.go_to_and_wait(
-                    Point(-distance_final_approach, 0), max_speed=20, relative=True, forward=False,
+                    Point(-100, 0),
+                    timeout=10,
+                    forward=False,
+                    **CONFIG.SPEED_PROFILES["cruise_speed"],
+                    **CONFIG.PRECISION_PROFILES["classic_precision"],
+                    relative=True,
                 )
                 != 0
             ):

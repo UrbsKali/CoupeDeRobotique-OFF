@@ -67,7 +67,7 @@
       "hostname": "0.0.0.0",
       "ping_pong_interval": 1
     },
-    "team": "b",
+    "team": "y",
     "log_level": 0,
     "print_log": true,
     "stop_treshold": 50,
@@ -144,7 +144,7 @@
           },
           {
             "pin": 6,
-            "open_angle": 100,
+            "open_angle": 95,
             "close_angle": 115
           }
         ],
