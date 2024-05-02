@@ -93,23 +93,16 @@ class MainBrain(Brain):
         self.logger.log("Starting plant stage...", LogLevels.INFO)
         await self.plant_stage()
 
-        # End game, return to home
-        self.logger.log(
-            "Finished game, returning to a friendly drop zone...", LogLevels.INFO
-        )
-        # TODO: retourner dans une zone différente de la zone de départ
-        # Compute nearest friendly drop zone
-        end_zones = self.arena.sort_drop_zone(self.rolling_basis.odometrie, maxi=100)
-        while end_zones is None or end_zones == []:
-            await asyncio.sleep(0.5)
-            end_zones = self.arena.sort_drop_zone(
-                self.rolling_basis.odometrie, maxi=100
-            )
-        await self.go_best_zone(end_zones, delta=0)
+        await self.kill_rolling_basis()
 
         self.logger.log(f"Game over", LogLevels.INFO)
 
-    async def go_and_pickup(self, target_pickup_zone: Plants_zone) -> int:
+    async def go_and_pickup(
+        self,
+        target_pickup_zone: Plants_zone,
+        distance_from_zone=15,
+        distance_final_approach=10,
+    ) -> int:
 
         await self.deploy_god_hand()
         await self.open_god_hand()
@@ -117,7 +110,7 @@ class MainBrain(Brain):
         target = self.arena.compute_go_to_destination(
             start_point=self.rolling_basis.odometrie,
             zone=target_pickup_zone.zone,
-            delta=15,
+            delta=distance_from_zone,
         )
 
         if (
@@ -134,7 +127,7 @@ class MainBrain(Brain):
 
             # Final approach
             await self.rolling_basis.go_to_and_wait(
-                Point(10, 0),
+                Point(distance_final_approach, 0),
                 timeout=10,
                 max_speed=20,
                 relative=True,
@@ -151,7 +144,7 @@ class MainBrain(Brain):
             # Step back
             if (
                 await self.rolling_basis.go_to_and_wait(
-                    Point(-15, 0),
+                    Point(-distance_final_approach, 0),
                     forward=False,
                     relative=True,
                 )
@@ -161,12 +154,17 @@ class MainBrain(Brain):
             else:
                 return 0
 
-    async def go_and_drop(self, target_drop_zone: Plants_zone) -> int:  # TODO
+    async def go_and_drop(
+        self,
+        target_drop_zone: Plants_zone,
+        distance_from_zone=25,
+        distance_final_approach=10,
+    ) -> int:  # TODO
 
         target = self.arena.compute_go_to_destination(
             start_point=self.rolling_basis.odometrie,
             zone=target_drop_zone.zone,
-            delta=35,
+            delta=distance_from_zone,
         )
 
         if (
@@ -183,7 +181,7 @@ class MainBrain(Brain):
 
             # Final approach
             await self.rolling_basis.go_to_and_wait(
-                Point(10, 0),
+                Point(distance_final_approach, 0),
                 timeout=10,
                 max_speed=20,
                 relative=True,
@@ -199,7 +197,7 @@ class MainBrain(Brain):
             # Step back
             if (
                 await self.rolling_basis.go_to_and_wait(
-                    Point(-10, 0), max_speed=20, relative=True
+                    Point(-distance_final_approach, 0), max_speed=20, relative=True
                 )
                 != 0
             ):
@@ -207,18 +205,48 @@ class MainBrain(Brain):
             else:
                 return 0
 
-    @Brain.task(process=False, run_on_start=False, timeout=300)
+    @Brain.task(process=False, run_on_start=False, timeout=100)
     async def plant_stage(self):
 
         start_stage_time = Utils.get_ts()
 
         in_yellow_team = self.team == "y"
 
-        # Compute and travel to the closest pickup zone
+        # Closest pickup zone
         pickup_target: Plants_zone = self.arena.pickup_zones[0 if in_yellow_team else 4]
 
         await self.go_and_pickup(pickup_target)
 
-        drop_target: Plants_zone = self.arena.drop_zones[self.arena.start_zone_id]
+        drop_target: Plants_zone = self.arena.drop_zones[0 if in_yellow_team else 3]
 
         await self.go_and_drop(drop_target)
+
+        # Next pickup zone
+        pickup_target: Plants_zone = self.arena.pickup_zones[1 if in_yellow_team else 3]
+
+        await self.go_and_pickup(pickup_target)
+
+        drop_target: Plants_zone = self.arena.drop_zones[2 if in_yellow_team else 5]
+
+        await self.go_and_drop(drop_target)
+
+        # Next pickup zone
+        pickup_target: Plants_zone = self.arena.pickup_zones[2 if in_yellow_team else 5]
+
+        await self.go_and_pickup(pickup_target)
+
+        drop_target: Plants_zone = self.arena.drop_zones[2 if in_yellow_team else 5]
+
+        await self.go_and_drop(
+            drop_target, distance_from_zone=15, distance_final_approach=10
+        )
+
+    @Brain.task(process=False, run_on_start=False)
+    async def kill_rolling_basis(self, timeout=-1):
+        if timeout > 0:
+            await asyncio.sleep(timeout)
+
+        self.logger.log("Killing rolling basis", LogLevels.WARNING)
+        self.rolling_basis.stop_and_clear_queue()
+        self.rolling_basis.set_pid(0.0, 0.0, 0.0)
+        self.rolling_basis = None
