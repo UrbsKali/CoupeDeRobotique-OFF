@@ -12,14 +12,13 @@ def test_enable_go_to():
         # Assuming CONFIG, Logger, MarsArena, and other necessary imports are present
 
     logger = Logger()
-    arena = MarsArena(1, logger, border_buffer=CONFIG.ARENA_CONFIG["border_buffer"], ennemy_buffer=CONFIG.ARENA_CONFIG["ennemy_buffer"])
+    arena = MarsArena(1, logger, border_buffer=CONFIG.ARENA_CONFIG["border_buffer"], robot_buffer=CONFIG.ARENA_CONFIG["robot_buffer"])
 
     # Display the required points in the graph
     x_start = []
     y_start = []
     x_stop = []
     y_stop = []
-
     for i in range(100):
         start = Point(randint(0, 200), randint(0, 300))
         stop = Point(randint(0, 200), randint(0, 300))
@@ -29,6 +28,7 @@ def test_enable_go_to():
             x_stop.append(stop.x)
             y_stop.append(stop.y)
             plt.plot([start.y, stop.y], [start.x, stop.x], color='black')
+    
 
     # Display forbidden zone polygon
     forbidden_zone = arena.zones["forbidden"]

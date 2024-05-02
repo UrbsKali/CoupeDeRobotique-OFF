@@ -31,16 +31,17 @@ class Arena:
         safe_collision_distance: float = 30,
         game_borders: Polygon = create_straight_rectangle(Point(0, 0), Point(200, 300)),
         zones: dict[str, MultiPolygon] | None = None,
-        border_buffer: float = 10,
-        ennemy_buffer: float = 25,
+        *,
+        border_buffer,
+        robot_buffer,
     ):
         self.logger: Logger = logger
         self.game_borders: Polygon = game_borders
-        self.game_borders_buffered: Polygon = self.game_borders.buffer(-10)
+        self.game_borders_buffered: Polygon = self.game_borders.buffer(border_buffer)
         self.safe_collision_distance: float = safe_collision_distance
         self.ennemy_position: Point | None = None
         self.border_buffer = border_buffer
-        self.ennemy_buffer = ennemy_buffer
+        self.robot_buffer = robot_buffer
 
         if zones is not None:
             self.zones = zones
@@ -109,7 +110,7 @@ class Arena:
         # define the area touched by the buffer, for example the sides of a robot moving
 
         geometry_to_check = (
-            path.buffer(self.border_buffer) if self.border_buffer > 0 else path
+            path.buffer(self.robot_buffer) if self.robot_buffer > 0 else path
         )
         
         if not self.contains(geometry_to_check):
@@ -118,7 +119,7 @@ class Arena:
         return not (
             self.zone_intersects(forbidden_zone_name, geometry_to_check)
             or (
-                self.ennemy_position.buffer(self.ennemy_buffer).intersects(
+                self.ennemy_position.buffer(self.robot_buffer).intersects(
                     geometry_to_check
                 )
                 if self.ennemy_position is not None

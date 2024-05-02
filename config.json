@@ -165,7 +165,7 @@
     }
   },
   "arena" : {
-    "border_buffer" : 10,
-    "ennemy_buffer" : 25
+    "border_buffer" : -10,
+    "robot_buffer" : 12.5
   }
 }
