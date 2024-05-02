@@ -95,10 +95,7 @@ if __name__ == "__main__":
     actuators = Actuators(logger=logger_actuators)
 
     # Arena
-    if CONFIG.TEAM == "b":
-        start_zone_id = 3
-    else:
-        start_zone_id = 0
+    start_zone_id = 3 if CONFIG.TEAM == "b" else 0
     arena = MarsArena(start_zone_id=start_zone_id, logger=logger_arena)
 
     # Set start position
@@ -121,7 +118,7 @@ if __name__ == "__main__":
         rolling_basis=rolling_basis,
         lidar=lidar,
         arena=arena,
-        jack=jack_pin,
+        jack=jack_pin
     )
 
     """
