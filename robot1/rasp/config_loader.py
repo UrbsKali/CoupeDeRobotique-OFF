@@ -67,6 +67,9 @@ class CONFIG:
     # Jack
     JACK_CONFIG = SPECIFIC_CONFIG["jack"]
     JACK_PIN = JACK_CONFIG["pin"]
+    
+    # zone_switch
+    ZONE_SWITCH_CONFIG = SPECIFIC_CONFIG["zone_switch"]
 
     # Rolling Basis
     ROLLING_BASIS_CONFIG = SPECIFIC_CONFIG["rolling_basis"]

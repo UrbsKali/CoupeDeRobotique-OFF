@@ -89,6 +89,10 @@ if __name__ == "__main__":
     # Jack
     jack_pin = PIN(CONFIG.JACK_PIN)
     jack_pin.setup("input_pulldown", reverse_state=True)
+    
+    # Zone switch
+    zone_switch = PIN(CONFIG.ZONE_SWITCH_CONFIG["pin"])
+    zone_switch.setup("input")
 
     # Robot
     rolling_basis = RollingBasis(logger=logger_rolling_basis)
@@ -122,6 +126,7 @@ if __name__ == "__main__":
         lidar=lidar,
         arena=arena,
         jack=jack_pin,
+        zone_switch=zone_switch,
     )
 
     """

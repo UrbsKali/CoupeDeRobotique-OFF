@@ -37,6 +37,7 @@ class MainBrain(Brain):
         lidar: Lidar,
         arena: MarsArena,
         jack: PIN,
+        zone_switch: PIN,
     ) -> None:
         # Camera data
         self.arucos = []
@@ -88,20 +89,28 @@ class MainBrain(Brain):
     @Brain.task(process=False, run_on_start=not CONFIG.ZOMBIE_MODE)
     async def start(self):
 
-        self.logger.log(
-            f"Game start, waiting for start info from RC...", LogLevels.INFO
-        )
-        # Wait for RC start info
-        zone = await self.ws_cmd.receiver.get()
-        while zone == WSmsg() and zone.msg != "zone":
+        
+        if CONFIG.ZONE_SWITCH_CONFIG["activated"]:
+            if self.zone_switch.digital_read():
+                start_zone_id = CONFIG.ZONE_SWITCH_CONFIG["zone_on"]
+            else:
+                start_zone_id = CONFIG.ZONE_SWITCH_CONFIG["zone_off"]
+            self.logger.log(f"Game start, zone choosed by switch : {start_zone_id}", LogLevels.INFO)
+        else:
+            self.logger.log(
+                f"Game start, waiting for start info from RC...", LogLevels.INFO
+            )
+            # Wait for RC start info
             zone = await self.ws_cmd.receiver.get()
-            await asyncio.sleep(0.2)
+            while zone == WSmsg() and zone.msg != "zone":
+                zone = await self.ws_cmd.receiver.get()
+                await asyncio.sleep(0.2)
 
-        start_zone_id = zone.data
-        self.logger.log(
-            f"Got start zone: {start_zone_id}, re-initializing arena and resetting odo...",
-            LogLevels.INFO,
-        )
+            start_zone_id = zone.data
+            self.logger.log(
+                f"Got start zone: {start_zone_id}, re-initializing arena and resetting odo...",
+                LogLevels.INFO,
+            )
 
         self.arena = MarsArena(start_zone_id=start_zone_id, logger=self.arena.logger)
 
