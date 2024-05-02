@@ -97,13 +97,15 @@ class MarsArena(Arena):
                 Plants_zone(create_straight_rectangle(Point(77.5, 303), Point(45, 315)))
             ),  # 3 - Blue
         ]
-        if self.start_zone_id % 2 == 0: forbidden = self.drop_zones[3].zone
-        else: forbidden = self.drop_zones[0].zone
+        if self.start_zone_id % 2 == 0:
+            forbidden = self.drop_zones[3].zone
+        else:
+            forbidden = self.drop_zones[0].zone
         super().__init__(
             game_borders=create_straight_rectangle(origin, opposite_corner),
             logger=logger,
             zones={
-                "forbidden":forbidden,
+                "forbidden": forbidden,
                 "home": self.drop_zones[start_zone_id].zone,
             },
             border_buffer=border_buffer,

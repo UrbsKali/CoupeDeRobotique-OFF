@@ -92,6 +92,6 @@ class CONFIG:
     ANTICOLLISION_MODE = SPECIFIC_CONFIG["anticollision_mode"]
     STOP_TRESHOLD = SPECIFIC_CONFIG["stop_treshold"]
     MAX_STOP_ANGLE = SPECIFIC_CONFIG["max_stop_angle"]
-    
+
     # arena
     ARENA_CONFIG = CONFIG_STORE[ARENA_CONFIG_KEY]

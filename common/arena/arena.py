@@ -112,7 +112,7 @@ class Arena:
         geometry_to_check = (
             path.buffer(self.robot_buffer) if self.robot_buffer > 0 else path
         )
-        
+
         if not self.contains(geometry_to_check):
             return False
 
