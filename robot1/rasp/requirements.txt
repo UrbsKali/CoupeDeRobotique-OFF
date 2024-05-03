@@ -13,6 +13,7 @@ pyserial==3.5
 pysicktim==0.0.9
 pyusb==1.2.1
 PyYAML==6.0.1
+rpi-ws281x==5.0.0
 RPi.GPIO==0.7.1
 shapely==2.0.4
 yarl==1.9.4
