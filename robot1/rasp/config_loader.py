@@ -73,6 +73,13 @@ class CONFIG:
     JACK_CONFIG = SPECIFIC_CONFIG["jack"]
     JACK_PIN = JACK_CONFIG["pin"]
 
+    # Led strip
+    LED_STRIP_CONFIG = SPECIFIC_CONFIG["strip_led"]
+    LED_STRIP_PIN = LED_STRIP_CONFIG["pin"]
+    LED_STRIP_BRIGHTNESS = LED_STRIP_CONFIG["brightness"]
+    LED_STRIP_NUM_LEDS = LED_STRIP_CONFIG["num_leds"]
+    LED_STRIP_FREQ = LED_STRIP_CONFIG["frequency"]
+
     # Rolling Basis
     ROLLING_BASIS_CONFIG = SPECIFIC_CONFIG["rolling_basis"]
     ROLLING_BASIS_TEENSY_SER = ROLLING_BASIS_CONFIG["rolling_basis_teensy_ser"]

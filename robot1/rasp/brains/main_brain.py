@@ -101,7 +101,6 @@ class MainBrain(Brain):
         distance_from_zone=15,
         distance_final_approach=10,
     ) -> int:
-
         await self.deploy_god_hand()
         await self.open_god_hand()
 
@@ -122,7 +121,6 @@ class MainBrain(Brain):
         ):
             return 1
         else:
-
             # Final approach
             await self.rolling_basis.go_to_and_wait(
                 Point(distance_final_approach, 0),
@@ -176,7 +174,6 @@ class MainBrain(Brain):
         ):
             return 1
         else:
-
             # Final approach
             await self.rolling_basis.go_to_and_wait(
                 Point(distance_final_approach, 0),
@@ -205,14 +202,11 @@ class MainBrain(Brain):
 
     @Brain.task(process=False, run_on_start=False, timeout=100)
     async def plant_stage(self):
-
         start_stage_time = Utils.get_ts()
-
         in_yellow_team = self.team == "y"
-
+        
         # Closest pickup zone
         pickup_target: Plants_zone = self.arena.pickup_zones[0 if in_yellow_team else 4]
-
         self.logger.log(
             f"Going to pickup zone {0 if in_yellow_team else 4}", LogLevels.INFO
         )

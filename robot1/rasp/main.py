@@ -4,6 +4,7 @@ from config_loader import CONFIG
 from WS_comms import WServer, WServerRouteManager, WSender, WSreceiver, WSmsg
 from logger import Logger, LogLevels
 from geometry import OrientedPoint
+from led_strip import LEDStrip
 from arena import MarsArena
 from GPIO import PIN
 
@@ -16,6 +17,14 @@ if __name__ == "__main__":
     """
     ###--- Initialization ---###
     """
+    # State strip leds
+    led = LEDStrip(
+        num_leds=CONFIG.LED_STRIP_NUM_LEDS,
+        pin=CONFIG.LED_STRIP_PIN,
+        freq=CONFIG.LED_STRIP_FREQ,
+        brightness=CONFIG.LED_STRIP_BRIGHTNESS,
+    )
+
     # Loggers
     logger_ws_server = Logger(
         identifier="ws_server",
@@ -28,12 +37,16 @@ if __name__ == "__main__":
         decorator_level=LogLevels.INFO,
         print_log_level=LogLevels.INFO,
         file_log_level=LogLevels.DEBUG,
+        led_log_level=LogLevels.INFO,
+        led_strip=led,
     )
     logger_rolling_basis = Logger(
         identifier="rolling_basis",
         decorator_level=LogLevels.INFO,
         print_log_level=LogLevels.INFO,
         file_log_level=LogLevels.DEBUG,
+        led_log_level=LogLevels.WARNING,
+        led_strip=led,
     )
     logger_actuators = Logger(
         identifier="actuators",

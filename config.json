@@ -79,6 +79,12 @@
     "jack": {
       "pin": 23
     },
+    "strip_led": {
+      "pin": 25,
+      "brightness": 100,
+      "num_leds": 8,
+      "frequency": 800000
+    },
     "rolling_basis": {
       "rolling_basis_teensy_ser": 12675800,
       "go_to_profiles": {
