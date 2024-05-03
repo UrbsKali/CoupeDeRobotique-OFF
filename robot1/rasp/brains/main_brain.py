@@ -39,17 +39,17 @@ class MainBrain(Brain):
         team_switch: PIN,
         leds: LEDStrip,
     ) -> None:
-
         self.team = arena.team
-        self.rolling_basis: RollingBasis
-        self.arena: MarsArena
-        self.jack: PIN
         self.anticollision_mode: AntiCollisionMode = AntiCollisionMode(
             CONFIG.ANTICOLLISION_MODE
         )
         self.anticollision_handle: AntiCollisionHandle = AntiCollisionHandle(
             CONFIG.ANTICOLLISION_HANDLE
         )
+
+        self.rolling_basis: RollingBasis
+        self.arena: MarsArena
+        self.jack: PIN
 
         # Init the brain
         super().__init__(logger, self)
@@ -94,7 +94,7 @@ class MainBrain(Brain):
                 start_zone_id = CONFIG.TEAM_SWITCH_OFF
                 self.leds.set_team("b")
             self.logger.log(
-                f"Game start, zone choosed by switch : {start_zone_id}", LogLevels.INFO
+                f"Game start, zone chosen by switch : {start_zone_id}", LogLevels.INFO
             )
         else:
             self.logger.log(
@@ -126,7 +126,7 @@ class MainBrain(Brain):
         # Check jack state
         while self.jack.digital_read():
             await asyncio.sleep(0.1)
-        self.leds.is_ready()
+        self.leds.set_jack(True)
 
         # Plant Stage
         self.logger.log("Starting plant stage...", LogLevels.INFO)
@@ -134,7 +134,7 @@ class MainBrain(Brain):
 
         await self.kill_rolling_basis()
 
-        self.logger.log(f"Game over", LogLevels.INFO)
+        self.logger.log("Game over", LogLevels.INFO)
 
     async def go_and_pickup(
         self,
