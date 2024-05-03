@@ -123,7 +123,7 @@ if __name__ == "__main__":
         start_zone_id,
         logger=logger_arena,
         border_buffer=CONFIG.ARENA_CONFIG["border_buffer"],
-        config_buffer=CONFIG.ARENA_CONFIG["robot_buffer"],
+        robot_buffer=CONFIG.ARENA_CONFIG["robot_buffer"],
     )  # must be declared from external calculus interface or switch on the robot
 
     start_pos = OrientedPoint.from_Point(
