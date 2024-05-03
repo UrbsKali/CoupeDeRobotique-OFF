@@ -1,11 +1,12 @@
 from utils.utils import Utils
 from logger.log_tools import LogLevels, STYLES, center_and_limit, style, strip_ANSI
-from led_strip import LEDStrip
 
 import os, types, functools
 from threading import Thread
 from dataclasses import dataclass
 
+from typing import TypeVar
+TLEDStrip = TypeVar("TLEDStrip", bound="LEDStrip")
 
 @dataclass
 class COLORS:
@@ -37,7 +38,7 @@ class Logger:
         led_log_level: LogLevels = LogLevels.INFO,
         print_log: bool = True,
         write_to_file: bool = True,
-        led_strip: LEDStrip | None = None,
+        led_strip: TLEDStrip | None = None,
     ):
         """
         Logger init, ignore func and level param (for decorator)
