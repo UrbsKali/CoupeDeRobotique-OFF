@@ -16,7 +16,7 @@ from utils import Utils
 from GPIO import PIN
 
 # Import from local path
-from brains.acs import AntiCollisionMode
+from brains.acs import AntiCollisionMode, AntiCollisionHandle
 from controllers import RollingBasis, Actuators
 from sensors import Lidar
 
@@ -47,6 +47,9 @@ class MainBrain(Brain):
         self.anticollision_mode: AntiCollisionMode = AntiCollisionMode(
             CONFIG.ANTICOLLISION_MODE
         )
+        self.anticollision_handle: AntiCollisionHandle = AntiCollisionHandle(
+            CONFIG.ANTICOLLISION_HANDLE
+        )
 
         # Init the brain
         super().__init__(logger, self)
@@ -64,6 +67,7 @@ class MainBrain(Brain):
         close_god_hand,
         go_best_zone,
         god_hand_demo,
+        smart_go_to,
     )
 
     # Sensors functions
@@ -147,7 +151,7 @@ class MainBrain(Brain):
         )
 
         if (
-            await self.rolling_basis.go_to_and_wait(
+            await self.smart_go_to(
                 position=target,
                 timeout=30,
                 **CONFIG.SPEED_PROFILES["cruise_speed"],
@@ -158,7 +162,7 @@ class MainBrain(Brain):
             return 1
         else:
             # Final approach
-            await self.rolling_basis.go_to_and_wait(
+            await self.smart_go_to(
                 Point(distance_final_approach, 0),
                 timeout=10,
                 **CONFIG.SPEED_PROFILES["cruise_speed"],
@@ -176,7 +180,7 @@ class MainBrain(Brain):
 
             # Step back
             if (
-                await self.rolling_basis.go_to_and_wait(
+                await self.smart_go_to(
                     Point(-100, 0),
                     timeout=10,
                     forward=False,
@@ -197,7 +201,7 @@ class MainBrain(Brain):
         )
 
         if (
-            await self.rolling_basis.go_to_and_wait(
+            await self.smart_go_to(
                 position=target,
                 timeout=30,
                 **CONFIG.SPEED_PROFILES["cruise_speed"],
@@ -207,6 +211,16 @@ class MainBrain(Brain):
         ):
             return 1
         else:
+
+            # Final approach
+            await self.smart_go_to(
+                Point(distance_final_approach, 0),
+                timeout=10,
+                **CONFIG.SPEED_PROFILES["cruise_speed"],
+                **CONFIG.PRECISION_PROFILES["classic_precision"],
+                relative=True,
+            )
+
             # Drop plants
             await self.deploy_god_hand()
             await self.open_god_hand()
@@ -216,7 +230,7 @@ class MainBrain(Brain):
 
             # Step back
             if (
-                await self.rolling_basis.go_to_and_wait(
+                await self.smart_go_to(
                     Point(-30, 0),
                     timeout=10,
                     forward=False,
