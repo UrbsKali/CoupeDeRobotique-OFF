@@ -1,5 +1,5 @@
 from rpi_ws281x import PixelStrip, Color
-from logger import LogLevels
+from logger.log_tools import LogLevels
 
 LogColors = {
     LogLevels.DEBUG: Color(0, 0, 255),
