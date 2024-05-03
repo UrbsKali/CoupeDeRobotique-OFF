@@ -149,7 +149,7 @@ if __name__ == "__main__":
         arena=arena,
         jack=jack_pin,
         team_switch=team_switch,
-        leds=leds
+        leds=leds,
     )
 
     """
