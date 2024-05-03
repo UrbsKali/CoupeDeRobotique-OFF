@@ -178,7 +178,7 @@ class RollingBasis(Teensy):
                 break
 
         if len(self.queue) == 0:
-            self.logger.log("Queue is empty, not sending anything")
+            self.logger.log("Queue is empty, not sending anything", LogLevels.INFO)
         else:
             self.logger.log("Sending next action in queue")
             self.send_bytes(self.queue[0].msg)

@@ -60,9 +60,6 @@ class CONFIG:
     WS_HOSTNAME = SPECIFIC_WS_CONFIG["hostname"]
     WS_PING_PONG_INTERVAL = int(SPECIFIC_WS_CONFIG["ping_pong_interval"])
 
-    # Specific team color
-    TEAM = SPECIFIC_CONFIG["team"]
-
     # Zombie mode
     ZOMBIE_MODE = SPECIFIC_CONFIG["zombie_mode"]
     if "-z" in sys.argv or "--zombie" in sys.argv:

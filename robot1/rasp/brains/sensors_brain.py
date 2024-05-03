@@ -81,18 +81,18 @@ async def compute_ennemy_position(self):
                     "ACS triggered, performing emergency stop", LogLevels.WARNING
                 )
                 self.rolling_basis.stop_and_clear_queue()
-                self.led.acs_state(True)
+                self.leds.acs_state(True)
             if self.anticollision_mode == AntiCollisionMode.FRONTAL:
                 if abs(self.get_angle_ennemy()) < CONFIG.MAX_STOP_ANGLE:
                     self.logger.log(
                         "ACS triggered, performing emergency stop", LogLevels.WARNING
                     )
                     self.rolling_basis.stop_and_clear_queue()
-                    self.led.acs_state(True)
+                    self.leds.acs_state(True)
 
         else:
-            #self.logger.log("ACS not triggered", LogLevels.DEBUG)
-            self.led.acs_state(False)
+            # self.logger.log("ACS not triggered", LogLevels.DEBUG)
+            self.leds.acs_state(False)
 
 
 def pol_to_abs_cart(self, polars: np.ndarray) -> MultiPoint:
