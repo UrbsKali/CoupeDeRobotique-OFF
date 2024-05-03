@@ -37,7 +37,7 @@ class MainBrain(Brain):
         arena: MarsArena,
         jack: PIN,
         zone_switch: PIN,
-        leds: LEDStrip
+        leds: LEDStrip,
     ) -> None:
 
         self.team = arena.team
@@ -250,7 +250,7 @@ class MainBrain(Brain):
     async def plant_stage(self):
         start_stage_time = Utils.get_ts()
         in_yellow_team = self.team == "y"
-        
+
         # Closest pickup zone
         pickup_target: Plants_zone = self.arena.pickup_zones[0 if in_yellow_team else 4]
         self.logger.log(
@@ -279,7 +279,6 @@ class MainBrain(Brain):
             f"Going to drop zone {2 if in_yellow_team else 5}", LogLevels.INFO
         )
         await self.go_and_drop(drop_target)
-
 
     @Brain.task(process=False, run_on_start=False)
     async def kill_rolling_basis(self, timeout=-1):

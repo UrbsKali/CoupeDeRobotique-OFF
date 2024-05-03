@@ -74,12 +74,16 @@ if __name__ == "__main__":
         logger=logger_ws_server,
         host=CONFIG.WS_HOSTNAME,
         port=CONFIG.WS_PORT,
-        ping_pong_clients_interval=CONFIG.WS_PING_PONG_INTERVAL
+        ping_pong_clients_interval=CONFIG.WS_PING_PONG_INTERVAL,
     )
 
     # Routes
-    ws_cmd = WServerRouteManager(WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME))
-    ws_pami = WServerRouteManager(WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME))
+    ws_cmd = WServerRouteManager(
+        WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME)
+    )
+    ws_pami = WServerRouteManager(
+        WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME)
+    )
     ws_log = WServerRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
 
     # Add routes
@@ -128,10 +132,10 @@ if __name__ == "__main__":
     )
 
     # Set start position
-    start_pos=OrientedPoint.from_Point(
-            arena.zones["home"].centroid,
-            math.pi / 2 if start_zone_id <= 2 else -math.pi / 2,
-        )
+    start_pos = OrientedPoint.from_Point(
+        arena.zones["home"].centroid,
+        math.pi / 2 if start_zone_id <= 2 else -math.pi / 2,
+    )
     rolling_basis.set_odo(start_pos)
     logger_brain.log(f"Start position: {start_pos}", LogLevels.INFO)
 
