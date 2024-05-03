@@ -2,7 +2,8 @@
 #include <com.h>
 
 #include <iostream>
-#include <sstream>
+#include <string>
+
 
 // Step motor action generic class
 void Step_Action::check_end_of_action(Ticks current_ticks)
@@ -83,8 +84,12 @@ void Step_Forward_Backward::compute(Ticks current_ticks, Rolling_Basis_Params *r
     // Compute ticks to do
     this->total_ticks = (rolling_basis_params->encoder_resolution / rolling_basis_params->wheel_perimeter) * this->distance;
     Com* com = new Com(&Serial1, 115200);
+
+    std::string str = std::to_string(this->total_ticks);
+    const char* cstr = str.c_str();
     com->print("nb_ticks: ");
-    com->print((char*)this->total_ticks);
+    com->print(cstr);
+
     if (this->direction == forward)
     {
         this->right_sign = 1;
