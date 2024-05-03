@@ -91,7 +91,7 @@ async def compute_ennemy_position(self):
                     self.led.acs_state(True)
 
         else:
-            self.logger.log("ACS not triggered", LogLevels.DEBUG)
+            #self.logger.log("ACS not triggered", LogLevels.DEBUG)
             self.led.acs_state(False)
 
 
