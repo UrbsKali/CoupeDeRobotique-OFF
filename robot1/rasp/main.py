@@ -20,7 +20,7 @@ if __name__ == "__main__":
     ###--- Initialization ---###
     """
     # State strip leds
-    led = LEDStrip(
+    leds = LEDStrip(
         num_leds=CONFIG.LED_STRIP_NUM_LEDS,
         pin=CONFIG.LED_STRIP_PIN,
         freq=CONFIG.LED_STRIP_FREQ,
@@ -105,11 +105,7 @@ if __name__ == "__main__":
     zone_switch = PIN(CONFIG.ZONE_SWITCH_CONFIG["pin"])
     zone_switch.setup("input")
 
-    # Zone switch
-    zone_switch = PIN(CONFIG.ZONE_SWITCH_CONFIG["pin"])
-    zone_switch.setup("input")
-
-    # Rolling Basis
+    # Robot
     rolling_basis = RollingBasis(logger=logger_rolling_basis)
     rolling_basis.stop_and_clear_queue()
     rolling_basis.set_pid(4.4, 0.0, 0.05)
@@ -131,6 +127,11 @@ if __name__ == "__main__":
         3.14 / 2,
     )
 
+    # Set start position
+    start_pos=OrientedPoint.from_Point(
+            arena.zones["home"].centroid,
+            math.pi / 2 if start_zone_id <= 2 else -math.pi / 2,
+        )
     rolling_basis.set_odo(start_pos)
     logger_brain.log(f"Start position: {start_pos}", LogLevels.INFO)
 
