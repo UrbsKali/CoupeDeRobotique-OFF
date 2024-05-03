@@ -76,10 +76,10 @@
     "zombie_mode": false,
     "max_stop_angle": 50,
     "jack": {
-      "pin": 23
+      "pin": 24
     },
     "team_switch": {
-      "pin": 22,
+      "pin": 23,
       "activated": true,
       "team_off": 0,
       "team_on":3
