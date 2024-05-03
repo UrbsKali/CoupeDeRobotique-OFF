@@ -35,6 +35,7 @@ class LEDStrip:
         self.set_color(Color(0, 0, 0))
 
         self.is_ready(False)
+        self.set_jack(False)
 
     def set_color(self, color):
         for i in range(self._strip.numPixels()):
