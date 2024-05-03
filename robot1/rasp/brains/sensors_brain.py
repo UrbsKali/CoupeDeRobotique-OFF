@@ -15,7 +15,7 @@ from logger import Logger, LogLevels
 
 # Import from local path
 from sensors import Lidar
-from brains.acs import AntiCollisionMode
+from brains.acs import AntiCollisionMode, AntiCollisionHandle
 
 
 def get_angle_ennemy(self):

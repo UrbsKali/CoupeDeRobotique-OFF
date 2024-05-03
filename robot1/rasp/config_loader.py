@@ -95,5 +95,6 @@ class CONFIG:
 
     # Robot1 brain
     ANTICOLLISION_MODE = SPECIFIC_CONFIG["anticollision_mode"]
+    ANTICOLLISION_HANDLE = SPECIFIC_CONFIG["anticollision_handle"]
     STOP_TRESHOLD = SPECIFIC_CONFIG["stop_treshold"]
     MAX_STOP_ANGLE = SPECIFIC_CONFIG["max_stop_angle"]

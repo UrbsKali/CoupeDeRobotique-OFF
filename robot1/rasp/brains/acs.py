@@ -11,7 +11,8 @@ class AntiCollisionMode(Enum):
 
 
 class AntiCollisionHandle(Enum):
-    # Change direction when an obstacle is detected not implemented
-    CHANGE_DIRECTION = 0
-    # Avoid the obstacle not implemented
-    AVOID = 1
+
+    NOTHING = 0
+    WAIT_AND_FAIL = 1
+    WAIT_AND_RETRY = 2
+    AVOID = 3  # Not implemented
