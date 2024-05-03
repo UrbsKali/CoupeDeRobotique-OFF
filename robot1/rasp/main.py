@@ -40,7 +40,7 @@ if __name__ == "__main__":
         print_log_level=LogLevels.DEBUG,
         file_log_level=LogLevels.DEBUG,
         led_log_level=LogLevels.INFO,
-        led_strip=led,
+        led_strip=leds,
     )
     logger_rolling_basis = Logger(
         identifier="rolling_basis",
@@ -48,7 +48,7 @@ if __name__ == "__main__":
         print_log_level=LogLevels.DEBUG,
         file_log_level=LogLevels.DEBUG,
         led_log_level=LogLevels.WARNING,
-        led_strip=led,
+        led_strip=leds,
     )
     logger_actuators = Logger(
         identifier="actuators",
