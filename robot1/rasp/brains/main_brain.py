@@ -87,7 +87,7 @@ class MainBrain(Brain):
     @Brain.task(process=False, run_on_start=not CONFIG.ZOMBIE_MODE)
     async def start(self):
         if CONFIG.ENABLE_TEAM_SWITCH:
-            if self.zone_switch.digital_read():
+            if self.team_switch.digital_read():
                 start_zone_id = CONFIG.TEAM_SWITCH_ON
                 self.leds.set_team("y")
             else:
@@ -111,8 +111,6 @@ class MainBrain(Brain):
                 f"Got start zone: {start_zone_id}, re-initializing arena and resetting odo...",
                 LogLevels.INFO,
             )
-
-        self.arena = MarsArena(start_zone_id=start_zone_id, logger=self.arena.logger)
 
         self.rolling_basis.set_odo(
             OrientedPoint.from_Point(

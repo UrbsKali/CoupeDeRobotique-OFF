@@ -39,14 +39,12 @@ if __name__ == "__main__":
         decorator_level=LogLevels.INFO,
         print_log_level=LogLevels.DEBUG,
         file_log_level=LogLevels.DEBUG,
-        led_log_level=LogLevels.INFO,
     )
     logger_rolling_basis = Logger(
         identifier="rolling_basis",
         decorator_level=LogLevels.INFO,
         print_log_level=LogLevels.DEBUG,
         file_log_level=LogLevels.DEBUG,
-        led_log_level=LogLevels.WARNING,
     )
     logger_actuators = Logger(
         identifier="actuators",
