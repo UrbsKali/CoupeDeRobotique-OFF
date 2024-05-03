@@ -7,10 +7,11 @@ import math
 from config_loader import CONFIG
 from brain import Brain
 
-from WS_comms import WSmsg, WSclientRouteManager
+from WS_comms import WSmsg, WSclientRouteManager, WServerRouteManager
 from geometry import OrientedPoint, Point
+from arena import MarsArena, Plants_zone
 from logger import Logger, LogLevels
-from arena import MarsArena
+from led_strip import LEDStrip
 from utils import Utils
 from GPIO import PIN
 
@@ -28,21 +29,21 @@ class MainBrain(Brain):
     def __init__(
         self,
         logger: Logger,
-        ws_cmd: WSclientRouteManager,
-        ws_lidar: WSclientRouteManager,
-        ws_odometer: WSclientRouteManager,
-        ws_camera: WSclientRouteManager,
+        ws_cmd: WServerRouteManager,
+        ws_pami: WServerRouteManager,
         actuators: Actuators,
         rolling_basis: RollingBasis,
         lidar: Lidar,
         arena: MarsArena,
         jack: PIN,
         zone_switch: PIN,
+        leds: LEDStrip
     ) -> None:
-        # Camera data
-        self.arucos = []
-        self.green_objects = []
 
+        self.team = arena.team
+        self.rolling_basis: RollingBasis
+        self.arena: MarsArena
+        self.jack: PIN
         self.anticollision_mode: AntiCollisionMode = AntiCollisionMode(
             CONFIG.ANTICOLLISION_MODE
         )
@@ -72,15 +73,8 @@ class MainBrain(Brain):
         get_angle_ennemy,
     )
 
-    """
-        Secondary routines
-    """
-
-    """ Subprocess routines """
-    # ...
-
-    """ Main process routines """
-    from brains.com_brain import camera_com, odometer_com, zombie_mode
+    # Com functions
+    from brains.com_brain import zombie_mode
 
     """
         Tasks
@@ -127,106 +121,172 @@ class MainBrain(Brain):
         # Check jack state
         while self.jack.digital_read():
             await asyncio.sleep(0.1)
+        self.leds.is_ready()
 
-        self.logger.log(f"Starting plant stage...", LogLevels.INFO)
+        # Plant Stage
+        self.logger.log("Starting plant stage...", LogLevels.INFO)
         await self.plant_stage()
 
-        self.logger.log(
-            f"Finished game, returning to a friendly drop zone...", LogLevels.INFO
-        )
-        # Compute nearest friendly drop zone
-        end_zones = self.arena.sort_drop_zone(self.rolling_basis.odometrie, maxi=100)
-        while end_zones is None or end_zones == []:
-            await asyncio.sleep(0.5)
-            end_zones = self.arena.sort_drop_zone(
-                self.rolling_basis.odometrie, maxi=100
-            )
-        await self.go_best_zone(end_zones)
-        await self.deploy_god_hand()
-        await self.open_god_hand()
+        await self.kill_rolling_basis()
 
         self.logger.log(f"Game over", LogLevels.INFO)
 
-    @Brain.task(process=False, run_on_start=False, timeout=85)
-    async def plant_stage(self):
-        start_stage_time = Utils.get_ts()
-        while 100 - Utils.time_since(start_stage_time) > 15:
-            await asyncio.sleep(0.1)
-            is_arrived: bool = False
-            await self.deploy_god_hand()
-            await self.open_god_hand()
-            while not is_arrived:
-                await asyncio.sleep(0.2)
-                self.logger.log("Sorting pickup zones...", LogLevels.INFO)
-                plant_zones = self.arena.sort_pickup_zone(self.rolling_basis.odometrie)
-                self.logger.log("Going to best pickup zone...", LogLevels.INFO)
+    async def go_and_pickup(
+        self,
+        target_pickup_zone: Plants_zone,
+        distance_from_zone=15,
+        distance_final_approach=10,
+    ) -> int:
+        await self.deploy_god_hand()
+        await self.open_god_hand()
 
-                is_arrived, destination_plant_zone = await self.go_best_zone(
-                    plant_zones,
-                    delta=30,
-                )
+        target = self.arena.compute_go_to_destination(
+            start_point=self.rolling_basis.odometrie,
+            zone=target_pickup_zone.zone,
+            delta=distance_from_zone,
+        )
+
+        if (
+            await self.rolling_basis.go_to_and_wait(
+                position=target,
+                timeout=30,
+                **CONFIG.SPEED_PROFILES["cruise_speed"],
+                **CONFIG.PRECISION_PROFILES["classic_precision"],
+            )
+            != 0
+        ):
+            return 1
+        else:
+            # Final approach
+            await self.rolling_basis.go_to_and_wait(
+                Point(distance_final_approach, 0),
+                timeout=10,
+                **CONFIG.SPEED_PROFILES["cruise_speed"],
+                **CONFIG.PRECISION_PROFILES["classic_precision"],
+                relative=True,
+            )
+
+            # Grab plants
+            await self.close_god_hand()
+            await asyncio.sleep(0.2)
+            await self.undeploy_god_hand()
+
+            # Account for removed plants
+            target_pickup_zone.take_plants(5)
+
+            # Step back
+            if (
                 await self.rolling_basis.go_to_and_wait(
-                    Point(20, 0),
+                    Point(-100, 0),
                     timeout=10,
-                    **CONFIG.SPEED_PROFILES["low_speed"],
+                    forward=False,
+                    **CONFIG.SPEED_PROFILES["cruise_speed"],
                     **CONFIG.PRECISION_PROFILES["classic_precision"],
                     relative=True,
                 )
+                != 0
+            ):
+                return 2
+            else:
+                return 0
 
-                self.logger.log(
-                    (
-                        f"Finished go_best_zone: " + "arrived"
-                        if is_arrived
-                        else "did not arrive"
-                    ),
-                    LogLevels.INFO,
-                )
+    async def go_and_drop(
+        self,
+        target_drop_zone: Plants_zone,
+        distance_from_zone=25,
+        distance_final_approach=10,
+    ) -> int:  # TODO
 
-                if is_arrived and destination_plant_zone is not None:
-                    # Grab plants
-                    await self.close_god_hand()
-                    await asyncio.sleep(0.2)
-                    await self.undeploy_god_hand()
-                    # Account for removed plants
-                    destination_plant_zone.take_plants(5)
-                    # Step back
-                    await self.rolling_basis.go_to_and_wait(
-                        Point(-20, 0),
-                        timeout=10,
-                        forward=False,
-                        **CONFIG.SPEED_PROFILES["cruise_speed"],
-                        **CONFIG.PRECISION_PROFILES["classic_precision"],
-                        relative=True,
-                    )
+        target = self.arena.compute_go_to_destination(
+            start_point=self.rolling_basis.odometrie,
+            zone=target_drop_zone.zone,
+            delta=distance_from_zone,
+        )
 
-            is_arrived = False
-            while not is_arrived:
-                self.logger.log("Sorting drop zones...", LogLevels.INFO)
-                plant_zones = self.arena.sort_drop_zone(self.rolling_basis.odometrie)
-                self.logger.log("Going to best drop zone...", LogLevels.INFO)
-                is_arrived, destination_plant_zone = await self.go_best_zone(
-                    plant_zones, delta=20
+        if (
+            await self.rolling_basis.go_to_and_wait(
+                position=target,
+                timeout=30,
+                **CONFIG.SPEED_PROFILES["cruise_speed"],
+                **CONFIG.PRECISION_PROFILES["classic_precision"],
+            )
+            != 0
+        ):
+            return 1
+        else:
+            # Final approach
+            await self.rolling_basis.go_to_and_wait(
+                Point(distance_final_approach, 0),
+                timeout=10,
+                **CONFIG.SPEED_PROFILES["cruise_speed"],
+                **CONFIG.PRECISION_PROFILES["classic_precision"],
+                relative=True,
+            )
+
+            # Drop plants
+            await self.deploy_god_hand()
+            await self.open_god_hand()
+
+            # Account for removed plants
+            target_drop_zone.drop_plants(5)
+
+            # Step back
+            if (
+                await self.rolling_basis.go_to_and_wait(
+                    Point(-100, 0),
+                    timeout=10,
+                    forward=False,
+                    **CONFIG.SPEED_PROFILES["cruise_speed"],
+                    **CONFIG.PRECISION_PROFILES["classic_precision"],
+                    relative=True,
                 )
-                self.logger.log(
-                    (
-                        f"Finished go_best_zone: " + "arrived"
-                        if is_arrived
-                        else "did not arrive"
-                    ),
-                    LogLevels.INFO,
-                )
-                if is_arrived and destination_plant_zone is not None:
-                    # Drop plants
-                    await self.deploy_god_hand()
-                    await self.open_god_hand()
-                    await asyncio.sleep(0.2)
-                    # Account for new plants
-                    destination_plant_zone.drop_plants(5)
-                    await self.rolling_basis.go_to_and_wait(
-                        Point(-20, 0),
-                        timeout=10,
-                        forward=False,
-                        **CONFIG.SPEED_PROFILES["low_speed"],
-                        **CONFIG.PRECISION_PROFILES["classic_precision"],
-                        relative=True,
-                    )
+                != 0
+            ):
+                return 2
+            else:
+                return 0
+
+    @Brain.task(process=False, run_on_start=False, timeout=100)
+    async def plant_stage(self):
+        start_stage_time = Utils.get_ts()
+        in_yellow_team = self.team == "y"
+        
+        # Closest pickup zone
+        pickup_target: Plants_zone = self.arena.pickup_zones[0 if in_yellow_team else 4]
+        self.logger.log(
+            f"Going to pickup zone {0 if in_yellow_team else 4}", LogLevels.INFO
+        )
+        await self.go_and_pickup(pickup_target)
+
+        drop_target: Plants_zone = self.arena.drop_zones[0 if in_yellow_team else 3]
+
+        self.logger.log(
+            f"Going to drop zone {0 if in_yellow_team else 3}", LogLevels.INFO
+        )
+        await self.go_and_drop(drop_target)
+
+        # Next pickup zone
+        pickup_target = self.arena.pickup_zones[1 if in_yellow_team else 3]
+
+        self.logger.log(
+            f"Going to pickup zone {1 if in_yellow_team else 3}", LogLevels.INFO
+        )
+        await self.go_and_pickup(pickup_target)
+
+        drop_target = self.arena.drop_zones[2 if in_yellow_team else 5]
+
+        self.logger.log(
+            f"Going to drop zone {2 if in_yellow_team else 5}", LogLevels.INFO
+        )
+        await self.go_and_drop(drop_target)
+
+
+    @Brain.task(process=False, run_on_start=False)
+    async def kill_rolling_basis(self, timeout=-1):
+        if timeout > 0:
+            await asyncio.sleep(timeout)
+
+        self.logger.log("Killing rolling basis", LogLevels.WARNING)
+        self.rolling_basis.stop_and_clear_queue()
+        self.rolling_basis.set_pid(0.0, 0.0, 0.0)
+        self.rolling_basis = None

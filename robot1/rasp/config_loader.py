@@ -17,7 +17,7 @@ def load_json_file(file_path):
 class CONFIG:
     # TO CONFIG !
     RELATIVE_ROOT_PATH = os.path.join("..", "..")
-    SPECIFIC_CONFIG_KEY = "robot1"
+    SPECIFIC_CONFIG_KEY = "rob"
     GENERAL_CONFIG_KEY = "general"
     ARENA_CONFIG_KEY = "arena"
 
@@ -52,10 +52,16 @@ class CONFIG:
 
     # Specific config
     SPECIFIC_CONFIG = CONFIG_STORE[SPECIFIC_CONFIG_KEY]
+
+    # Specific ws config
     SPECIFIC_WS_CONFIG = SPECIFIC_CONFIG["ws"]
 
     WS_SENDER_NAME = SPECIFIC_WS_CONFIG["sender_name"]
-    WS_SERVER_IP = SPECIFIC_WS_CONFIG["server_ip"]
+    WS_HOSTNAME = SPECIFIC_WS_CONFIG["hostname"]
+    WS_PING_PONG_INTERVAL = int(SPECIFIC_WS_CONFIG["ping_pong_interval"])
+
+    # Specific team color
+    TEAM = SPECIFIC_CONFIG["team"]
 
     # Zombie mode
     ZOMBIE_MODE = SPECIFIC_CONFIG["zombie_mode"]
@@ -70,6 +76,13 @@ class CONFIG:
 
     # zone_switch
     ZONE_SWITCH_CONFIG = SPECIFIC_CONFIG["zone_switch"]
+
+    # Led strip
+    LED_STRIP_CONFIG = SPECIFIC_CONFIG["strip_led"]
+    LED_STRIP_PIN = LED_STRIP_CONFIG["pin"]
+    LED_STRIP_BRIGHTNESS = LED_STRIP_CONFIG["brightness"]
+    LED_STRIP_NUM_LEDS = LED_STRIP_CONFIG["num_leds"]
+    LED_STRIP_FREQ = LED_STRIP_CONFIG["frequency"]
 
     # Rolling Basis
     ROLLING_BASIS_CONFIG = SPECIFIC_CONFIG["rolling_basis"]

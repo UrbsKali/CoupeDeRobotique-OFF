@@ -114,6 +114,10 @@ class MarsArena(Arena):
             robot_buffer=robot_buffer,
         )
 
+    @property
+    def team(self):
+        return "y" if self.start_zone_id % 2 == 0 else "b"
+
     def sort_plant_zones(
         self,
         zones_to_sort: list[Plants_zone],

@@ -1,9 +1,12 @@
 from config_loader import CONFIG
 
+import math
+
 # Import from common
-from WS_comms import WSclient, WSclientRouteManager, WSender, WSreceiver, WSmsg
+from WS_comms import WServer, WServerRouteManager, WSender, WSreceiver, WSmsg
 from logger import Logger, LogLevels
 from geometry import OrientedPoint
+from led_strip import LEDStrip
 from arena import MarsArena
 from GPIO import PIN
 
@@ -16,65 +19,73 @@ if __name__ == "__main__":
     """
     ###--- Initialization ---###
     """
+    # State strip leds
+    led = LEDStrip(
+        num_leds=CONFIG.LED_STRIP_NUM_LEDS,
+        pin=CONFIG.LED_STRIP_PIN,
+        freq=CONFIG.LED_STRIP_FREQ,
+        brightness=CONFIG.LED_STRIP_BRIGHTNESS,
+    )
+
     # Loggers
-    logger_ws_client = Logger(
-        identifier="ws_client",
+    logger_ws_server = Logger(
+        identifier="ws_server",
         decorator_level=LogLevels.INFO,
-        print_log_level=LogLevels.FATAL,
+        print_log_level=LogLevels.DEBUG,
         file_log_level=LogLevels.DEBUG,
     )
     logger_brain = Logger(
         identifier="brain",
         decorator_level=LogLevels.INFO,
-        print_log_level=LogLevels.INFO,
+        print_log_level=LogLevels.DEBUG,
         file_log_level=LogLevels.DEBUG,
+        led_log_level=LogLevels.INFO,
+        led_strip=led,
     )
     logger_rolling_basis = Logger(
         identifier="rolling_basis",
         decorator_level=LogLevels.INFO,
-        print_log_level=LogLevels.INFO,
+        print_log_level=LogLevels.DEBUG,
         file_log_level=LogLevels.DEBUG,
+        led_log_level=LogLevels.WARNING,
+        led_strip=led,
     )
     logger_actuators = Logger(
         identifier="actuators",
         decorator_level=LogLevels.INFO,
-        print_log_level=LogLevels.INFO,
+        print_log_level=LogLevels.DEBUG,
         file_log_level=LogLevels.DEBUG,
     )
     logger_arena = Logger(
         identifier="arena",
         decorator_level=LogLevels.INFO,
-        print_log_level=LogLevels.INFO,
+        print_log_level=LogLevels.DEBUG,
         file_log_level=LogLevels.DEBUG,
     )
     logger_lidar = Logger(
         identifier="lidar",
         decorator_level=LogLevels.INFO,
-        print_log_level=LogLevels.FATAL,
+        print_log_level=LogLevels.CRITICAL,
         file_log_level=LogLevels.DEBUG,
     )
 
     # Websocket server
-    ws_client = WSclient(
-        logger=logger_ws_client, host=CONFIG.WS_SERVER_IP, port=CONFIG.WS_PORT
+    ws_server = WServer(
+        logger=logger_ws_server,
+        host=CONFIG.WS_HOSTNAME,
+        port=CONFIG.WS_PORT,
+        ping_pong_clients_interval=CONFIG.WS_PING_PONG_INTERVAL
     )
+
     # Routes
-    ws_cmd = WSclientRouteManager(
-        WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME)
-    )
-    ws_pami = WSclientRouteManager(
-        WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME)
-    )
-    # Sensors
-    ws_lidar = WSclientRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
-    ws_odometer = WSclientRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
-    ws_camera = WSclientRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
+    ws_cmd = WServerRouteManager(WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME))
+    ws_pami = WServerRouteManager(WSreceiver(use_queue=True), WSender(CONFIG.WS_SENDER_NAME))
+    ws_log = WServerRouteManager(WSreceiver(), WSender(CONFIG.WS_SENDER_NAME))
+
     # Add routes
-    ws_client.add_route_handler(CONFIG.WS_CMD_ROUTE, ws_cmd)
-    ws_client.add_route_handler(CONFIG.WS_PAMI_ROUTE, ws_pami)
-    ws_client.add_route_handler(CONFIG.WS_LIDAR_ROUTE, ws_lidar)
-    ws_client.add_route_handler(CONFIG.WS_ODOMETER_ROUTE, ws_odometer)
-    ws_client.add_route_handler(CONFIG.WS_CAMERA_ROUTE, ws_camera)
+    ws_server.add_route_handler(CONFIG.WS_CMD_ROUTE, ws_cmd)
+    ws_server.add_route_handler(CONFIG.WS_PAMI_ROUTE, ws_pami)
+    ws_server.add_route_handler(CONFIG.WS_LOG_ROUTE, ws_log)
 
     # Lidar
     lidar = Lidar(
@@ -94,10 +105,16 @@ if __name__ == "__main__":
     zone_switch = PIN(CONFIG.ZONE_SWITCH_CONFIG["pin"])
     zone_switch.setup("input")
 
-    # Robot
+    # Zone switch
+    zone_switch = PIN(CONFIG.ZONE_SWITCH_CONFIG["pin"])
+    zone_switch.setup("input")
+
+    # Rolling Basis
     rolling_basis = RollingBasis(logger=logger_rolling_basis)
     rolling_basis.stop_and_clear_queue()
     rolling_basis.set_pid(4.4, 0.0, 0.05)
+
+    # Actuators
     actuators = Actuators(logger=logger_actuators)
 
     # Arena
@@ -122,14 +139,13 @@ if __name__ == "__main__":
         actuators=actuators,
         logger=logger_brain,
         ws_cmd=ws_cmd,
-        ws_lidar=ws_lidar,
-        ws_odometer=ws_odometer,
-        ws_camera=ws_camera,
+        ws_pami=ws_pami,
         rolling_basis=rolling_basis,
         lidar=lidar,
         arena=arena,
         jack=jack_pin,
         zone_switch=zone_switch,
+        leds=leds,
     )
 
     """
@@ -137,6 +153,6 @@ if __name__ == "__main__":
     """
     # Add background tasks, in format ws_server.add_background_task(func, func_params)
     for routine in brain.get_tasks():
-        ws_client.add_background_task(routine)
+        ws_server.add_background_task(routine)
 
-    ws_client.run()
+    ws_server.run()
