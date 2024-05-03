@@ -75,7 +75,7 @@ class DictProxyAccessor:
             tuple,
             OrientedPoint,
             Point,
-            type(None)
+            type(None),
         )
 
         if isinstance(obj, serialized_types):
