@@ -63,6 +63,7 @@ class DictProxyAccessor:
 
     @staticmethod
     def is_serialized(obj) -> bool:
+        print("try to serialize", obj)
         # Tuple of all types that are considered serialized directly.
         serialized_types = (
             Logger,
@@ -75,7 +76,7 @@ class DictProxyAccessor:
             tuple,
             OrientedPoint,
             Point,
-            type(None),
+            type(None)
         )
 
         if isinstance(obj, serialized_types):
