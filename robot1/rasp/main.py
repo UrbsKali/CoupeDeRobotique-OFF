@@ -130,7 +130,8 @@ if __name__ == "__main__":
         rolling_basis=rolling_basis,
         lidar=lidar,
         arena=arena,
-        jack=jack_pin
+        jack=jack_pin,
+        led=leds,
     )
 
     """

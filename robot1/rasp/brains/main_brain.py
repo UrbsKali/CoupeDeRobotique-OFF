@@ -9,8 +9,9 @@ from brain import Brain
 
 from WS_comms import WSmsg, WSclientRouteManager, WServerRouteManager
 from geometry import OrientedPoint, Point
-from logger import Logger, LogLevels
 from arena import MarsArena, Plants_zone
+from logger import Logger, LogLevels
+from led_strip import LEDStrip
 from utils import Utils
 from GPIO import PIN
 
@@ -35,6 +36,7 @@ class MainBrain(Brain):
         lidar: Lidar,
         arena: MarsArena,
         jack: PIN,
+        leds: LEDStrip
     ) -> None:
 
         self.team = arena.team
@@ -84,6 +86,7 @@ class MainBrain(Brain):
         # Check jack state
         while self.jack.digital_read():
             await asyncio.sleep(0.1)
+        self.leds.is_ready()
 
         # Plant Stage
         self.logger.log("Starting plant stage...", LogLevels.INFO)
