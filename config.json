@@ -67,13 +67,11 @@
       "hostname": "0.0.0.0",
       "ping_pong_interval": 1
     },
-
-    "team": "b",
-
+    "team": "y",
     "log_level": 0,
     "print_log": true,
     "stop_treshold": 50,
-    "anticollision_mode": 2,
+    "anticollision_mode": 1,
     "zombie_mode": false,
     "max_stop_angle": 50,
     "jack": {
@@ -136,30 +134,37 @@
       "front_god_hand": {
         "take_servo": [
           {
-            "pin": 2,
-            "open_angle": 55,
-            "close_angle": 35
-          },
-          {
             "pin": 3,
-            "open_angle": 55,
-            "close_angle": 35
+            "open_angle": 90,
+            "close_angle": 70
           },
           {
             "pin": 4,
-            "open_angle": 22,
-            "close_angle": 30
+            "open_angle": 90,
+            "close_angle": 70
           },
           {
-            "pin": 2,
-            "open_angle": 58,
-            "close_angle": 38
+            "pin": 5,
+            "open_angle": 100,
+            "close_angle": 115
+          },
+          {
+            "pin": 6,
+            "open_angle": 95,
+            "close_angle": 115
           }
         ],
         "deployment_servo": {
-          "pin": 5,
-          "deploy_angle": 98,
-          "undeploy_angle": 70
+          "pin": 7,
+          "deploy_angle": 90,
+          "undeploy_angle": 150
+        },
+        "solar_panel": {
+          "right": {
+            "pin": 8,
+            "deploy": 180,
+            "undeploy": 81
+          }
         }
       },
       "minimum_delay": 0.1

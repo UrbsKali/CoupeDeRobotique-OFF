@@ -7,7 +7,7 @@ import math
 from config_loader import CONFIG
 from brain import Brain
 
-from WS_comms import WSmsg, WSclientRouteManager
+from WS_comms import WSmsg, WSclientRouteManager, WServerRouteManager
 from geometry import OrientedPoint, Point
 from logger import Logger, LogLevels
 from arena import MarsArena, Plants_zone
@@ -28,10 +28,8 @@ class MainBrain(Brain):
     def __init__(
         self,
         logger: Logger,
-        ws_cmd: WSclientRouteManager,
-        ws_lidar: WSclientRouteManager,
-        ws_odometer: WSclientRouteManager,
-        ws_camera: WSclientRouteManager,
+        ws_cmd: WServerRouteManager,
+        ws_pami: WServerRouteManager,
         actuators: Actuators,
         rolling_basis: RollingBasis,
         lidar: Lidar,
@@ -125,7 +123,8 @@ class MainBrain(Brain):
             await self.rolling_basis.go_to_and_wait(
                 Point(distance_final_approach, 0),
                 timeout=10,
-                max_speed=20,
+                **CONFIG.SPEED_PROFILES["cruise_speed"],
+                **CONFIG.PRECISION_PROFILES["classic_precision"],
                 relative=True,
             )
 
@@ -140,8 +139,11 @@ class MainBrain(Brain):
             # Step back
             if (
                 await self.rolling_basis.go_to_and_wait(
-                    Point(-distance_final_approach, 0),
+                    Point(-100, 0),
+                    timeout=10,
                     forward=False,
+                    **CONFIG.SPEED_PROFILES["cruise_speed"],
+                    **CONFIG.PRECISION_PROFILES["classic_precision"],
                     relative=True,
                 )
                 != 0
@@ -178,7 +180,8 @@ class MainBrain(Brain):
             await self.rolling_basis.go_to_and_wait(
                 Point(distance_final_approach, 0),
                 timeout=10,
-                max_speed=20,
+                **CONFIG.SPEED_PROFILES["cruise_speed"],
+                **CONFIG.PRECISION_PROFILES["classic_precision"],
                 relative=True,
             )
 
@@ -192,7 +195,12 @@ class MainBrain(Brain):
             # Step back
             if (
                 await self.rolling_basis.go_to_and_wait(
-                    Point(-distance_final_approach, 0), max_speed=20, relative=True
+                    Point(-100, 0),
+                    timeout=10,
+                    forward=False,
+                    **CONFIG.SPEED_PROFILES["cruise_speed"],
+                    **CONFIG.PRECISION_PROFILES["classic_precision"],
+                    relative=True,
                 )
                 != 0
             ):
@@ -234,23 +242,6 @@ class MainBrain(Brain):
         )
         await self.go_and_drop(drop_target)
 
-        # Next pickup zone
-        pickup_target = self.arena.pickup_zones[2 if in_yellow_team else 5]
-
-        self.logger.log(
-            f"Going to pickup zone {2 if in_yellow_team else 5}", LogLevels.INFO
-        )
-        await self.go_and_pickup(pickup_target)
-
-        drop_target = self.arena.drop_zones[2 if in_yellow_team else 5]
-
-        self.logger.log(
-            f"Going to final drop zone (modified distances) {2 if in_yellow_team else 5}",
-            LogLevels.INFO,
-        )
-        await self.go_and_drop(
-            drop_target, distance_from_zone=15, distance_final_approach=10
-        )
 
     @Brain.task(process=False, run_on_start=False)
     async def kill_rolling_basis(self, timeout=-1):
