@@ -5,8 +5,6 @@ import os, types, functools
 from threading import Thread
 from dataclasses import dataclass
 
-from led_strip import LEDStrip
-
 
 @dataclass
 class COLORS:
@@ -35,10 +33,8 @@ class Logger:
         decorator_level: LogLevels = LogLevels.DEBUG,
         print_log_level: LogLevels = LogLevels.INFO,
         file_log_level: LogLevels = LogLevels.DEBUG,
-        led_log_level: LogLevels = LogLevels.INFO,
         print_log: bool = True,
         write_to_file: bool = True,
-        led_strip: LEDStrip | None = None,
     ):
         """
         Logger init, ignore func and level param (for decorator)
@@ -60,10 +56,8 @@ class Logger:
         self.log_level_width = max([len(loglvl.name) for loglvl in LogLevels]) + 2
         self.print_log_level = print_log_level
         self.file_log_level = file_log_level
-        self.led_log_level = led_log_level
         self.print_log = print_log
         self.write_to_file = write_to_file
-        self.led_strip = led_strip
 
         os.mkdir("logs") if not os.path.isdir("logs") else None
         date = Utils.get_date()
@@ -149,10 +143,6 @@ class Logger:
                     )  # Remove ANSI escape sequences from the string to save to file, or it will not display properly no most interfaces (could keep them if displayed through cat for example)
                     + "\n"
                 )
-
-        if not bypass_led and self.led_strip and level >= self.led_log_level:
-            self.led_strip.new_log(level)
-
         # Sync logs to server (deprecated for now)
         # try:
         #     Thread(target=update_log_sync, args=(message,)).start()
