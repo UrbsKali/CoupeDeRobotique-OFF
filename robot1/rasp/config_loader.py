@@ -74,8 +74,12 @@ class CONFIG:
     JACK_CONFIG = SPECIFIC_CONFIG["jack"]
     JACK_PIN = JACK_CONFIG["pin"]
 
-    # zone_switch
-    ZONE_SWITCH_CONFIG = SPECIFIC_CONFIG["zone_switch"]
+    # Team switch
+    TEAM_SWITCH_CONFIG = SPECIFIC_CONFIG["team_switch"]
+    TEAM_SWITCH_PIN = TEAM_SWITCH_CONFIG["pin"]
+    ENABLE_TEAM_SWITCH = TEAM_SWITCH_CONFIG["activated"]
+    TEAM_SWITCH_OFF = TEAM_SWITCH_CONFIG["team_off"]
+    TEAM_SWITCH_ON = TEAM_SWITCH_CONFIG["team_on"]
 
     # Led strip
     LED_STRIP_CONFIG = SPECIFIC_CONFIG["strip_led"]

@@ -36,7 +36,7 @@ class MainBrain(Brain):
         lidar: Lidar,
         arena: MarsArena,
         jack: PIN,
-        zone_switch: PIN,
+        team_switch: PIN,
         leds: LEDStrip,
     ) -> None:
 
@@ -86,18 +86,19 @@ class MainBrain(Brain):
 
     @Brain.task(process=False, run_on_start=not CONFIG.ZOMBIE_MODE)
     async def start(self):
-
-        if CONFIG.ZONE_SWITCH_CONFIG["activated"]:
+        if CONFIG.ENABLE_TEAM_SWITCH:
             if self.zone_switch.digital_read():
-                start_zone_id = CONFIG.ZONE_SWITCH_CONFIG["zone_on"]
+                start_zone_id = CONFIG.TEAM_SWITCH_ON
+                self.leds.set_team("y")
             else:
-                start_zone_id = CONFIG.ZONE_SWITCH_CONFIG["zone_off"]
+                start_zone_id = CONFIG.TEAM_SWITCH_OFF
+                self.leds.set_team("b")
             self.logger.log(
                 f"Game start, zone choosed by switch : {start_zone_id}", LogLevels.INFO
             )
         else:
             self.logger.log(
-                f"Game start, waiting for start info from RC...", LogLevels.INFO
+                "Game start, waiting for start info from RC...", LogLevels.INFO
             )
             # Wait for RC start info
             zone = await self.ws_cmd.receiver.get()
@@ -120,7 +121,7 @@ class MainBrain(Brain):
             )
         )
 
-        self.logger.log(f"Waiting for jack trigger...", LogLevels.INFO)
+        self.logger.log("Waiting for jack trigger...", LogLevels.INFO)
 
         # Check jack state
         while self.jack.digital_read():

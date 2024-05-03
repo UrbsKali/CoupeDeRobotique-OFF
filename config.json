@@ -78,11 +78,11 @@
     "jack": {
       "pin": 23
     },
-    "zone_switch": {
+    "team_switch": {
       "pin": 22,
-      "activated": false,
-      "zone_off": 0,
-      "zone_on":3
+      "activated": true,
+      "team_off": 0,
+      "team_on":3
     },
     "strip_led": {
       "pin": 18,
