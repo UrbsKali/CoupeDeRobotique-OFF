@@ -190,14 +190,10 @@ class MainBrain(Brain):
             else:
                 return 0
 
-    async def go_and_drop(
-        self,
-        target_drop_zone: Plants_zone
-    ) -> int:  # TODO
+    async def go_and_drop(self, target_drop_zone: Plants_zone) -> int:  # TODO
 
         target = self.arena.compute_go_to_destination(
-            start_point=self.rolling_basis.odometrie,
-            zone=target_drop_zone.zone
+            start_point=self.rolling_basis.odometrie, zone=target_drop_zone.zone
         )
 
         if (
@@ -210,7 +206,7 @@ class MainBrain(Brain):
             != 0
         ):
             return 1
-        else:           
+        else:
             # Drop plants
             await self.deploy_god_hand()
             await self.open_god_hand()
