@@ -21,7 +21,6 @@ void Complex_Action::handle(Point current_point, Ticks current_ticks, Rolling_Ba
     if (0 <= this->movement_index && this->movement_index < this->nb_basic_movements)
     {
         this->state = in_progress;
-
         // Handle basic action
         if (
                 this->basic_movements[this->movement_index]->state == not_started ||
