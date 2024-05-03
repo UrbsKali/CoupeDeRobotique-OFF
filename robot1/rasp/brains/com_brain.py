@@ -14,6 +14,7 @@ from logger import Logger, LogLevels
 # Import from local path
 # ...
 
+
 @Brain.task(process=False, run_on_start=CONFIG.ZOMBIE_MODE, refresh_rate=0.5)
 async def zombie_mode(self):
     """
