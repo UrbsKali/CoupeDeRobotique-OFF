@@ -138,6 +138,7 @@ if __name__ == "__main__":
     logger_brain.log(f"Start position: {start_pos}", LogLevels.INFO)
 
     # Brain
+    leds.is_ready()
     brain = MainBrain(
         actuators=actuators,
         logger=logger_brain,
@@ -148,7 +149,7 @@ if __name__ == "__main__":
         arena=arena,
         jack=jack_pin,
         team_switch=team_switch,
-        leds=leds,
+        leds=leds
     )
 
     """
