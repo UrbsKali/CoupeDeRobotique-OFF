@@ -192,15 +192,12 @@ class MainBrain(Brain):
 
     async def go_and_drop(
         self,
-        target_drop_zone: Plants_zone,
-        distance_from_zone=25,
-        distance_final_approach=10,
+        target_drop_zone: Plants_zone
     ) -> int:  # TODO
 
         target = self.arena.compute_go_to_destination(
             start_point=self.rolling_basis.odometrie,
-            zone=target_drop_zone.zone,
-            delta=distance_from_zone,
+            zone=target_drop_zone.zone
         )
 
         if (
@@ -213,16 +210,7 @@ class MainBrain(Brain):
             != 0
         ):
             return 1
-        else:
-            # Final approach
-            await self.rolling_basis.go_to_and_wait(
-                Point(distance_final_approach, 0),
-                timeout=10,
-                **CONFIG.SPEED_PROFILES["cruise_speed"],
-                **CONFIG.PRECISION_PROFILES["classic_precision"],
-                relative=True,
-            )
-
+        else:           
             # Drop plants
             await self.deploy_god_hand()
             await self.open_god_hand()
@@ -233,7 +221,7 @@ class MainBrain(Brain):
             # Step back
             if (
                 await self.rolling_basis.go_to_and_wait(
-                    Point(-100, 0),
+                    Point(-30, 0),
                     timeout=10,
                     forward=False,
                     **CONFIG.SPEED_PROFILES["cruise_speed"],
