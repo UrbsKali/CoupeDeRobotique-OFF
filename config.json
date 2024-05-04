@@ -143,28 +143,29 @@
           {
             "pin": 3,
             "open_angle": 90,
-            "close_angle": 70
+            "close_angle": 68
           },
           {
             "pin": 4,
             "open_angle": 90,
-            "close_angle": 70
+            "close_angle": 68
           },
           {
             "pin": 5,
             "open_angle": 100,
-            "close_angle": 115
+            "close_angle": 122
           },
           {
             "pin": 6,
             "open_angle": 95,
-            "close_angle": 115
+            "close_angle": 117
           }
         ],
         "deployment_servo": {
           "pin": 7,
-          "deploy_angle": 90,
-          "undeploy_angle": 150
+          "deploy_angle": 140,
+          "intermediate_deploy_angle": 100,
+          "undeploy_angle": 45
         }
       },
       "solar_panel": {
