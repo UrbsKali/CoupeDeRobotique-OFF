@@ -165,7 +165,7 @@
           "pin": 7,
           "deploy_angle": 140,
           "intermediate_deploy_angle": 100,
-          "undeploy_angle": 45
+          "undeploy_angle": 47
         }
       },
       "solar_panel": {
