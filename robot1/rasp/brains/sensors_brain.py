@@ -18,14 +18,16 @@ from sensors import Lidar
 from brains.acs import AntiCollisionMode, AntiCollisionHandle
 
 
-def get_angle_ennemy(self):
-    return math.degrees(
+def get_ennemy_angle(self, relative=False):
+    angle_abs = math.degrees(
         math.atan(
             (self.arena.ennemy_position.x - self.rolling_basis.odometrie.x)
             / (self.arena.ennemy_position.y - self.rolling_basis.odometrie.y)
         )
         - self.rolling_basis.odometrie.theta
     )
+
+    return angle_abs if not relative else angle_abs - self.rolling_basis.odometrie.theta
 
 
 @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
@@ -63,7 +65,7 @@ async def compute_ennemy_position(self):
     )
 
     self.logger.log(
-        f"Ennemy position computed: {self.arena.ennemy_position if self.arena.ennemy_position is not None else 'None'}, at angle: {self.get_angle_ennemy() if self.arena.ennemy_position is not None else 'None'} and distance: {math.sqrt(pow(self.arena.ennemy_position.x - self.rolling_basis.odometrie.x,2)+pow(self.arena.ennemy_position.y - self.rolling_basis.odometrie.y,2)) if self.arena.ennemy_position is not None else 'None'}",
+        f"Ennemy position computed: {self.arena.ennemy_position if self.arena.ennemy_position is not None else 'None'}, at absolute/relative angle: {(round(self.get_ennemy_angle()) + "/" + round(self.get_ennemy_angle(relative=True))) if self.arena.ennemy_position is not None else 'None'} and distance: {math.sqrt(pow(self.arena.ennemy_position.x - self.rolling_basis.odometrie.x,2)+pow(self.arena.ennemy_position.y - self.rolling_basis.odometrie.y,2)) if self.arena.ennemy_position is not None else 'None'}",
         LogLevels.DEBUG,
     )
 
@@ -83,7 +85,7 @@ async def compute_ennemy_position(self):
                 self.rolling_basis.stop_and_clear_queue()
                 self.leds.acs_state(True)
             if self.anticollision_mode == AntiCollisionMode.FRONTAL:
-                if abs(self.get_angle_ennemy()) < CONFIG.LIDAR_FRONTAL_DETECTION_ANGLE:
+                if abs(self.get_ennemy_angle(relative=True)) < CONFIG.LIDAR_FRONTAL_DETECTION_ANGLE:
                     self.logger.log(
                         "ACS triggered, performing emergency stop", LogLevels.WARNING
                     )
@@ -91,7 +93,7 @@ async def compute_ennemy_position(self):
                     self.leds.acs_state(True)
             if self.anticollision_mode == AntiCollisionMode.SEMI_CIRCULAR:
                 if (
-                    abs(self.get_angle_ennemy())
+                    abs(self.get_ennemy_angle(relative=True))
                     < CONFIG.LIDAR_SEMI_CIRCULAR_DETECTION_ANGLE
                 ):
                     self.logger.log(

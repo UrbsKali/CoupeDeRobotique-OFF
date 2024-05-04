@@ -75,7 +75,7 @@ class MainBrain(Brain):
     from brains.sensors_brain import (
         compute_ennemy_position,
         pol_to_abs_cart,
-        get_angle_ennemy,
+        get_ennemy_angle,
     )
 
     # Com functions
