@@ -158,6 +158,12 @@
           "pin": 6,
           "deploy_angle": 98,
           "undeploy_angle": 60
+        },
+        "elevator":{
+          "up_steps": 1000,
+          "down_steps": -1000,
+          "pin_dir": 8,
+          "pin_step": 9
         }
       },
       "minimum_delay": 0.1
