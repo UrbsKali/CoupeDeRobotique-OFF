@@ -19,7 +19,7 @@ from brains.acs import AntiCollisionMode, AntiCollisionHandle
 
 
 def get_ennemy_angle(self, relative=False):
-    angle_abs = math.degrees(
+    angle_abs = (
         math.atan(
             (self.arena.ennemy_position.x - self.rolling_basis.odometrie.x)
             / (self.arena.ennemy_position.y - self.rolling_basis.odometrie.y)
@@ -27,7 +27,11 @@ def get_ennemy_angle(self, relative=False):
         - self.rolling_basis.odometrie.theta
     )
 
-    return angle_abs if not relative else angle_abs - self.rolling_basis.odometrie.theta
+    return (
+        math.degrees(angle_abs)
+        if not relative
+        else math.degrees(angle_abs - self.rolling_basis.odometrie.theta)
+    )
 
 
 @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
