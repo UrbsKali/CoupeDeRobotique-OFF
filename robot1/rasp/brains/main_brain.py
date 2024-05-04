@@ -68,7 +68,7 @@ class MainBrain(Brain):
         go_best_zone,
         god_hand_demo,
         smart_go_to,
-        intermediate_deploy_god_hand,
+        vertical_god_hand,
     )
 
     # Sensors functions
@@ -87,6 +87,24 @@ class MainBrain(Brain):
 
     @Brain.task(process=False, run_on_start=not CONFIG.ZOMBIE_MODE)
     async def start(self):
+
+        # Setup things
+        await self.setup()
+
+        # Wait for trigger
+        self.logger.log("Waiting for jack trigger...", LogLevels.INFO)
+        await self.wait_for_trigger()
+
+        # Plant Stage
+        self.logger.log("Starting plant stage...", LogLevels.INFO)
+        await self.plant_stage()
+
+        # Clean up
+        await self.endgame()
+        self.logger.log("Game over", LogLevels.INFO)
+        exit()
+
+    async def setup(self):
         if CONFIG.ENABLE_TEAM_SWITCH:
             if self.team_switch.digital_read():
                 start_zone_id = CONFIG.TEAM_SWITCH_ON
@@ -120,20 +138,23 @@ class MainBrain(Brain):
             )
         )
 
-        self.logger.log("Waiting for jack trigger...", LogLevels.INFO)
-
+    async def wait_for_trigger(self):
         # Check jack state
+        self.leds.set_jack(False)
         while self.jack.digital_read():
             await asyncio.sleep(0.1)
         self.leds.set_jack(True)
 
-        # Plant Stage
-        self.logger.log("Starting plant stage...", LogLevels.INFO)
-        await self.plant_stage()
-
-        await self.kill_rolling_basis()
-
-        self.logger.log("Game over", LogLevels.INFO)
+    async def endgame(self):
+        # Keep kill_rolling_basis outside of a try to be absolutely sure to get to it
+        try:
+            # Open and deploy god hand, to macimize odds of being in home zone and to let go af any plant still held by accident
+            await self.deploy_god_hand()
+            await self.open_god_hand()
+        except Exception:
+            pass
+        finally:
+            await self.kill_rolling_basis()
 
     async def go_and_pickup(
         self,
@@ -211,15 +232,6 @@ class MainBrain(Brain):
         ):
             return 1
         else:
-
-            # Final approach
-            await self.smart_go_to(
-                Point(distance_final_approach, 0),
-                timeout=10,
-                **CONFIG.SPEED_PROFILES["cruise_speed"],
-                **CONFIG.PRECISION_PROFILES["classic_precision"],
-                relative=True,
-            )
 
             # Drop plants
             await self.deploy_god_hand()

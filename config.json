@@ -70,7 +70,7 @@
     "log_level": 0,
     "print_log": true,
     "stop_treshold": 50,
-    "anticollision_mode": 2,
+    "anticollision_mode": 1,
     "anticollision_handle": 2,
     "zombie_mode": false,
     "jack": {
@@ -164,8 +164,8 @@
         "deployment_servo": {
           "pin": 7,
           "deploy_angle": 140,
-          "intermediate_deploy_angle": 100,
-          "undeploy_angle": 47
+          "undeploy_angle": 100,
+          "vertical_angle": 47
         }
       },
       "solar_panel": {
