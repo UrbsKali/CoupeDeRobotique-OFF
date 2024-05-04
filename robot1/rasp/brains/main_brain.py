@@ -138,6 +138,10 @@ class MainBrain(Brain):
             )
         )
 
+    async def homologate1(self):
+        await self.close_god_hand()
+        await self.vertical_god_hand()
+
     async def wait_for_trigger(self):
         # Check jack state
         self.leds.set_jack(False)
