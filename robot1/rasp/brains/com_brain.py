@@ -39,29 +39,10 @@ async def zombie_mode(self):
                 instructions = cmd.data
 
             for instruction in instructions:
-                eval(instruction)
-
-        elif cmd.msg == "await_eval":
-
-            instructions = []
-            if isinstance(cmd.data, str):
-                instructions.append(cmd.data)
-            elif isinstance(cmd.data, list):
-                instructions = cmd.data
-
-            for instruction in instructions:
-                await eval(instruction)
-
-        elif cmd.msg == "exec":
-
-            instructions = []
-            if isinstance(cmd.data, str):
-                instructions.append(cmd.data)
-            elif isinstance(cmd.data, list):
-                instructions = cmd.data
-
-            for instruction in instructions:
-                exec(instruction)
+                if instruction.startswith("await "):
+                    await eval(instruction.removeprefix("await "))
+                else:
+                    eval(instruction)
 
         else:
             self.logger.log(
