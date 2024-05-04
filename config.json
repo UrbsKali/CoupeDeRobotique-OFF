@@ -80,7 +80,7 @@
       "pin": 23,
       "activated": true,
       "team_off": 0,
-      "team_on":3
+      "team_on": 3
     },
     "strip_led": {
       "pin": 18,
@@ -166,7 +166,6 @@
           "deploy_angle": 90,
           "undeploy_angle": 150
         }
-        
       },
       "solar_panel": {
         "right": {
@@ -175,7 +174,7 @@
           "undeploy": 81
         }
       },
-      "elevator":{
+      "elevator": {
         "up_steps": 1000,
         "down_steps": -1000,
         "pin_dir": 21,
@@ -193,8 +192,8 @@
       "semi_circular_detection_angle": 100
     }
   },
-  "arena" : {
-    "border_buffer" : -10,
-    "robot_buffer" : 12.5
+  "arena": {
+    "border_buffer": -10,
+    "robot_buffer": 12.5
   }
 }

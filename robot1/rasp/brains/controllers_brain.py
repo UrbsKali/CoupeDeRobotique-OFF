@@ -42,6 +42,32 @@ async def close_god_hand(self):
     for servo in CONFIG.FRONT_GOD_HAND["take_servo"]:
         await asyncio.sleep(CONFIG.MINIMUM_DELAY)
         self.actuators.update_servo(servo["pin"], servo["close_angle"])
+    
+@Logger
+async def lift_elevator(self):
+    await asyncio.sleep(CONFIG.MINIMUM_DELAY)
+    stepper = CONFIG.ELEVATOR
+    self.actuators.stepper_step(
+        stepper["up_steps"],
+        stepper["number_of_steps"],
+        stepper["motor_pin_1"],
+        stepper["motor_pin_2"],
+        stepper["motor_pin_3"],
+        stepper["motor_pin_4"],
+    )
+    
+async def lower_elevator(self):
+    await asyncio.sleep(CONFIG.MINIMUM_DELAY)
+    stepper = CONFIG.ELEVATOR
+    self.actuators.stepper_step(
+        stepper["down_steps"],
+        stepper["number_of_steps"],
+        stepper["motor_pin_1"],
+        stepper["motor_pin_2"],
+        stepper["motor_pin_3"],
+        stepper["motor_pin_4"],
+    )
+    
 
 
 async def god_hand_demo(self):

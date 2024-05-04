@@ -16,6 +16,14 @@ struct msg_Unknown_Msg_Type
 struct msg_Servo_Go_To
 {
     byte command = SERVO_GO_TO;
-    byte pin;
-    byte angle;
+    byte pin;   // pin to which the servo is connected
+    byte angle; // angle to which the servo should be moved in degrees
+};
+
+struct msg_Stepper_Go_To
+{
+    byte command = STEPPER_STEP;
+    int steps; // total number of steps this motor can take
+    int pin_dir;         // pin to which the direction pin is connected
+    int pin_step;        // pin to which the step pin is connected   
 };
