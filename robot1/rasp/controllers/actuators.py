@@ -56,9 +56,7 @@ class Actuators(Teensy):
         self.send_bytes(msg)
 
     @Logger
-    def stepper_step(
-        self, steps: int,pin_dir: int, pin_step: int
-    ) -> None:
+    def stepper_step(self, steps: int, pin_dir: int, pin_step: int) -> None:
         """
         Moves the stepper motor a specified number of steps. Note that the number of motor pin can change depending on the motor.
         2 or 5 pins are common.
@@ -79,12 +77,11 @@ class Actuators(Teensy):
             # https://docs.python.org/3/library/struct.html#format-characters
         )
         self.send_bytes(msg)
-        
 
     @Logger
     def update_servo(
         self, pin: int, angle: int, min_angle: int = 0, max_angle: int = 180
-    )->None:
+    ) -> None:
         """set angle to the servo at the given pin
 
         Args:
