@@ -24,6 +24,7 @@ class Actuators(Teensy):
 
     class Command:  # values must correspond to the one defined on the teensy
         ServoGoTo = b"\x01"
+        StepperStep = b"\x02"
 
     def __str__(self) -> str:
         return self.__class__.__name__
@@ -31,6 +32,28 @@ class Actuators(Teensy):
     #########################
     # User facing functions #
     #########################
+    @Logger
+    def stepper_step(self, steps: int, pin_dir: int, pin_step: int) -> None:
+        """
+        Moves the stepper motor a specified number of steps. Note that the number of motor pin can change depending on the motor.
+        2 or 5 pins are common.
+
+        Args:
+            steps (int): The number of steps to move the motor.
+            pin_dir (int): The pin number of the direction pin.
+            pin_step (int): The pin number of the step pin.
+
+        Returns:
+            None
+        """
+        msg = (
+            self.Command.StepperStep
+            + struct.pack("<b", steps)
+            + struct.pack("<B", pin_dir)
+            + struct.pack("<B", pin_step)
+            # https://docs.python.org/3/library/struct.html#format-characters
+        )
+        self.send_bytes(msg)
 
     @Logger
     def update_servo(

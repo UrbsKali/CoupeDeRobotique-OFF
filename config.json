@@ -172,6 +172,12 @@
             "deploy": 180,
             "undeploy": 81
           }
+        },
+        "elevator":{
+          "up_steps": 1000,
+          "down_steps": -1000,
+          "pin_dir": 8,
+          "pin_step": 9
         }
       },
       "minimum_delay": 0.1
