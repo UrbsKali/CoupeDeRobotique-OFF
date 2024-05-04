@@ -113,6 +113,5 @@ class CONFIG:
     ANTICOLLISION_HANDLE = SPECIFIC_CONFIG["anticollision_handle"]
     STOP_TRESHOLD = SPECIFIC_CONFIG["stop_treshold"]
 
-
     # arena
     ARENA_CONFIG = CONFIG_STORE[ARENA_CONFIG_KEY]
