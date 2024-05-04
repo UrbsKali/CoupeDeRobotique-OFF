@@ -178,7 +178,7 @@ class RollingBasis(Teensy):
                 break
 
         if len(self.queue) == 0:
-            self.logger.log("Queue is empty, not sending anything")
+            self.logger.log("Queue is empty, not sending anything", LogLevels.INFO)
         else:
             self.logger.log("Sending next action in queue")
             self.send_bytes(self.queue[0].msg)
@@ -349,7 +349,7 @@ class RollingBasis(Teensy):
                 LogLevels.INFO,
             )
             return 0
-        else:
+        else:  # Should only mean ACS triggered or unplanned behaviour
             self.logger.log(
                 f"Didn't timeout in Go_To_And_Wait but did not arrive, at: {self.odometrie}",
                 LogLevels.WARNING,

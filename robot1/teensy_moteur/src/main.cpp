@@ -21,7 +21,8 @@
 #define START_THETA 0.0
 
 // Creation Rolling Basis
-#define ENCODER_RESOLUTION 1024
+// New encoder
+#define ENCODER_RESOLUTION 600
 #define CENTER_DISTANCE 29.01
 #define WHEEL_DIAMETER 6.1
 
@@ -33,7 +34,7 @@
 #define L_IN1 3
 
 // Motor Right
-#define R_ENCA 13
+#define R_ENCA 13 
 #define R_ENCB 14
 #define R_PWM 2
 #define R_IN2 0
@@ -256,6 +257,8 @@ inline void left_motor_read_encoder()
     rolling_basis_ptr->left_motor->ticks++;
   else
     rolling_basis_ptr->left_motor->ticks--;
+
+  com->print("left");
 }
 
 inline void right_motor_read_encoder()

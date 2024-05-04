@@ -1,48 +1,18 @@
 # External imports
-# ..
+import asyncio
 
 # Import from common
 from config_loader import CONFIG
-import asyncio
+
 from brain import Brain
 
 from WS_comms import WSmsg, WServerRouteManager
 from geometry import OrientedPoint, Point
 from logger import Logger, LogLevels
 
+
 # Import from local path
-# from sensors import Lidar
-
-
-@Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
-async def camera_com(self):
-    """
-    Get camera information: ArUcO and Green Objects (plants) positions
-    """
-    msg = await self.ws_camera.receiver.get()
-    if msg != WSmsg():
-        if msg.msg == "arucos":
-            self.arucos = msg.data
-        elif msg.msg == "green_objects":
-            self.green_objects == msg.data
-
-
-@Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
-async def odometer_com(self):
-    """
-    Send ROB current odometer to server
-    """
-    if self.rolling_basis.odometrie is not None:
-        await self.ws_odometer.sender.send(
-            WSmsg(
-                msg="odometer",
-                data=[
-                    self.rolling_basis.odometrie.x,
-                    self.rolling_basis.odometrie.y,
-                    self.rolling_basis.odometrie.theta,
-                ],
-            )
-        )
+# ...
 
 
 @Brain.task(process=False, run_on_start=CONFIG.ZOMBIE_MODE, refresh_rate=0.5)

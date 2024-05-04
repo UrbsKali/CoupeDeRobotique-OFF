@@ -15,7 +15,7 @@ from logger import Logger, LogLevels
 
 # Import from local path
 from sensors import Lidar
-from brains.acs import AntiCollisionMode
+from brains.acs import AntiCollisionMode, AntiCollisionHandle
 
 
 def get_angle_ennemy(self):
@@ -38,22 +38,22 @@ async def compute_ennemy_position(self):
 
     # self.logger.log(f"obstacles: {obstacles}", LogLevels.INFO)
 
-    asyncio.create_task(
-        self.ws_lidar.sender.send(
-            WSmsg(
-                msg="obstacles",
-                data=(
-                    []
-                    if is_empty(obstacles)
-                    else (
-                        [(geom.x, geom.y) for geom in obstacles.geoms]
-                        if isinstance(obstacles, MultiPoint)
-                        else (obstacles.x, obstacles.y)
-                    )
-                ),
-            )
-        )
-    )
+    # asyncio.create_task(
+    #     self.ws_lidar.sender.send(
+    #         WSmsg(
+    #             msg="obstacles",
+    #             data=(
+    #                 []
+    #                 if is_empty(obstacles)
+    #                 else (
+    #                     [(geom.x, geom.y) for geom in obstacles.geoms]
+    #                     if isinstance(obstacles, MultiPoint)
+    #                     else (obstacles.x, obstacles.y)
+    #                 )
+    #             ),
+    #         )
+    #     )
+    # )
 
     # For now, the closest will be the enemy position
     self.arena.ennemy_position = (
@@ -81,15 +81,18 @@ async def compute_ennemy_position(self):
                     "ACS triggered, performing emergency stop", LogLevels.WARNING
                 )
                 self.rolling_basis.stop_and_clear_queue()
+                self.leds.acs_state(True)
             if self.anticollision_mode == AntiCollisionMode.FRONTAL:
                 if abs(self.get_angle_ennemy()) < CONFIG.MAX_STOP_ANGLE:
                     self.logger.log(
                         "ACS triggered, performing emergency stop", LogLevels.WARNING
                     )
                     self.rolling_basis.stop_and_clear_queue()
+                    self.leds.acs_state(True)
 
         else:
-            self.logger.log("ACS not triggered", LogLevels.DEBUG)
+            # self.logger.log("ACS not triggered", LogLevels.DEBUG)
+            self.leds.acs_state(False)
 
 
 def pol_to_abs_cart(self, polars: np.ndarray) -> MultiPoint:

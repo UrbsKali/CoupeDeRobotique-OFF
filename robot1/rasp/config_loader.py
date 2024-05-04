@@ -17,7 +17,7 @@ def load_json_file(file_path):
 class CONFIG:
     # TO CONFIG !
     RELATIVE_ROOT_PATH = os.path.join("..", "..")
-    SPECIFIC_CONFIG_KEY = "robot1"
+    SPECIFIC_CONFIG_KEY = "rob"
     GENERAL_CONFIG_KEY = "general"
     ARENA_CONFIG_KEY = "arena"
 
@@ -52,10 +52,13 @@ class CONFIG:
 
     # Specific config
     SPECIFIC_CONFIG = CONFIG_STORE[SPECIFIC_CONFIG_KEY]
+
+    # Specific ws config
     SPECIFIC_WS_CONFIG = SPECIFIC_CONFIG["ws"]
 
     WS_SENDER_NAME = SPECIFIC_WS_CONFIG["sender_name"]
-    WS_SERVER_IP = SPECIFIC_WS_CONFIG["server_ip"]
+    WS_HOSTNAME = SPECIFIC_WS_CONFIG["hostname"]
+    WS_PING_PONG_INTERVAL = int(SPECIFIC_WS_CONFIG["ping_pong_interval"])
 
     # Zombie mode
     ZOMBIE_MODE = SPECIFIC_CONFIG["zombie_mode"]
@@ -67,9 +70,20 @@ class CONFIG:
     # Jack
     JACK_CONFIG = SPECIFIC_CONFIG["jack"]
     JACK_PIN = JACK_CONFIG["pin"]
-    
-    # zone_switch
-    ZONE_SWITCH_CONFIG = SPECIFIC_CONFIG["zone_switch"]
+
+    # Team switch
+    TEAM_SWITCH_CONFIG = SPECIFIC_CONFIG["team_switch"]
+    TEAM_SWITCH_PIN = TEAM_SWITCH_CONFIG["pin"]
+    ENABLE_TEAM_SWITCH = TEAM_SWITCH_CONFIG["activated"]
+    TEAM_SWITCH_OFF = TEAM_SWITCH_CONFIG["team_off"]
+    TEAM_SWITCH_ON = TEAM_SWITCH_CONFIG["team_on"]
+
+    # Led strip
+    LED_STRIP_CONFIG = SPECIFIC_CONFIG["strip_led"]
+    LED_STRIP_PIN = LED_STRIP_CONFIG["pin"]
+    LED_STRIP_BRIGHTNESS = LED_STRIP_CONFIG["brightness"]
+    LED_STRIP_NUM_LEDS = LED_STRIP_CONFIG["num_leds"]
+    LED_STRIP_FREQ = LED_STRIP_CONFIG["frequency"]
 
     # Rolling Basis
     ROLLING_BASIS_CONFIG = SPECIFIC_CONFIG["rolling_basis"]
@@ -94,6 +108,7 @@ class CONFIG:
 
     # Robot1 brain
     ANTICOLLISION_MODE = SPECIFIC_CONFIG["anticollision_mode"]
+    ANTICOLLISION_HANDLE = SPECIFIC_CONFIG["anticollision_handle"]
     STOP_TRESHOLD = SPECIFIC_CONFIG["stop_treshold"]
     MAX_STOP_ANGLE = SPECIFIC_CONFIG["max_stop_angle"]
 

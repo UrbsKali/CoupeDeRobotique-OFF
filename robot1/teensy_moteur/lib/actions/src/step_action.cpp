@@ -1,10 +1,16 @@
 #include <step_action.h>
+#include <com.h>
+
+#include <iostream>
+#include <string>
+
 
 // Step motor action generic class
 void Step_Action::check_end_of_action(Ticks current_ticks)
 {
-    long right_error = abs(this->right_ref + this->right_sign * this->total_ticks) - abs(current_ticks.right);
-    long left_error  = abs(this->left_ref  + this->left_sign * this->total_ticks)  - abs(current_ticks.left);
+    // TEST 1 
+    long right_error = abs(abs(this->right_ref + this->right_sign * this->total_ticks) - abs(current_ticks.right));
+    long left_error  = abs(abs(this->left_ref  + this->left_sign * this->total_ticks)  - abs(current_ticks.left));
 
     // Check if the robot is near the target position
     if ((long)this->precision_params->error_precision >= right_error && (long)this->precision_params->error_precision >= left_error)
@@ -77,6 +83,13 @@ void Step_Forward_Backward::compute(Ticks current_ticks, Rolling_Basis_Params *r
 {
     // Compute ticks to do
     this->total_ticks = (rolling_basis_params->encoder_resolution / rolling_basis_params->wheel_perimeter) * this->distance;
+    Com* com = new Com(&Serial1, 115200);
+
+    std::string str = std::to_string(this->total_ticks);
+    const char* cstr = str.c_str();
+    com->print("nb_ticks: ");
+    com->print(cstr);
+
     if (this->direction == forward)
     {
         this->right_sign = 1;

@@ -1,7 +1,6 @@
 from utils.utils import Utils
 from logger.log_tools import LogLevels, STYLES, center_and_limit, style, strip_ANSI
 
-
 import os, types, functools
 from threading import Thread
 from dataclasses import dataclass
@@ -67,8 +66,8 @@ class Logger:
         if func is None:
             self.log(
                 f"Logger initialized, "
-                + f"print: {style(center_and_limit(self.print_log_level.name,self.log_level_width),STYLES.LogLevelsColorsDict[self.print_log_level]) if self.print_log else style(center_and_limit('NO',self.log_level_width),STYLES.RESET_ALL)}, "
-                + f"write to file: {style(center_and_limit(self.file_log_level.name,self.log_level_width),STYLES.LogLevelsColorsDict[self.file_log_level]) if self.log_file else style(center_and_limit('NO',self.log_level_width),STYLES.RESET_ALL)}",
+                + f"print: {style(center_and_limit(self.print_log_level.name, self.log_level_width), STYLES.LogLevelsColorsDict[self.print_log_level]) if self.print_log else style(center_and_limit('NO', self.log_level_width), STYLES.RESET_ALL)}, "
+                + f"write to file: {style(center_and_limit(self.file_log_level.name, self.log_level_width), STYLES.LogLevelsColorsDict[self.file_log_level]) if self.log_file else style(center_and_limit('NO', self.log_level_width), STYLES.RESET_ALL)}",
                 level=LogLevels.INFO,
             )
 
@@ -112,6 +111,7 @@ class Logger:
         message: str,
         level: LogLevels = LogLevels.WARNING,
         identifier_override: str | None = None,
+        bypass_led: bool = False,
     ) -> None:
         """
         Log un message dans le fichier de log et dans la sortie standard
@@ -143,7 +143,6 @@ class Logger:
                     )  # Remove ANSI escape sequences from the string to save to file, or it will not display properly no most interfaces (could keep them if displayed through cat for example)
                     + "\n"
                 )
-
         # Sync logs to server (deprecated for now)
         # try:
         #     Thread(target=update_log_sync, args=(message,)).start()
