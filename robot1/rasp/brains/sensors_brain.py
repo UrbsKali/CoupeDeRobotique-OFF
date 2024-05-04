@@ -83,7 +83,14 @@ async def compute_ennemy_position(self):
                 self.rolling_basis.stop_and_clear_queue()
                 self.leds.acs_state(True)
             if self.anticollision_mode == AntiCollisionMode.FRONTAL:
-                if abs(self.get_angle_ennemy()) < CONFIG.MAX_STOP_ANGLE:
+                if abs(self.get_angle_ennemy()) < CONFIG.LIDAR_FRONTAL_DETECTION_ANGLE:
+                    self.logger.log(
+                        "ACS triggered, performing emergency stop", LogLevels.WARNING
+                    )
+                    self.rolling_basis.stop_and_clear_queue()
+                    self.leds.acs_state(True)
+            if self.anticollision_mode == AntiCollisionMode.SEMI_CIRCULAR:
+                if abs(self.get_angle_ennemy()) < CONFIG.LIDAR_SEMI_CIRCULAR_DETECTION_ANGLE:
                     self.logger.log(
                         "ACS triggered, performing emergency stop", LogLevels.WARNING
                     )

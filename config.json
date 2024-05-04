@@ -73,7 +73,6 @@
     "anticollision_mode": 2,
     "anticollision_handle": 2,
     "zombie_mode": false,
-    "max_stop_angle": 50,
     "jack": {
       "pin": 24
     },
@@ -182,7 +181,9 @@
       "angles_unit": "rad",
       "min_angle": -0.785398,
       "max_angle": 3.926991,
-      "min_distance_detection": 5.0
+      "min_distance_detection": 5.0,
+      "frontal_detection_angle": 50,
+      "semi_circular_detection_angle": 100
     }
   },
   "arena" : {
