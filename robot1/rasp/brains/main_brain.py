@@ -68,6 +68,7 @@ class MainBrain(Brain):
         go_best_zone,
         god_hand_demo,
         smart_go_to,
+        intermediate_deploy_god_hand,
     )
 
     # Sensors functions
