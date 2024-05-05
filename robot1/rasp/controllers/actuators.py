@@ -50,7 +50,7 @@ class Actuators(Teensy):
         """
         msg = (
             self.Command.StepperStep
-            + struct.pack("<b", steps)
+            + struct.pack("<i", steps)
             + struct.pack("<B", pin_dir)
             + struct.pack("<B", pin_step)
             # https://docs.python.org/3/library/struct.html#format-characters

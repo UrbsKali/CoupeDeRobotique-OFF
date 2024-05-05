@@ -24,6 +24,6 @@ struct msg_Stepper_Go_To
 {
     byte command = STEPPER_STEP;
     int steps; // total number of steps this motor can take
-    int pin_dir;         // pin to which the direction pin is connected
-    int pin_step;        // pin to which the step pin is connected   
+    byte pin_dir;         // pin to which the direction pin is connected
+    byte pin_step;        // pin to which the step pin is connected   
 };
