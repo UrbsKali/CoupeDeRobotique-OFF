@@ -18,9 +18,9 @@ class WServerRouteManager:
         self.clients = {}
 
     def add_client(
-            self,
-            request: aiohttp.web_request.Request,
-            client: aiohttp.web_ws.WebSocketResponse,
+        self,
+        request: aiohttp.web_request.Request,
+        client: aiohttp.web_ws.WebSocketResponse,
     ) -> str:
         """
         Add a new client in the router handler list.
@@ -73,7 +73,7 @@ class WServerRouteManager:
         self.clients.clear()
 
     async def routine(
-            self, request: aiohttp.web_request.Request
+        self, request: aiohttp.web_request.Request
     ) -> aiohttp.web_ws.WebSocketResponse or None:
         """
         Routine to handle new connections.
