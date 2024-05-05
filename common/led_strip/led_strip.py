@@ -42,7 +42,6 @@ class LEDStrip:
         self.log_history = [Colors.BLACK for _ in self.led_indexes["log"]]
 
     def set_color(self, color: RGBW | list[RGBW], index: list | int | None = None):
-        print("j'arrive", index, color)
         if index is None and isinstance(color, RGBW):
             for i in range(self._strip.numPixels()):
                 self._strip.setPixelColor(i, color)
@@ -53,9 +52,8 @@ class LEDStrip:
             and isinstance(color, list)
             and len(index) == len(color)
         ):
-            print("Hey", index, color)
-            for i in index:
-                self._strip.setPixelColor(i, color[i])
+            for i, j in enumerate(index):
+                self._strip.setPixelColor(i, color[j])
         if isinstance(index, list) and isinstance(color, RGBW):
             for i in index:
                 self._strip.setPixelColor(i, color)
@@ -74,13 +72,9 @@ class LEDStrip:
         self.set_color(Color(0, 0, 0))
 
     def log(self, log_level: LogLevels):
-        print("A")
         self.log_history.insert(0, LogColors[log_level])
-        print("B")
         del self.log_history[-1]
-        print("C")
         self.set_color(self.log_history, self.led_indexes["log"])
-        print("D")
 
     def is_ready(self, state=True):
         self.set_color(
