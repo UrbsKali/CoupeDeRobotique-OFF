@@ -160,5 +160,5 @@ class WServer:
                         "WServer stopped by user request during restart.",
                         LogLevels.INFO,
                     )
-                    self.stop_server()
+                    asyncio.run(self.stop_server())
                     exit()
