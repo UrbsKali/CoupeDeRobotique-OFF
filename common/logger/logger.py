@@ -110,8 +110,8 @@ class Logger:
         self,
         message: str,
         level: LogLevels = LogLevels.WARNING,
+        led_strip=None,
         identifier_override: str | None = None,
-        bypass_led: bool = False,
     ) -> None:
         """
         Log un message dans le fichier de log et dans la sortie standard
@@ -134,6 +134,9 @@ class Logger:
 
         if self.print_log and level >= self.print_log_level:
             print(message_str)
+
+        if led_strip is not None:
+            led_strip.log(level)
 
         if self.log_file and level >= self.file_log_level:
             with open(f"logs/{self.log_file}", "a") as f:
