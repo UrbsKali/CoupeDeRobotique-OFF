@@ -146,7 +146,7 @@ class WServer:
                 web.run_app(self._app, host=self.__host, port=self.__port)
             except KeyboardInterrupt:
                 self.__logger.log("WServer stopped by user request.", LogLevels.INFO)
-                self.stop_server()
+                await self.stop_server()
                 exit()
 
             except Exception as error:
