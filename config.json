@@ -74,17 +74,17 @@
     "anticollision_handle": 2,
     "zombie_mode": false,
     "jack": {
-      "pin": 24
+      "pin": 23
     },
     "team_switch": {
-      "pin": 23,
+      "pin": 24,
       "activated": true,
       "team_off": 0,
       "team_on": 3
     },
     "strip_led": {
       "pin": 18,
-      "brightness": 100,
+      "brightness": 70,
       "num_leds": 8,
       "frequency": 800000
     },
