@@ -144,7 +144,7 @@ class WServer:
                         LogLevels.DEBUG,
                     )
 
-                #web.run_app(self._app, host=self.__host, port=self.__port)
+                # web.run_app(self._app, host=self.__host, port=self.__port)
                 runner = web.AppRunner(app)
                 asyncio.run(runner.setup())
                 site = web.TCPSite(runner, host, port)
@@ -152,9 +152,13 @@ class WServer:
 
                 loop = asyncio.get_running_loop()
 
-                for signame in ('SIGINT', 'SIGTERM'):
-                    loop.add_signal_handler(getattr(signal, signame),
-                                            lambda sig=signame: asyncio.create_task(shutdown(site, app, sig, loop)))
+                for signame in ("SIGINT", "SIGTERM"):
+                    loop.add_signal_handler(
+                        getattr(signal, signame),
+                        lambda sig=signame: asyncio.create_task(
+                            shutdown(site, app, sig, loop)
+                        ),
+                    )
                 asyncio.run(asyncio.Event().wait())
 
             except KeyboardInterrupt:
