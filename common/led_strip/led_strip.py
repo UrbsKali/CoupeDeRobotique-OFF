@@ -7,7 +7,7 @@ LogColors = {
     LogLevels.INFO: Color(0, 0, 255),
     LogLevels.WARNING: Color(250, 250, 0),
     LogLevels.ERROR: Color(255, 0, 0),
-    LogLevels.CRITICAL: Color(255, 0, 0),
+    LogLevels.CRITICAL: Color(255, 0, 255),
     LogLevels.FATAL: Color(255, 0, 0),
 }
 
