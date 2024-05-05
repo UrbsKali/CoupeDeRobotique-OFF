@@ -20,13 +20,25 @@ from controllers import RollingBasis, Actuators
 async def deploy_solar_panel(self):
     await asyncio.sleep(CONFIG.MINIMUM_DELAY)
     servo = CONFIG.SOLAR_PANEL_RIGHT
-    self.actuators.update_servo(pin=servo["pin"], angle = servo["deploy_angle"],detach=True,detach_delay=servo["detach_delay"])
-    
+    self.actuators.update_servo(
+        pin=servo["pin"],
+        angle=servo["deploy_angle"],
+        detach=True,
+        detach_delay=servo["detach_delay"],
+    )
+
+
 @Logger
 async def deploy_solar_panel(self):
     await asyncio.sleep(CONFIG.MINIMUM_DELAY)
     servo = CONFIG.SOLAR_PANEL_RIGHT
-    self.actuators.update_servo(pin=servo["pin"], angle = servo["deploy_angle"],detach=True,detach_delay=servo["detach_delay"])
+    self.actuators.update_servo(
+        pin=servo["pin"],
+        angle=servo["deploy_angle"],
+        detach=True,
+        detach_delay=servo["detach_delay"],
+    )
+
 
 @Logger
 async def deploy_god_hand(self):
@@ -68,9 +80,9 @@ async def lift_elevator(self):
     await asyncio.sleep(CONFIG.MINIMUM_DELAY)
     stepper = CONFIG.ELEVATOR
     self.actuators.stepper_step(
-        steps = stepper["up_steps"],
-        pin_dir = stepper["pin_dir"],
-        pin_step = stepper["pin_step"]
+        steps=stepper["up_steps"],
+        pin_dir=stepper["pin_dir"],
+        pin_step=stepper["pin_step"],
     )
 
 
@@ -78,11 +90,10 @@ async def lower_elevator(self):
     await asyncio.sleep(CONFIG.MINIMUM_DELAY)
     stepper = CONFIG.ELEVATOR
     self.actuators.stepper_step(
-        steps = stepper["down_steps"],
-        pin_dir  = stepper["pin_dir"],
-        pin_step = stepper["pin_step"]
+        steps=stepper["down_steps"],
+        pin_dir=stepper["pin_dir"],
+        pin_step=stepper["pin_step"],
     )
-
 
 
 async def god_hand_demo(self):
