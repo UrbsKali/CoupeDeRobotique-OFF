@@ -35,7 +35,7 @@ class Actuators(Teensy):
     #########################
 
     @Logger
-    def stepper_step(self, steps: int, dir : bool, pin_dir: int, pin_step: int) -> None:
+    def stepper_step(self, steps: int, dir: bool, pin_dir: int, pin_step: int) -> None:
         """
         Moves the stepper motor a specified number of steps. Note that the number of motor pin can change depending on the motor.
         2 or 5 pins are common.
