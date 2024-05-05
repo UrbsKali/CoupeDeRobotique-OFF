@@ -85,6 +85,15 @@ class MainBrain(Brain):
         Tasks
     """
 
+    @Brain.task(process=False, run_on_start=True, refresh_rate=0.25)
+    async def show_team(self):
+        if self.team_switch.digital_read():
+            self.logger.log(f"Going to team yellow")
+            self.leds.set_team("y")
+        else:
+            self.logger.log(f"Going to team blue")
+            self.leds.set_team("b")
+
     @Brain.task(process=False, run_on_start=not CONFIG.ZOMBIE_MODE)
     async def start(self):
 
