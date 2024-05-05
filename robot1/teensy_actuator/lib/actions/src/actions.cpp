@@ -26,10 +26,19 @@ void handle_callback(Com *com)
     }
 }
 
-/// @brief if the given servo exists this function enables to write the given angle on it
-/// @param servo a pointer to an instance of Servo_Motor
-/// @param angle the angle to write of the servo
+
+/**
+ * Moves the servo to the specified angle.
+ *
+ * @param servo Pointer to the Servo object.
+ * @param angle The angle to which the servo should be moved in degrees.
+ */
 void servo_go_to(Servo *servo, int angle)
 {
     servo->write(angle);
+}
+
+void stepper_step(Bonezegei_A4988* stepper, int steps)
+{
+    stepper->step(stepper->_dir, steps);
 }

@@ -31,6 +31,13 @@ async def undeploy_god_hand(self):
 
 
 @Logger
+async def vertical_god_hand(self):
+    await asyncio.sleep(CONFIG.MINIMUM_DELAY)
+    servo = CONFIG.FRONT_GOD_HAND["deployment_servo"]
+    self.actuators.update_servo(servo["pin"], servo["vertical_angle"])
+
+
+@Logger
 async def open_god_hand(self):
     for servo in CONFIG.FRONT_GOD_HAND["take_servo"]:
         await asyncio.sleep(CONFIG.MINIMUM_DELAY)
@@ -44,10 +51,39 @@ async def close_god_hand(self):
         self.actuators.update_servo(servo["pin"], servo["close_angle"])
 
 
+@Logger
+async def lift_elevator(self):
+    await asyncio.sleep(CONFIG.MINIMUM_DELAY)
+    stepper = CONFIG.ELEVATOR
+    self.actuators.stepper_step(
+        stepper["up_steps"],
+        stepper["number_of_steps"],
+        stepper["motor_pin_1"],
+        stepper["motor_pin_2"],
+        stepper["motor_pin_3"],
+        stepper["motor_pin_4"],
+    )
+
+
+async def lower_elevator(self):
+    await asyncio.sleep(CONFIG.MINIMUM_DELAY)
+    stepper = CONFIG.ELEVATOR
+    self.actuators.stepper_step(
+        stepper["down_steps"],
+        stepper["number_of_steps"],
+        stepper["motor_pin_1"],
+        stepper["motor_pin_2"],
+        stepper["motor_pin_3"],
+        stepper["motor_pin_4"],
+    )
+
+
 async def god_hand_demo(self):
     while True:
+        await self.vertical_god_hand()
+        await asyncio.sleep(0.5)
         await self.undeploy_god_hand()
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.5)
         await self.deploy_god_hand()
         await asyncio.sleep(1)
         await self.open_god_hand()
@@ -55,7 +91,9 @@ async def god_hand_demo(self):
         await self.close_god_hand()
         await asyncio.sleep(1)
         await self.undeploy_god_hand()
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.5)
+        await self.vertical_god_hand()
+        await asyncio.sleep(0.5)
 
 
 async def smart_go_to(

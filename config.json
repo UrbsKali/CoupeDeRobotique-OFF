@@ -70,21 +70,21 @@
     "log_level": 0,
     "print_log": true,
     "stop_treshold": 50,
-    "anticollision_mode": 2,
+    "anticollision_mode": 1,
     "anticollision_handle": 2,
     "zombie_mode": false,
     "jack": {
-      "pin": 24
+      "pin": 23
     },
     "team_switch": {
-      "pin": 23,
+      "pin": 24,
       "activated": true,
       "team_off": 0,
-      "team_on":3
+      "team_on": 3
     },
     "strip_led": {
       "pin": 18,
-      "brightness": 100,
+      "brightness": 70,
       "num_leds": 8,
       "frequency": 800000
     },
@@ -143,30 +143,30 @@
           {
             "pin": 3,
             "open_angle": 90,
-            "close_angle": 70
+            "close_angle": 68
           },
           {
             "pin": 4,
             "open_angle": 90,
-            "close_angle": 70
+            "close_angle": 68
           },
           {
             "pin": 5,
             "open_angle": 100,
-            "close_angle": 115
+            "close_angle": 122
           },
           {
             "pin": 6,
             "open_angle": 95,
-            "close_angle": 115
+            "close_angle": 117
           }
         ],
         "deployment_servo": {
           "pin": 7,
-          "deploy_angle": 90,
-          "undeploy_angle": 150
+          "deploy_angle": 140,
+          "undeploy_angle": 100,
+          "vertical_angle": 47
         }
-        
       },
       "solar_panel": {
         "right": {
@@ -175,7 +175,7 @@
           "undeploy": 81
         }
       },
-      "elevator":{
+      "elevator": {
         "up_steps": 1000,
         "down_steps": -1000,
         "pin_dir": 21,
@@ -193,8 +193,8 @@
       "semi_circular_detection_angle": 100
     }
   },
-  "arena" : {
-    "border_buffer" : -10,
-    "robot_buffer" : 12.5
+  "arena": {
+    "border_buffer": -10,
+    "robot_buffer": 12.5
   }
 }
