@@ -1,6 +1,5 @@
 from aiohttp import web
 import asyncio
-import signal
 import time
 
 from WS_comms.server.server_route import WServerRouteManager
@@ -88,7 +87,7 @@ class WServer:
         Stop the server and all the background tasks.
         :return:
         """
-        self.__logger.log(f"Received exit signal {signal.name}...", LogLevels.INFO)
+        self.__logger.log("Received exit signal...", LogLevels.INFO)
         for route, manager in self.route_managers.items():
             await manager.close_all_connections()
         tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
