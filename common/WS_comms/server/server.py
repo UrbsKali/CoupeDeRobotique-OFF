@@ -135,7 +135,6 @@ class WServer:
         self._app.on_startup.append(background_task)
 
     def run(self) -> None:
-        # Configuration pour arrêter la boucle asyncio sur un signal d'interruption (SIGINT)
         loop = asyncio.get_event_loop()
 
         def handle_exit():
