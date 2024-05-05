@@ -23,8 +23,9 @@ class Actuators(Teensy):
         )
 
     class Command:  # values must correspond to the one defined on the teensy
-        ServoGoTo = b"\x01"
+        Update_servo = b"\x01"
         StepperStep = b"\x02"
+        Update_servo_detach = b"\x03"
 
     def __str__(self) -> str:
         return self.__class__.__name__
@@ -57,26 +58,36 @@ class Actuators(Teensy):
 
     @Logger
     def update_servo(
-        self, pin: int, angle: int, min_angle: int = 0, max_angle: int = 180
+        self, pin: int, angle: int, min_angle: int = 0, max_angle: int = 180,detach=False,detach_time=1000
     ):
-        """set angle to the servo at the given pin
+        """Set the angle of the servo at the given pin.
 
         Args:
-            pin (int): servo's pin
-            angle (int): the angle to set
-            min_angle (int, optional): angle lower -> angle won't be set. Defaults to 0.
-            max_angle (int, optional): angle higher -> angle won't be set. Defaults to 180.
+            pin (int): The pin number of the servo.
+            angle (int): The angle to set for the servo.
+            min_angle (int, optional): The minimum angle allowed for the servo. Defaults to 0.
+            max_angle (int, optional): The maximum angle allowed for the servo. Defaults to 180.
+            detach (bool, optional): Whether to detach the servo after setting the angle. Defaults to False.
+            detach_time (int, optional): The time in milliseconds to keep the servo detached. Defaults to 1000.
         """
         if angle >= min_angle and angle <= max_angle:
-            msg = (
-                self.Command.ServoGoTo
-                + struct.pack("<B", pin)
-                + struct.pack("<B", angle)
-            )
+            if detach:
+                msg = (
+                    self.Command.Update_servo_detach
+                    + struct.pack("<B", pin)
+                    + struct.pack("<B", angle)
+                    + struct.pack("<H", detach_time)
+                )
+            else :
+                msg = (
+                    self.Command.Update_servo
+                    + struct.pack("<B", pin)
+                    + struct.pack("<B", angle)
+                )
             # https://docs.python.org/3/library/struct.html#format-characters
             self.send_bytes(msg)
         else:
             self.logger.log(
-                f"you tried to write {angle}° on pin {pin} whereas angle must be between {min_angle} and {max_angle}°",
+                f"You tried to write {angle}° on pin {pin}, whereas the angle must be between {min_angle} and {max_angle}°",
                 LogLevels.ERROR,
             )
