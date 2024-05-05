@@ -88,10 +88,13 @@ class WServer:
         :return:
         """
         self.logger.log(f"Received exit signal {signal.name}...", LogLevels.INFO)
-        for task in self.tasks:
-            task.cancel()
         for route, manager in self.route_managers.items():
             await manager.close_all_connections()
+        tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
+        for task in tasks:
+            task.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
+        asyncio.get_event_loop().stop()
         self._app._loop.stop()
 
     def add_background_task(
