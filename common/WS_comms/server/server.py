@@ -148,8 +148,16 @@ class WServer:
                 self.__logger.log("WServer stopped by user request.", LogLevels.INFO)
                 self.stop_server()
                 exit()
+
             except Exception as error:
                 self.__logger.log(
                     f"WServer error: ({error}), try to restart...", LogLevels.ERROR
                 )
-                time.sleep(5)
+                try:
+                    time.sleep(5)
+                except KeyboardInterrupt:
+                    self.__logger.log(
+                        "WServer stopped by user request during restart.", LogLevels.INFO
+                    )
+                    self.stop_server()
+                    exit()
