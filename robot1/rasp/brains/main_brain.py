@@ -106,10 +106,8 @@ class MainBrain(Brain):
 
     async def show_team_switch(self):
         if self.team_switch.digital_read():
-            self.logger.log("team yellow", LogLevels.WARNING, self.leds)
             self.leds.set_team("y")
         else:
-            self.logger.log("team blue", LogLevels.INFO, self.leds)
             self.leds.set_team("b")
 
     async def setup(self):
