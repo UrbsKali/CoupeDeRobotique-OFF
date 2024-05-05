@@ -135,39 +135,36 @@ class WServer:
         self._app.on_startup.append(background_task)
 
     def run(self) -> None:
-        while True:
-            try:
-                self.__logger.log(
-                    f"WServer started, url: [ws://{self.__host}:{self.__port}]",
-                    LogLevels.INFO,
-                )
-                # Add ping pong task if self.__ping_pong_clients_interval has a value, then run server
-                if self.__ping_pong_clients_interval is not None:
-                    self.add_background_task(
-                        self.__ping_pong_clients_task,
-                        interval=self.__ping_pong_clients_interval,
-                    )
-                    self.__logger.log(
-                        f"Ping pong mode activated, interval: [{self.__ping_pong_clients_interval}]",
-                        LogLevels.DEBUG,
-                    )
+        # Configuration pour arrêter la boucle asyncio sur un signal d'interruption (SIGINT)
+        loop = asyncio.get_event_loop()
 
-                web.run_app(self._app, host=self.__host, port=self.__port)
-            except KeyboardInterrupt:
-                self.__logger.log("WServer stopped by user request.", LogLevels.INFO)
-                asyncio.run(self.stop_server())
-                exit()
+        def handle_exit():
+            self.__logger.log("WServer stopped by user request.", LogLevels.INFO)
+            asyncio.create_task(self.stop_server())
+            loop.stop()
 
-            except Exception as error:
-                self.__logger.log(
-                    f"WServer error: ({error}), try to restart...", LogLevels.ERROR
+        loop.add_signal_handler(signal.SIGINT, handle_exit)
+
+        try:
+            self.__logger.log(
+                f"WServer started, url: [ws://{self.__host}:{self.__port}]",
+                LogLevels.INFO,
+            )
+            if self.__ping_pong_clients_interval is not None:
+                self.add_background_task(
+                    self.__ping_pong_clients_task,
+                    interval=self.__ping_pong_clients_interval,
                 )
-                try:
-                    time.sleep(5)
-                except KeyboardInterrupt:
-                    self.__logger.log(
-                        "WServer stopped by user request during restart.",
-                        LogLevels.INFO,
-                    )
-                    asyncio.run(self.stop_server())
-                    exit()
+                self.__logger.log(
+                    f"Ping pong mode activated, interval: [{self.__ping_pong_clients_interval}]",
+                    LogLevels.DEBUG,
+                )
+
+            web.run_app(self._app, host=self.__host, port=self.__port)
+        except Exception as error:
+            self.__logger.log(
+                f"WServer error: ({error}), try to restart...", LogLevels.ERROR
+            )
+            time.sleep(5)
+        finally:
+            loop.close()
