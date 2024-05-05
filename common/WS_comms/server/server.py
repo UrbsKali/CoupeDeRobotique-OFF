@@ -99,7 +99,7 @@ class WServer:
         self._app._loop.stop()
 
     async def shutdown(self, server, signal, loop):
-        print(f'Received exit signal {signal.name}...')
+        print(f"Received exit signal {signal.name}...")
         server.close()
         await server.wait_closed()
         await self._app.shutdown()
@@ -163,7 +163,7 @@ class WServer:
                         getattr(signal, signame),
                         lambda sig=signame: asyncio.create_task(
                             shutdown(site, self._app, sig, loop)
-                        )
+                        ),
                     )
                 asyncio.run(asyncio.Event().wait())
 
