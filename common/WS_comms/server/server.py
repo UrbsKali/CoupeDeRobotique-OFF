@@ -146,16 +146,16 @@ class WServer:
 
                 #web.run_app(self._app, host=self.__host, port=self.__port)
                 runner = web.AppRunner(app)
-                await runner.setup()
+                asyncio.run(runner.setup())
                 site = web.TCPSite(runner, host, port)
-                await site.start()
+                asyncio.run(site.start())
 
                 loop = asyncio.get_running_loop()
 
                 for signame in ('SIGINT', 'SIGTERM'):
                     loop.add_signal_handler(getattr(signal, signame),
                                             lambda sig=signame: asyncio.create_task(shutdown(site, app, sig, loop)))
-                await asyncio.Event().wait()
+                asyncio.run(asyncio.Event().wait())
 
             except KeyboardInterrupt:
                 self.__logger.log("WServer stopped by user request.", LogLevels.INFO)
