@@ -56,7 +56,7 @@ void call_stepper_step(byte *msg, byte size)
       );
       steppers[stepper_go_to_msg->pin_dir]=stepper;
     }
-    stepper_step(steppers[stepper_go_to_msg->pin_dir],stepper_go_to_msg->steps);
+    stepper_step(steppers[stepper_go_to_msg->pin_dir],stepper_go_to_msg->steps,stepper_go_to_msg->dir);
 }
 
 
