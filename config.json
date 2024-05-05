@@ -84,7 +84,7 @@
     },
     "strip_led": {
       "pin": 18,
-      "brightness": 70,
+      "brightness": 30,
       "num_leds": 21,
       "frequency": 800000,
       "led_indexes": {

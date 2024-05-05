@@ -47,11 +47,7 @@ class LEDStrip:
                 self._strip.setPixelColor(i, color)
         if isinstance(index, int) and isinstance(color, RGBW):
             self._strip.setPixelColor(index, color)
-        if (
-            isinstance(index, list)
-            and isinstance(color, list)
-            and len(index) == len(color)
-        ):
+        if isinstance(index, list) and isinstance(color, list) and len(index) == len(color):
             for i in index:
                 self._strip.setPixelColor(i, color[i])
         if isinstance(index, list) and isinstance(color, RGBW):
@@ -83,19 +79,24 @@ class LEDStrip:
         )
 
     def set_jack(self, state):
-        self.set_color(Colors.GREEN if state else Colors.RED, self.led_indexes["jack"])
+        self.set_color(
+            Colors.GREEN if state else Colors.RED,
+            self.led_indexes["jack"]
+        )
 
     def set_team(self, team):
         self.set_color(
-            Colors.YELLOW if team == "y" else Colors.BLUE, self.led_indexes["team"]
+            Colors.YELLOW if team == "y" else Colors.BLUE,
+            self.led_indexes["team"]
         )
 
     def acs_state(self, state):
-        self.set_color(Colors.RED if state else Colors.GREEN, self.led_indexes["acs"])
+        self.set_color(
+            Colors.RED if state else Colors.GREEN,
+            self.led_indexes["acs"]
+        )
 
     def set_progress(self, total_duration, current_progress):
-        progress = int(
-            (current_progress / total_duration) * len(self.led_indexes["progress"])
-        )
+        progress = int((current_progress / total_duration) * len(self.led_indexes["progress"]))
         self.set_color(Colors.ORANGE, self.led_indexes["progress"][:progress])
         self.set_color(Colors.BLACK, self.led_indexes["progress"][progress:])
