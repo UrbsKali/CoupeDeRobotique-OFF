@@ -68,9 +68,13 @@ class LEDStrip:
         self.set_color(Color(0, 0, 0))
 
     def log(self, log_level: LogLevels):
+        print("A")
         self.log_history.insert(0, LogColors[log_level])
+        print("B")
         del self.log_history[-1]
+        print("C")
         self.set_color(self.log_history, self.led_indexes["log"])
+        print("D")
 
     def is_ready(self, state=True):
         self.set_color(

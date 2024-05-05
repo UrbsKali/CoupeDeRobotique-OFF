@@ -20,11 +20,11 @@ from brains.acs import AntiCollisionMode, AntiCollisionHandle
 
 def get_ennemy_angle(self, relative=False):
     angle_abs = (
-        math.atan(
-            (self.arena.ennemy_position.x - self.rolling_basis.odometrie.x)
-            / (self.arena.ennemy_position.y - self.rolling_basis.odometrie.y)
-        )
-        - self.rolling_basis.odometrie.theta
+            math.atan(
+                (self.arena.ennemy_position.x - self.rolling_basis.odometrie.x)
+                / (self.arena.ennemy_position.y - self.rolling_basis.odometrie.y)
+            )
+            - self.rolling_basis.odometrie.theta
     )
 
     return (
@@ -69,7 +69,7 @@ async def compute_ennemy_position(self):
     )
 
     self.logger.log(
-        f"Ennemy position computed: {self.arena.ennemy_position if self.arena.ennemy_position is not None else 'None'}, at absolute/relative angle: {(str(round(self.get_ennemy_angle())) + '/' + str(round(self.get_ennemy_angle(relative=True)))) if self.arena.ennemy_position is not None else 'None'} and distance: {math.sqrt(pow(self.arena.ennemy_position.x - self.rolling_basis.odometrie.x,2)+pow(self.arena.ennemy_position.y - self.rolling_basis.odometrie.y,2)) if self.arena.ennemy_position is not None else 'None'}",
+        f"Ennemy position computed: {self.arena.ennemy_position if self.arena.ennemy_position is not None else 'None'}, at absolute/relative angle: {(str(round(self.get_ennemy_angle())) + '/' + str(round(self.get_ennemy_angle(relative=True)))) if self.arena.ennemy_position is not None else 'None'} and distance: {math.sqrt(pow(self.arena.ennemy_position.x - self.rolling_basis.odometrie.x, 2) + pow(self.arena.ennemy_position.y - self.rolling_basis.odometrie.y, 2)) if self.arena.ennemy_position is not None else 'None'}",
         LogLevels.DEBUG,
     )
 
@@ -77,25 +77,25 @@ async def compute_ennemy_position(self):
 
     # For now, just stop if close. When updating, consider self.arena.check_collision_by_distances
     if (
-        self.anticollision_mode != AntiCollisionMode.DISABLED
-        and self.arena.ennemy_position is not None
+            self.anticollision_mode != AntiCollisionMode.DISABLED
+            and self.arena.ennemy_position is not None
     ):
         if (
-            self.rolling_basis.odometrie.distance(self.arena.ennemy_position)
-            < CONFIG.STOP_TRESHOLD
+                self.rolling_basis.odometrie.distance(self.arena.ennemy_position)
+                < CONFIG.STOP_TRESHOLD
         ):
             if self.anticollision_mode == AntiCollisionMode.CIRCULAR:
                 trigger_acs = True
             if self.anticollision_mode == AntiCollisionMode.FRONTAL:
                 if (
-                    abs(self.get_ennemy_angle(relative=True))
-                    < CONFIG.LIDAR_FRONTAL_DETECTION_ANGLE
+                        abs(self.get_ennemy_angle(relative=True))
+                        < CONFIG.LIDAR_FRONTAL_DETECTION_ANGLE
                 ):
                     trigger_acs = True
             if self.anticollision_mode == AntiCollisionMode.SEMI_CIRCULAR:
                 if (
-                    abs(self.get_ennemy_angle(relative=True))
-                    < CONFIG.LIDAR_SEMI_CIRCULAR_DETECTION_ANGLE
+                        abs(self.get_ennemy_angle(relative=True))
+                        < CONFIG.LIDAR_SEMI_CIRCULAR_DETECTION_ANGLE
                 ):
                     trigger_acs = True
 
