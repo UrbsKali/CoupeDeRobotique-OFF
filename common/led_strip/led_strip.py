@@ -53,7 +53,7 @@ class LEDStrip:
             and len(index) == len(color)
         ):
             for i, j in enumerate(index):
-                self._strip.setPixelColor(i, color[j])
+                self._strip.setPixelColor(j, color[i])
         if isinstance(index, list) and isinstance(color, RGBW):
             for i in index:
                 self._strip.setPixelColor(i, color)
