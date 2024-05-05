@@ -17,16 +17,16 @@ from controllers import RollingBasis, Actuators
 
 
 @Logger
-async def deploy_solar_panel(self):
+async def deploy_right_solar_panel(self):
     await asyncio.sleep(CONFIG.MINIMUM_DELAY)
     servo = CONFIG.SOLAR_PANEL_RIGHT
     self.actuators.update_servo(pin=servo["pin"], angle = servo["deploy_angle"],detach=True,detach_delay=servo["detach_delay"])
     
 @Logger
-async def deploy_solar_panel(self):
+async def undeploy_right_solar_panel(self):
     await asyncio.sleep(CONFIG.MINIMUM_DELAY)
     servo = CONFIG.SOLAR_PANEL_RIGHT
-    self.actuators.update_servo(pin=servo["pin"], angle = servo["deploy_angle"],detach=True,detach_delay=servo["detach_delay"])
+    self.actuators.update_servo(pin=servo["pin"], angle = servo["undeploy_angle"],detach=True,detach_delay=servo["detach_delay"])
 
 @Logger
 async def deploy_god_hand(self):
