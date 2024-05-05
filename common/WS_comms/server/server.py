@@ -152,21 +152,7 @@ class WServer:
                         LogLevels.DEBUG,
                     )
 
-                # web.run_app(self._app, host=self.__host, port=self.__port)
-                loop = asyncio.new_event_loop()
-                runner = web.AppRunner(self._app)
-                asyncio.run(runner.setup())
-                site = web.TCPSite(runner, self.__host, self.__port)
-                asyncio.run(site.start())
-                for signame in ("SIGINT", "SIGTERM"):
-                    loop.add_signal_handler(
-                        getattr(signal, signame),
-                        lambda sig=signame: asyncio.create_task(
-                            shutdown(site, self._app, sig, loop)
-                        ),
-                    )
-                asyncio.run(asyncio.Event().wait())
-
+                web.run_app(self._app, host=self.__host, port=self.__port)
             except KeyboardInterrupt:
                 self.__logger.log("WServer stopped by user request.", LogLevels.INFO)
                 asyncio.run(self.stop_server())
