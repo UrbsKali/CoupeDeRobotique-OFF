@@ -172,7 +172,8 @@
         "right": {
           "pin": 8,
           "deploy": 180,
-          "undeploy": 81
+          "undeploy": 81,
+          "detach_delay": 500
         }
       },
       "elevator": {

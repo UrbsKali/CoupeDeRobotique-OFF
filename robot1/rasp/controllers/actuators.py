@@ -64,7 +64,7 @@ class Actuators(Teensy):
         angle: int,
         min_angle: int = 0,
         max_angle: int = 180,
-        detach=False,
+        detach=False, # If True, the servo will detach after setting the angle, DO NOT USE DETACH = TRUE AND DETACH = FALSE ON THE SAME SERVO
         detach_delay=1000,
     ) -> None:
         """Set the angle of the servo at the given pin.

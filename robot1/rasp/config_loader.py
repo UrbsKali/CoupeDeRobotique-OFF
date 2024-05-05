@@ -97,7 +97,7 @@ class CONFIG:
     FRONT_GOD_HAND = ACTUATORS_CONFIG["front_god_hand"]
     MINIMUM_DELAY = ACTUATORS_CONFIG["minimum_delay"]
     ELEVATOR = ACTUATORS_CONFIG["elevator"]
-    ELEVATOR = ACTUATORS_CONFIG["elevator"]
+    SOLAR_PANEL_RIGHT = ACTUATORS_CONFIG["solar_panel"]["right"]
 
     # Lidar
     LIDAR_CONFIG = SPECIFIC_CONFIG["lidar"]
