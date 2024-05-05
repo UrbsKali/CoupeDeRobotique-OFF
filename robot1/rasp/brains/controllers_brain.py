@@ -81,6 +81,7 @@ async def lift_elevator(self):
     stepper = CONFIG.ELEVATOR
     self.actuators.stepper_step(
         steps=stepper["up_steps"],
+        dir=stepper["up_direction"],
         pin_dir=stepper["pin_dir"],
         pin_step=stepper["pin_step"],
     )
@@ -91,6 +92,7 @@ async def lower_elevator(self):
     stepper = CONFIG.ELEVATOR
     self.actuators.stepper_step(
         steps=stepper["down_steps"],
+        dir=stepper["down_direction"],
         pin_dir=stepper["pin_dir"],
         pin_step=stepper["pin_step"],
     )

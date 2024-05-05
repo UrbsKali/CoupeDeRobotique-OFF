@@ -110,8 +110,8 @@ class Logger:
         self,
         message: str,
         level: LogLevels = LogLevels.WARNING,
-        led_strip = None,
-        identifier_override: str | None = None
+        led_strip=None,
+        identifier_override: str | None = None,
     ) -> None:
         """
         Log un message dans le fichier de log et dans la sortie standard
