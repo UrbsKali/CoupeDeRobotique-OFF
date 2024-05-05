@@ -88,11 +88,11 @@ class MainBrain(Brain):
     @Brain.task(process=False, run_on_start=not CONFIG.ZOMBIE_MODE)
     async def start(self):
 
-        # Setup things
-        await self.setup()
-
         # Wait for trigger
         self.logger.log("Waiting for jack trigger...", LogLevels.INFO)
+
+        # Setup things
+        await self.setup()
         await self.wait_for_trigger()
 
         # Plant Stage
@@ -103,6 +103,12 @@ class MainBrain(Brain):
         await self.endgame()
         self.logger.log("Game over", LogLevels.INFO)
         exit()
+
+    async def show_team_switch(self):
+        if self.team_switch.digital_read():
+            self.leds.set_team("y")
+        else:
+            self.leds.set_team("b")
 
     async def setup(self):
         if CONFIG.ENABLE_TEAM_SWITCH:
@@ -146,6 +152,7 @@ class MainBrain(Brain):
         # Check jack state
         self.leds.set_jack(False)
         while self.jack.digital_read():
+            await self.show_team_switch()
             await asyncio.sleep(0.1)
         self.leds.set_jack(True)
 
