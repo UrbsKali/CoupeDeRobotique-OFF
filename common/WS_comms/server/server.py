@@ -17,11 +17,11 @@ class WServer:
     """
 
     def __init__(
-        self,
-        logger: Logger,
-        host: str,
-        port: int,
-        ping_pong_clients_interval: int = None,
+            self,
+            logger: Logger,
+            host: str,
+            port: int,
+            ping_pong_clients_interval: int = None,
     ) -> None:
         self.__logger = logger
 
@@ -91,7 +91,7 @@ class WServer:
         await self._app.cleanup()
 
     def add_background_task(
-        self, task: callable, *args, name: str = "", **kwargs
+            self, task: callable, *args, name: str = "", **kwargs
     ) -> None:
         """
         Add a new background task to the server. It is useful to execute task in parallel with the server.
@@ -108,7 +108,19 @@ class WServer:
         name = task.__name__ if name == "" else name
 
         async def background_task(app):
-            app[name] = asyncio.create_task(task(*args, **kwargs))
+            try:
+                task_instance = asyncio.create_task(task(*args, **kwargs))
+                self.background_tasks.add(task_instance)  #
+                await asyncio.wait_for(task_instance, timeout=timeout) if timeout else await task_instance
+            except asyncio.TimeoutError:
+                self.__logger.log(f"Task [{name}] timed out after {timeout} seconds", LogLevels.WARNING)
+                task_instance.cancel()
+            except Exception as error:
+                self.__logger.log(f"Error in task [{name}]: {error}", LogLevels.ERROR)
+            finally:
+                self.background_tasks.discard(task_instance)
+
+            #app[name] = asyncio.create_task(task(*args, **kwargs))
 
         self.__logger.log(
             f"New background task added [{name}]",
@@ -125,7 +137,6 @@ class WServer:
                 )
                 # Add ping pong task if self.__ping_pong_clients_interval has a value, then run server
                 if self.__ping_pong_clients_interval is not None:
-
                     self.add_background_task(
                         self.__ping_pong_clients_task,
                         interval=self.__ping_pong_clients_interval,
