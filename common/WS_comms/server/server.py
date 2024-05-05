@@ -147,6 +147,7 @@ class WServer:
                 web.run_app(self._app, host=self.__host, port=self.__port)
 
                 stop = asyncio.Future()
+
                 def signal_handler():
                     stop.set_result(True)
 
