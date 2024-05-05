@@ -98,6 +98,14 @@ class WServer:
         asyncio.get_event_loop().stop()
         self._app._loop.stop()
 
+    async def shutdown(self, server, signal, loop):
+        print(f'Received exit signal {signal.name}...')
+        server.close()
+        await server.wait_closed()
+        await self._app.shutdown()
+        await self._app.cleanup()
+        loop.stop()
+
     def add_background_task(
         self, task: callable, *args, name: str = "", **kwargs
     ) -> None:
@@ -145,19 +153,17 @@ class WServer:
                     )
 
                 # web.run_app(self._app, host=self.__host, port=self.__port)
-                runner = web.AppRunner(app)
+                runner = web.AppRunner(self._app)
                 asyncio.run(runner.setup())
-                site = web.TCPSite(runner, host, port)
+                site = web.TCPSite(runner, self.__host, self.__port)
                 asyncio.run(site.start())
-
                 loop = asyncio.get_running_loop()
-
                 for signame in ("SIGINT", "SIGTERM"):
                     loop.add_signal_handler(
                         getattr(signal, signame),
                         lambda sig=signame: asyncio.create_task(
-                            shutdown(site, app, sig, loop)
-                        ),
+                            shutdown(site, self._app, sig, loop)
+                        )
                     )
                 asyncio.run(asyncio.Event().wait())
 
