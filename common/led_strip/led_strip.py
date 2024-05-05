@@ -86,6 +86,7 @@ class LEDStrip:
         self.set_color(Colors.GREEN if state else Colors.RED, self.led_indexes["jack"])
 
     def set_team(self, team):
+        print(f"Set team to {team}")
         self.set_color(
             Colors.YELLOW if team == "y" else Colors.BLUE, self.led_indexes["team"]
         )
