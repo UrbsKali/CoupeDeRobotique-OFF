@@ -17,11 +17,11 @@ class WServer:
     """
 
     def __init__(
-            self,
-            logger: Logger,
-            host: str,
-            port: int,
-            ping_pong_clients_interval: int = None,
+        self,
+        logger: Logger,
+        host: str,
+        port: int,
+        ping_pong_clients_interval: int = None,
     ) -> None:
         self.__logger = logger
 
@@ -34,6 +34,8 @@ class WServer:
 
         # Keep access on the route manager
         self.__route_managers = {}
+        # Keep access on the background tasks
+        self.__background_tasks = set()
 
     async def __ping_pong_clients_task(self, interval: int):
         while True:
@@ -85,13 +87,15 @@ class WServer:
         Stop the server and all the background tasks.
         :return:
         """
-        for task in self.background_tasks:
+        self.logger.log(f"Received exit signal {signal.name}...", LogLevels.INFO)
+        for task in self.tasks:
             task.cancel()
-        await self._app.shutdown()
-        await self._app.cleanup()
+        for route, manager in self.route_managers.items():
+            await manager.close_all_connections()
+        self._app._loop.stop()
 
     def add_background_task(
-            self, task: callable, *args, name: str = "", **kwargs
+        self, task: callable, *args, name: str = "", **kwargs
     ) -> None:
         """
         Add a new background task to the server. It is useful to execute task in parallel with the server.
@@ -108,19 +112,9 @@ class WServer:
         name = task.__name__ if name == "" else name
 
         async def background_task(app):
-            try:
-                task_instance = asyncio.create_task(task(*args, **kwargs))
-                self.background_tasks.add(task_instance)  #
-                await asyncio.wait_for(task_instance, timeout=timeout) if timeout else await task_instance
-            except asyncio.TimeoutError:
-                self.__logger.log(f"Task [{name}] timed out after {timeout} seconds", LogLevels.WARNING)
-                task_instance.cancel()
-            except Exception as error:
-                self.__logger.log(f"Error in task [{name}]: {error}", LogLevels.ERROR)
-            finally:
-                self.background_tasks.discard(task_instance)
-
-            #app[name] = asyncio.create_task(task(*args, **kwargs))
+            task_instance = asyncio.create_task(task(*args, **kwargs))
+            app[name] = task_instance
+            self.__background_tasks.add(task_instance)
 
         self.__logger.log(
             f"New background task added [{name}]",
@@ -149,7 +143,7 @@ class WServer:
                 web.run_app(self._app, host=self.__host, port=self.__port)
             except KeyboardInterrupt:
                 self.__logger.log("WServer stopped by user request.", LogLevels.INFO)
-                asyncio.run(self.stop_server())
+                self.stop_server()
                 exit()
             except Exception as error:
                 self.__logger.log(
