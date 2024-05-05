@@ -18,11 +18,11 @@ class WServer:
     """
 
     def __init__(
-            self,
-            logger: Logger,
-            host: str,
-            port: int,
-            ping_pong_clients_interval: int = None,
+        self,
+        logger: Logger,
+        host: str,
+        port: int,
+        ping_pong_clients_interval: int = None,
     ) -> None:
         self.__logger = logger
 
@@ -96,7 +96,7 @@ class WServer:
         self._app._loop.stop()
 
     def add_background_task(
-            self, task: callable, *args, name: str = "", **kwargs
+        self, task: callable, *args, name: str = "", **kwargs
     ) -> None:
         """
         Add a new background task to the server. It is useful to execute task in parallel with the server.
@@ -149,9 +149,11 @@ class WServer:
                         LogLevels.DEBUG,
                     )
                 loop = asyncio.get_event_loop()
-                for signame in ('SIGINT', 'SIGTERM'):
-                    loop.add_signal_handler(getattr(signal, signame),
-                                            lambda: asyncio.ensure_future(self.shutdown(signame)))
+                for signame in ("SIGINT", "SIGTERM"):
+                    loop.add_signal_handler(
+                        getattr(signal, signame),
+                        lambda: asyncio.ensure_future(self.shutdown(signame)),
+                    )
                 web.run_app(self._app, host=self.__host, port=self.__port)
             except KeyboardInterrupt:
                 self.__logger.log("WServer stopped by user request.", LogLevels.INFO)
