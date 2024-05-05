@@ -18,9 +18,9 @@ class WServerRouteManager:
         self.clients = {}
 
     def add_client(
-        self,
-        request: aiohttp.web_request.Request,
-        client: aiohttp.web_ws.WebSocketResponse,
+            self,
+            request: aiohttp.web_request.Request,
+            client: aiohttp.web_ws.WebSocketResponse,
     ) -> str:
         """
         Add a new client in the router handler list.
@@ -61,8 +61,19 @@ class WServerRouteManager:
     def get_all_clients(self):
         return list(self.clients.values())
 
+    async def close_all_connections(self):
+        """
+        Close all active WebSocket connections.
+        """
+        # Loop through all clients and close each WebSocket connection
+        for client_name, client in list(self.clients.items()):
+            if not client.closed:
+                await client.close()
+            print(f"Closed connection for {client_name}")
+        self.clients.clear()
+
     async def routine(
-        self, request: aiohttp.web_request.Request
+            self, request: aiohttp.web_request.Request
     ) -> aiohttp.web_ws.WebSocketResponse or None:
         """
         Routine to handle new connections.
