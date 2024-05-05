@@ -27,17 +27,17 @@ class MainBrain(Brain):
     """
 
     def __init__(
-        self,
-        logger: Logger,
-        ws_cmd: WServerRouteManager,
-        ws_pami: WServerRouteManager,
-        actuators: Actuators,
-        rolling_basis: RollingBasis,
-        lidar: Lidar,
-        arena: MarsArena,
-        jack: PIN,
-        team_switch: PIN,
-        leds: LEDStrip,
+            self,
+            logger: Logger,
+            ws_cmd: WServerRouteManager,
+            ws_pami: WServerRouteManager,
+            actuators: Actuators,
+            rolling_basis: RollingBasis,
+            lidar: Lidar,
+            arena: MarsArena,
+            jack: PIN,
+            team_switch: PIN,
+            leds: LEDStrip,
     ) -> None:
         self.team = arena.team
         self.anticollision_mode: AntiCollisionMode = AntiCollisionMode(
@@ -168,10 +168,10 @@ class MainBrain(Brain):
             await self.kill_rolling_basis()
 
     async def go_and_pickup(
-        self,
-        target_pickup_zone: Plants_zone,
-        distance_from_zone=15,
-        distance_final_approach=10,
+            self,
+            target_pickup_zone: Plants_zone,
+            distance_from_zone=15,
+            distance_final_approach=10,
     ) -> int:
         await self.deploy_god_hand()
         await self.open_god_hand()
@@ -183,13 +183,13 @@ class MainBrain(Brain):
         )
 
         if (
-            await self.smart_go_to(
-                position=target,
-                timeout=30,
-                **CONFIG.SPEED_PROFILES["cruise_speed"],
-                **CONFIG.PRECISION_PROFILES["classic_precision"],
-            )
-            != 0
+                await self.smart_go_to(
+                    position=target,
+                    timeout=30,
+                    **CONFIG.SPEED_PROFILES["cruise_speed"],
+                    **CONFIG.PRECISION_PROFILES["classic_precision"],
+                )
+                != 0
         ):
             return 1
         else:
@@ -212,15 +212,15 @@ class MainBrain(Brain):
 
             # Step back
             if (
-                await self.smart_go_to(
-                    Point(-100, 0),
-                    timeout=10,
-                    forward=False,
-                    **CONFIG.SPEED_PROFILES["cruise_speed"],
-                    **CONFIG.PRECISION_PROFILES["classic_precision"],
-                    relative=True,
-                )
-                != 0
+                    await self.smart_go_to(
+                        Point(-100, 0),
+                        timeout=10,
+                        forward=False,
+                        **CONFIG.SPEED_PROFILES["cruise_speed"],
+                        **CONFIG.PRECISION_PROFILES["classic_precision"],
+                        relative=True,
+                    )
+                    != 0
             ):
                 return 2
             else:
@@ -233,13 +233,13 @@ class MainBrain(Brain):
         )
 
         if (
-            await self.smart_go_to(
-                position=target,
-                timeout=30,
-                **CONFIG.SPEED_PROFILES["cruise_speed"],
-                **CONFIG.PRECISION_PROFILES["classic_precision"],
-            )
-            != 0
+                await self.smart_go_to(
+                    position=target,
+                    timeout=30,
+                    **CONFIG.SPEED_PROFILES["cruise_speed"],
+                    **CONFIG.PRECISION_PROFILES["classic_precision"],
+                )
+                != 0
         ):
             return 1
         else:
@@ -253,15 +253,15 @@ class MainBrain(Brain):
 
             # Step back
             if (
-                await self.smart_go_to(
-                    Point(-30, 0),
-                    timeout=10,
-                    forward=False,
-                    **CONFIG.SPEED_PROFILES["cruise_speed"],
-                    **CONFIG.PRECISION_PROFILES["classic_precision"],
-                    relative=True,
-                )
-                != 0
+                    await self.smart_go_to(
+                        Point(-30, 0),
+                        timeout=10,
+                        forward=False,
+                        **CONFIG.SPEED_PROFILES["cruise_speed"],
+                        **CONFIG.PRECISION_PROFILES["classic_precision"],
+                        relative=True,
+                    )
+                    != 0
             ):
                 return 2
             else:

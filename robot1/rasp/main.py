@@ -20,12 +20,7 @@ if __name__ == "__main__":
     ###--- Initialization ---###
     """
     # State strip leds
-    leds = LEDStrip(
-        num_leds=CONFIG.LED_STRIP_NUM_LEDS,
-        pin=CONFIG.LED_STRIP_PIN,
-        freq=CONFIG.LED_STRIP_FREQ,
-        brightness=CONFIG.LED_STRIP_BRIGHTNESS,
-    )
+    leds = LEDStrip(**CONFIG.LED_STRIP_CONFIG)
 
     # Loggers
     logger_ws_server = Logger(

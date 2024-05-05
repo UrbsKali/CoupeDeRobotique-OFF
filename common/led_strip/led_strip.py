@@ -28,9 +28,9 @@ class Colors:
 
 
 class LEDStrip:
-    def __init__(self, num_leds, pin, freq, brightness, led_indexes):
+    def __init__(self, num_leds, pin, frequency, brightness, led_indexes):
         self._strip = PixelStrip(
-            num=num_leds, pin=pin, freq_hz=freq, brightness=brightness
+            num=num_leds, pin=pin, freq_hz=frequency, brightness=brightness
         )
         self._strip.begin()
         self.set_color(Color(0, 0, 0))
