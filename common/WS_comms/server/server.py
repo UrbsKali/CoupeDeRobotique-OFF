@@ -1,5 +1,6 @@
 from aiohttp import web
 import asyncio
+import signal
 import time
 
 from WS_comms.server.server_route import WServerRouteManager
@@ -144,6 +145,13 @@ class WServer:
                     )
 
                 web.run_app(self._app, host=self.__host, port=self.__port)
+
+                stop = asyncio.Future()
+                def signal_handler():
+                    stop.set_result(True)
+
+                signal.signal(signal.SIGINT, signal_handler)
+                signal.signal(signal.SIGTERM, signal_handler)
             except KeyboardInterrupt:
                 self.__logger.log("WServer stopped by user request.", LogLevels.INFO)
                 asyncio.run(self.stop_server())
