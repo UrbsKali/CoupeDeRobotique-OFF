@@ -36,7 +36,7 @@ void call_servo_go_to(byte *msg, byte size)
 
 void call_servo_go_to_detach(byte *msg, byte size)
 {
-    msg_Servo_Go_To *servo_go_to_msg = (msg_Servo_Go_To*) msg;
+    msg_Servo_Go_To_Detach *servo_go_to_msg = (msg_Servo_Go_To_Detach*) msg;
     Servo* actuator = new Servo();
     actuator->attach(servo_go_to_msg->pin);
     servos[servo_go_to_msg->pin]=actuator;
