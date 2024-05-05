@@ -73,6 +73,8 @@ async def compute_ennemy_position(self):
         LogLevels.DEBUG,
     )
 
+    trigger_acs = False
+
     # For now, just stop if close. When updating, consider self.arena.check_collision_by_distances
     if (
         self.anticollision_mode != AntiCollisionMode.DISABLED
@@ -83,35 +85,29 @@ async def compute_ennemy_position(self):
             < CONFIG.STOP_TRESHOLD
         ):
             if self.anticollision_mode == AntiCollisionMode.CIRCULAR:
-                self.logger.log(
-                    "ACS triggered, performing emergency stop", LogLevels.WARNING
-                )
-                self.rolling_basis.stop_and_clear_queue()
-                self.leds.acs_state(True)
+                trigger_acs = True
             if self.anticollision_mode == AntiCollisionMode.FRONTAL:
                 if (
                     abs(self.get_ennemy_angle(relative=True))
                     < CONFIG.LIDAR_FRONTAL_DETECTION_ANGLE
                 ):
-                    self.logger.log(
-                        "ACS triggered, performing emergency stop", LogLevels.WARNING
-                    )
-                    self.rolling_basis.stop_and_clear_queue()
-                    self.leds.acs_state(True)
+                    trigger_acs = True
             if self.anticollision_mode == AntiCollisionMode.SEMI_CIRCULAR:
                 if (
                     abs(self.get_ennemy_angle(relative=True))
                     < CONFIG.LIDAR_SEMI_CIRCULAR_DETECTION_ANGLE
                 ):
-                    self.logger.log(
-                        "ACS triggered, performing emergency stop", LogLevels.WARNING
-                    )
-                    self.rolling_basis.stop_and_clear_queue()
-                    self.leds.acs_state(True)
+                    trigger_acs = True
 
-        else:
-            # self.logger.log("ACS not triggered", LogLevels.DEBUG)
-            self.leds.acs_state(False)
+    if trigger_acs:
+        self.logger.log(
+            "ACS triggered, performing emergency stop", LogLevels.WARNING, self.leds
+        )
+        self.rolling_basis.stop_and_clear_queue()
+        self.leds.acs_state(True)
+    else:
+        # self.logger.log("ACS not triggered", LogLevels.DEBUG)
+        self.leds.acs_state(False)
 
 
 def pol_to_abs_cart(self, polars: np.ndarray) -> MultiPoint:

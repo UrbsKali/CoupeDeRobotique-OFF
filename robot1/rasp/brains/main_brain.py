@@ -89,19 +89,19 @@ class MainBrain(Brain):
     async def start(self):
 
         # Wait for trigger
-        self.logger.log("Waiting for jack trigger...", LogLevels.INFO)
+        self.logger.log("Waiting for jack trigger...", LogLevels.INFO, self.leds)
 
         # Setup things
         await self.setup()
         await self.wait_for_trigger()
 
         # Plant Stage
-        self.logger.log("Starting plant stage...", LogLevels.INFO)
+        self.logger.log("Starting plant stage...", LogLevels.INFO, self.leds)
         await self.plant_stage()
 
         # Clean up
         await self.endgame()
-        self.logger.log("Game over", LogLevels.INFO)
+        self.logger.log("Game over", LogLevels.INFO, self.leds)
         exit()
 
     async def show_team_switch(self):
@@ -114,9 +114,11 @@ class MainBrain(Brain):
         if CONFIG.ENABLE_TEAM_SWITCH:
             if self.team_switch.digital_read():
                 start_zone_id = CONFIG.TEAM_SWITCH_ON
+                self.logger.log("Team yellow", LogLevels.INFO)
                 self.leds.set_team("y")
             else:
                 start_zone_id = CONFIG.TEAM_SWITCH_OFF
+                self.logger.log("Team blue", LogLevels.INFO)
                 self.leds.set_team("b")
             self.logger.log(
                 f"Game start, zone chosen by switch : {start_zone_id}", LogLevels.INFO
@@ -191,6 +193,7 @@ class MainBrain(Brain):
             )
             != 0
         ):
+            self.log("Failed", LogLevels.ERROR, self.leds)
             return 1
         else:
             # Final approach
@@ -222,8 +225,10 @@ class MainBrain(Brain):
                 )
                 != 0
             ):
+                self.log("Failed", LogLevels.ERROR, self.leds)
                 return 2
             else:
+                self.log("Success", LogLevels.INFO, self.leds)
                 return 0
 
     async def go_and_drop(self, target_drop_zone: Plants_zone) -> int:  # TODO
@@ -241,6 +246,7 @@ class MainBrain(Brain):
             )
             != 0
         ):
+            self.log("Failed", LogLevels.ERROR, self.leds)
             return 1
         else:
 
@@ -263,8 +269,10 @@ class MainBrain(Brain):
                 )
                 != 0
             ):
+                self.log("Failed", LogLevels.ERROR, self.leds)
                 return 2
             else:
+                self.log("Success", LogLevels.INFO, self.leds)
                 return 0
 
     @Brain.task(process=False, run_on_start=False, timeout=100)
@@ -275,14 +283,18 @@ class MainBrain(Brain):
         # Closest pickup zone
         pickup_target: Plants_zone = self.arena.pickup_zones[0 if in_yellow_team else 4]
         self.logger.log(
-            f"Going to pickup zone {0 if in_yellow_team else 4}", LogLevels.INFO
+            f"Going to pickup zone {0 if in_yellow_team else 4}",
+            LogLevels.INFO,
+            self.leds,
         )
         await self.go_and_pickup(pickup_target)
 
         drop_target: Plants_zone = self.arena.drop_zones[0 if in_yellow_team else 3]
 
         self.logger.log(
-            f"Going to drop zone {0 if in_yellow_team else 3}", LogLevels.INFO
+            f"Going to drop zone {0 if in_yellow_team else 3}",
+            LogLevels.INFO,
+            self.leds,
         )
         await self.go_and_drop(drop_target)
 
@@ -290,14 +302,18 @@ class MainBrain(Brain):
         pickup_target = self.arena.pickup_zones[1 if in_yellow_team else 3]
 
         self.logger.log(
-            f"Going to pickup zone {1 if in_yellow_team else 3}", LogLevels.INFO
+            f"Going to pickup zone {1 if in_yellow_team else 3}",
+            LogLevels.INFO,
+            self.leds,
         )
         await self.go_and_pickup(pickup_target)
 
         drop_target = self.arena.drop_zones[2 if in_yellow_team else 5]
 
         self.logger.log(
-            f"Going to drop zone {2 if in_yellow_team else 5}", LogLevels.INFO
+            f"Going to drop zone {2 if in_yellow_team else 5}",
+            LogLevels.INFO,
+            self.leds,
         )
         await self.go_and_drop(drop_target)
 
