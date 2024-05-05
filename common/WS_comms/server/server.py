@@ -153,11 +153,11 @@ class WServer:
                     )
 
                 # web.run_app(self._app, host=self.__host, port=self.__port)
+                loop = asyncio.new_event_loop()
                 runner = web.AppRunner(self._app)
                 asyncio.run(runner.setup())
                 site = web.TCPSite(runner, self.__host, self.__port)
                 asyncio.run(site.start())
-                loop = asyncio.get_running_loop()
                 for signame in ("SIGINT", "SIGTERM"):
                     loop.add_signal_handler(
                         getattr(signal, signame),
