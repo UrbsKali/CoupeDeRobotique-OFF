@@ -59,7 +59,13 @@ class Actuators(Teensy):
 
     @Logger
     def update_servo(
-        self, pin: int, angle: int, min_angle: int = 0, max_angle: int = 180,detach=False,detach_time=1000
+        self,
+        pin: int,
+        angle: int,
+        min_angle: int = 0,
+        max_angle: int = 180,
+        detach=False,
+        detach_time=1000,
     ) -> None:
         """Set the angle of the servo at the given pin.
 
@@ -79,7 +85,7 @@ class Actuators(Teensy):
                     + struct.pack("<B", angle)
                     + struct.pack("<H", detach_time)
                 )
-            else :
+            else:
                 msg = (
                     self.Command.Update_servo
                     + struct.pack("<B", pin)
