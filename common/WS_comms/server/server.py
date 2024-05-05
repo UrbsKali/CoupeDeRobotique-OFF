@@ -88,7 +88,7 @@ class WServer:
         :return:
         """
         self.__logger.log("Received exit signal...", LogLevels.INFO)
-        for route, manager in self.route_managers.items():
+        for route, manager in self.__route_managers.items():
             await manager.close_all_connections()
         tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
         for task in tasks:
