@@ -41,7 +41,7 @@ class LEDStrip:
 
         self.log_history = [Colors.BLACK for _ in range(self.led_indexes["log"])]
 
-    def set_color(self, color: Color | list[Color], index: list | int | None = None):
+    def set_color(self, color, index: list | int | None = None):
         if index is None and isinstance(color, Color):
             for i in range(self._strip.numPixels()):
                 self._strip.setPixelColor(i, color)
