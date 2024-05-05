@@ -157,7 +157,8 @@ class WServer:
                     time.sleep(5)
                 except KeyboardInterrupt:
                     self.__logger.log(
-                        "WServer stopped by user request during restart.", LogLevels.INFO
+                        "WServer stopped by user request during restart.",
+                        LogLevels.INFO,
                     )
                     self.stop_server()
                     exit()
