@@ -39,7 +39,7 @@ class LEDStrip:
         self.is_ready(False)
         self.set_jack(False)
 
-        self.log_history = [Colors.BLACK for _ in range(self.led_indexes["log"])]
+        self.log_history = [Colors.BLACK for _ in self.led_indexes["log"]]
 
     def set_color(self, color: RGBW | list[RGBW], index: list | int | None = None):
         if index is None and isinstance(color, RGBW):
