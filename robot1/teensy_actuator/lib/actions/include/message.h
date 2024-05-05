@@ -20,6 +20,14 @@ struct msg_Servo_Go_To
     byte angle; // angle to which the servo should be moved in degrees
 };
 
+struct msg_Servo_Go_To_Detach
+{
+    byte command = SERVO_GO_TO_DETACH;
+    byte pin;   // pin to which the servo is connected
+    byte angle; // angle to which the servo should be moved in degrees
+    int detach_delay;  // delay in milliseconds before detaching the servo
+};
+
 struct msg_Stepper_Go_To
 {
     byte command = STEPPER_STEP;

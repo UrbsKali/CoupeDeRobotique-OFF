@@ -65,7 +65,7 @@ class Actuators(Teensy):
         min_angle: int = 0,
         max_angle: int = 180,
         detach=False,
-        detach_time=1000,
+        detach_delay=1000,
     ) -> None:
         """Set the angle of the servo at the given pin.
 
@@ -75,7 +75,7 @@ class Actuators(Teensy):
             min_angle (int, optional): The minimum angle allowed for the servo. Defaults to 0.
             max_angle (int, optional): The maximum angle allowed for the servo. Defaults to 180.
             detach (bool, optional): Whether to detach the servo after setting the angle. Defaults to False.
-            detach_time (int, optional): The time in milliseconds to keep the servo detached. Defaults to 1000.
+            detach_delay (int, optional): The time in milliseconds to keep the servo detached. Defaults to 1000.
         """
         if angle >= min_angle and angle <= max_angle:
             if detach:
@@ -83,7 +83,7 @@ class Actuators(Teensy):
                     self.Command.Update_servo_detach
                     + struct.pack("<B", pin)
                     + struct.pack("<B", angle)
-                    + struct.pack("<H", detach_time)
+                    + struct.pack("<i", detach_delay)
                 )
             else:
                 msg = (

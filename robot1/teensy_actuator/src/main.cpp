@@ -34,6 +34,17 @@ void call_servo_go_to(byte *msg, byte size)
     servo_go_to(servos[servo_go_to_msg->pin],servo_go_to_msg->angle);
 }
 
+void call_servo_go_to_detach(byte *msg, byte size)
+{
+    msg_Servo_Go_To *servo_go_to_msg = (msg_Servo_Go_To*) msg;
+    Servo* actuator = new Servo();
+    actuator->attach(servo_go_to_msg->pin);
+    servos[servo_go_to_msg->pin]=actuator;
+    servo_go_to(servos[servo_go_to_msg->pin],servo_go_to_msg->angle);
+    delay(servo_go_to_msg->detach_delay);
+    servos[servo_go_to_msg->pin]->detach();
+}
+
 void call_stepper_step(byte *msg, byte size)
 {
     msg_Stepper_Go_To *stepper_go_to_msg = (msg_Stepper_Go_To*) msg;
@@ -56,6 +67,7 @@ void setup()
   // only the messages received by the teensy are listed here
   functions[SERVO_GO_TO] = &call_servo_go_to;
   functions[STEPPER_STEP] = &call_stepper_step;
+  functions[SERVO_GO_TO_DETACH] = &call_servo_go_to_detach;
 
   Serial.begin(115200);
 }
