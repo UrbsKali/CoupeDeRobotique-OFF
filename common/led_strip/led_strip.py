@@ -1,4 +1,4 @@
-from rpi_ws281x import PixelStrip, Color
+from rpi_ws281x import PixelStrip, Color, RGBW
 from logger.log_tools import LogLevels
 from logger.logger import Logger
 
@@ -41,11 +41,11 @@ class LEDStrip:
 
         self.log_history = [Colors.BLACK for _ in range(self.led_indexes["log"])]
 
-    def set_color(self, color: Color | list[Color], index: list | int | None = None):
-        if index is None and isinstance(color, Color):
+    def set_color(self, color: RGBW | list[RGBW], index: list | int | None = None):
+        if index is None and isinstance(color, RGBW):
             for i in range(self._strip.numPixels()):
                 self._strip.setPixelColor(i, color)
-        if isinstance(index, int) and isinstance(color, Color):
+        if isinstance(index, int) and isinstance(color, RGBW):
             self._strip.setPixelColor(index, color)
         if (
             isinstance(index, list)
@@ -54,7 +54,7 @@ class LEDStrip:
         ):
             for i in index:
                 self._strip.setPixelColor(i, color[i])
-        if isinstance(index, list) and isinstance(color, Color):
+        if isinstance(index, list) and isinstance(color, RGBW):
             for i in index:
                 self._strip.setPixelColor(i, color)
         self._strip.show()
