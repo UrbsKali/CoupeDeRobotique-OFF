@@ -202,7 +202,7 @@ class MainBrain(Brain):
                 timeout=10,
                 **CONFIG.SPEED_PROFILES["cruise_speed"],
                 **CONFIG.PRECISION_PROFILES["classic_precision"],
-                relative=True
+                relative=True,
             )
 
             # Grab plants
@@ -221,7 +221,7 @@ class MainBrain(Brain):
                     forward=False,
                     **CONFIG.SPEED_PROFILES["cruise_speed"],
                     **CONFIG.PRECISION_PROFILES["classic_precision"],
-                    relative=True
+                    relative=True,
                 )
                 != 0
             ):
@@ -313,7 +313,7 @@ class MainBrain(Brain):
         self.logger.log(
             f"Going to drop zone {2 if in_yellow_team else 5}",
             LogLevels.INFO,
-            self.leds
+            self.leds,
         )
         await self.go_and_drop(drop_target)
 
