@@ -80,6 +80,16 @@ class WServer:
         self.__route_managers[route] = route_manager
         self._app.router.add_get(route, route_manager.routine)
 
+    async def stop_server(self):
+        """
+        Stop the server and all the background tasks.
+        :return:
+        """
+        for task in self.background_tasks:
+            task.cancel()
+        await self._app.shutdown()
+        await self._app.cleanup()
+
     def add_background_task(
         self, task: callable, *args, name: str = "", **kwargs
     ) -> None:
@@ -128,6 +138,7 @@ class WServer:
                 web.run_app(self._app, host=self.__host, port=self.__port)
             except KeyboardInterrupt:
                 self.__logger.log("WServer stopped by user request.", LogLevels.INFO)
+                asyncio.run(self.stop_server())
                 exit()
             except Exception as error:
                 self.__logger.log(
