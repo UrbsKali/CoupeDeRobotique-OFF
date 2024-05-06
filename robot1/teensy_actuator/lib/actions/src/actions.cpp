@@ -1,5 +1,8 @@
 #include <actions.h>
 
+#define FORWARD 1
+#define REVERSE 0
+
 // tries to call the functions called by the rasp and send back an error message otherwise
 void handle_callback(Com *com)
 {
@@ -37,9 +40,14 @@ void servo_go_to(Servo *servo, int angle)
     servo->write(angle);
 }
 
-void stepper_step(Bonezegei_A4988 *stepper, int steps, bool dir, byte pin_driver)
+void stepper_step(Bonezegei_A4988 *stepper, int steps, bool forward, byte pin_driver)
 {
     digitalWrite(pin_driver, LOW);
-    stepper->step(dir, steps);
+
+    if (forward)
+        stepper->step(FORWARD, steps);
+    else
+        stepper->step(REVERSE, steps);
+
     digitalWrite(pin_driver, HIGH);
 }
