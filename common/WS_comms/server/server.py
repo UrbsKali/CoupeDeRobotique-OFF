@@ -178,7 +178,6 @@ class WServer:
                 LogLevels.INFO,
             )
 
-
             web.run_app(self._app, host=self.__host, port=self.__port)
         except Exception as error:
             self.__logger.log(
