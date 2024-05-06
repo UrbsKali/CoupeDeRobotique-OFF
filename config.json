@@ -199,6 +199,12 @@
           "deploy_angle": 180,
           "undeploy_angle": 81,
           "detach_delay": 500
+        },
+        "left": {
+          "pin": 8,
+          "deploy_angle": 180,
+          "undeploy_angle": 81,
+          "detach_delay": 500
         }
       },
       "elevator": {
