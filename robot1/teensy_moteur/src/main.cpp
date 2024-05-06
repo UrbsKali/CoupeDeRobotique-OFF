@@ -8,12 +8,12 @@
 
 // PID
 #define MAX_PWM 160
-#define Kp 4.4
+#define Kp 5.0
 #define Ki 0.0
-#define Kd 0.05
+#define Kd 0.0
 
 #define RIGHT_MOTOR_POWER_FACTOR 1.0
-#define LEFT_MOTOR_POWER_FACTOR 1.18
+#define LEFT_MOTOR_POWER_FACTOR 1.0
 
 // Default position
 #define START_X 0.0
@@ -23,19 +23,19 @@
 // Creation Rolling Basis
 // New encoder
 #define ENCODER_RESOLUTION 600
-#define CENTER_DISTANCE 29.01
+#define CENTER_DISTANCE 33.57
 #define WHEEL_DIAMETER 6.1
 
 // Motor Left
-#define L_ENCA 11
-#define L_ENCB 12
+#define L_ENCA 12
+#define L_ENCB 11
 #define L_PWM 5
 #define L_IN2 4
 #define L_IN1 3
 
 // Motor Right
-#define R_ENCA 13 
-#define R_ENCB 14
+#define R_ENCA 14 // Va te faire foutre (Flo)
+#define R_ENCB 13 // Si rien ne marche change les pins
 #define R_PWM 2
 #define R_IN2 0
 #define R_IN1 1
@@ -253,20 +253,18 @@ extern void handle_callback(Com *com);
 /******* Attach Interrupt *******/
 inline void left_motor_read_encoder()
 {
-  if (digitalReadFast(L_ENCB) > 0)
-    rolling_basis_ptr->left_motor->ticks++;
+  if (digitalRead(L_ENCB))
+      rolling_basis_ptr->left_motor->ticks--;
   else
-    rolling_basis_ptr->left_motor->ticks--;
-
-  com->print("left");
+      rolling_basis_ptr->left_motor->ticks++;
 }
 
 inline void right_motor_read_encoder()
 {
-  if (digitalReadFast(R_ENCB) > 0)
-    rolling_basis_ptr->right_motor->ticks++;
+  if (digitalRead(R_ENCB))
+      rolling_basis_ptr->right_motor->ticks--;
   else
-    rolling_basis_ptr->right_motor->ticks--;
+      rolling_basis_ptr->right_motor->ticks++;
 }
 
 // Globales variables
