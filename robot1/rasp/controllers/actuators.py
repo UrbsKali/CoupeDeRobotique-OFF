@@ -56,9 +56,9 @@ class Actuators(Teensy):
             None
         """
         if steps < 0:
-            direction = 0
+            direction = False
         else:
-            direction = 1
+            direction = True
         msg = (
             self.Command.StepperStep
             + struct.pack("<i", steps)
