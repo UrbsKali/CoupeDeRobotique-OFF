@@ -4,11 +4,14 @@
 #include <util/atomic.h>
 #include <messages.h>
 
+#include <string>
+
+
 #define INACTIVE_DELAY 4000
 
 // PID
 #define MAX_PWM 160
-#define Kp 5.0
+#define Kp 8.0
 #define Ki 0.0
 #define Kd 0.0
 
@@ -245,7 +248,6 @@ void set_home(byte *msg, byte size)
   com->send_msg((byte *)&fin_msg, sizeof(msg_Action_Finished));
 }
 
-
 void (*functions[256])(byte *msg, byte size);
 
 extern void handle_callback(Com *com);
@@ -253,7 +255,7 @@ extern void handle_callback(Com *com);
 /******* Attach Interrupt *******/
 inline void left_motor_read_encoder()
 {
-  if (!digitalRead(L_ENCB)) // Reverse encoder 
+  if (digitalRead(L_ENCB))
       rolling_basis_ptr->left_motor->ticks--;
   else
       rolling_basis_ptr->left_motor->ticks++;
@@ -346,9 +348,8 @@ void handle()
 {
   if (current_action == nullptr || current_action->is_finished())
   {
-    if (keep_curr_pos_when_no_action){
+    if (keep_curr_pos_when_no_action)
       rolling_basis_ptr->keep_position(last_ticks_position.right, last_ticks_position.left);
-    }
     return;
   }
 
