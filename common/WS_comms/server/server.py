@@ -126,14 +126,6 @@ class WServer:
         asyncio.get_event_loop().stop()
         self._app._loop.stop()
 
-    async def shutdown(self, server, signal, loop):
-        print(f"Received exit signal {signal.name}...")
-        server.close()
-        await server.wait_closed()
-        await self._app.shutdown()
-        await self._app.cleanup()
-        loop.stop()
-
     def add_background_task(
         self, task: callable, *args, name: str = "", **kwargs
     ) -> None:
@@ -177,8 +169,6 @@ class WServer:
                 f"WServer started, url: [ws://{self.__host}:{self.__port}]",
                 LogLevels.INFO,
             )
-
-
             web.run_app(self._app, host=self.__host, port=self.__port)
         except Exception as error:
             self.__logger.log(
