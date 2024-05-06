@@ -54,7 +54,7 @@ class WServerRouteManager:
         #    )
         return client_name
 
-    def get_client(self, name: str) -> list[aiohttp.web_ws.WebSocketResponse] | []:
+    def get_client(self, name: str) -> list[aiohttp.web_ws.WebSocketResponse]:
         """
         Get a client by its source value (its name).
         :param name:
