@@ -42,7 +42,6 @@ class Actuators(Teensy):
         pin_dir: int,
         pin_step: int,
         pin_driver: int,
-        driver_on: bool = False,
     ) -> None:
         """
         Moves the stepper motor a specified number of steps. Note that the number of motor pin can change depending on the motor.
@@ -65,7 +64,6 @@ class Actuators(Teensy):
             + struct.pack("<i", steps)
             + struct.pack("<?", direction)
             + struct.pack("<i", speed)
-            + struct.pack("<?", driver_on)
             + struct.pack("<B", pin_dir)
             + struct.pack("<B", pin_step)
             + struct.pack("<B", pin_driver)

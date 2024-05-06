@@ -23,19 +23,18 @@ struct msg_Servo_Go_To
 struct msg_Servo_Go_To_Detach
 {
     byte command = SERVO_GO_TO_DETACH;
-    byte pin;   // pin to which the servo is connected
-    byte angle; // angle to which the servo should be moved in degrees
-    int detach_delay;  // delay in milliseconds before detaching the servo
+    byte pin;         // pin to which the servo is connected
+    byte angle;       // angle to which the servo should be moved in degrees
+    int detach_delay; // delay in milliseconds before detaching the servo
 };
 
 struct msg_Stepper_Go_To
 {
     byte command = STEPPER_STEP;
-    int steps; // total number of steps this motor can take
-    bool dir;  // direction of the motor
-    int speed; // speed
-    bool driver_on; // driver on value
-    byte pin_dir;         // pin to which the direction pin is connected
-    byte pin_step;        // pin to which the step pin is connected 
-    byte pin_driver;      // pin to which the driver pin is connected  
+    int steps;       // total number of steps this motor can take
+    bool dir;        // direction of the motor
+    int speed;       // speed
+    byte pin_dir;    // pin to which the direction pin is connected
+    byte pin_step;   // pin to which the step pin is connected
+    byte pin_driver; // pin to which the driver pin is connected
 };
