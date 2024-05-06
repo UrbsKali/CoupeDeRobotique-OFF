@@ -97,7 +97,9 @@ class LEDStrip:
             Colors.RED if state else Colors.GREEN, self.led_indexes["acs_trigger"]
         )
 
-    def lidar_direction(self, angle: float, max_angle: float, min_angle: float = 0.0):
+    def lidar_direction(
+        self, angle: float | None, max_angle: float, min_angle: float = 0.0
+    ):
         """Lights up led in given direction (proportionally)
 
         Args:
@@ -105,16 +107,23 @@ class LEDStrip:
             max_angle (float): max possible angle
             min_angle (float): min possible angle (default 0.0)
         """
-        index = int(
-            (angle - min_angle)
-            / (max_angle - min_angle)
-            * len(self.led_indexes["lidar"])
-        )
-        self.set_color(
-            Color(100, 100, 100),
-            self.led_indexes["lidar"][:index] + self.led_indexes["lidar"][index + 1 :],
-        )
-        self.set_color(Color(100, 0, 0), self.led_indexes["lidar"][index])
+        if angle == None:
+            self.set_color(
+                Colors.YELLOW,
+                self.led_indexes["lidar"],
+            )
+        else:
+            index = int(
+                (angle - min_angle)
+                / (max_angle - min_angle)
+                * len(self.led_indexes["lidar"])
+            )
+            self.set_color(
+                Colors.WHITE,
+                self.led_indexes["lidar"][:index]
+                + self.led_indexes["lidar"][index + 1 :],
+            )
+            self.set_color(Colors.RED, self.led_indexes["lidar"][index])
 
     def set_progress(self, total_duration, current_progress):
         progress = int(

@@ -34,6 +34,18 @@ def get_ennemy_angle(self, rads=False, relative=False) -> float | None:
         angle_abs if not relative else angle_abs - self.rolling_basis.odometrie.theta
     )
 
+    if not rads and angle > 180:
+        angle -= 180
+
+    if not rads and angle < -180:
+        angle += 180
+
+    if rads and angle > math.pi:
+        angle -= math.pi
+
+    if rads and angle < -math.pi:
+        angle += math.pi
+
     return math.degrees(angle) if not rads else angle
 
 
