@@ -71,6 +71,7 @@ class MainBrain(Brain):
         vertical_god_hand,
         deploy_right_solar_panel,
         undeploy_right_solar_panel,
+        avoid_obstacle,
     )
 
     # Sensors functions
