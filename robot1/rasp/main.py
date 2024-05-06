@@ -117,14 +117,9 @@ if __name__ == "__main__":
         robot_buffer=CONFIG.ARENA_CONFIG["robot_buffer"],
     )  # must be declared from external calculus interface or switch on the robot
 
-    start_pos = OrientedPoint.from_Point(
-        arena.drop_zones[2].zone.centroid,
-        3.14 / 2,
-    )
-
     # Set start position
     start_pos = OrientedPoint.from_Point(
-        arena.zones["home"].centroid,
+        arena.drop_zones[start_zone_id].zone.centroid,
         math.pi / 2 if start_zone_id <= 2 else -math.pi / 2,
     )
     rolling_basis.set_odo(start_pos)
