@@ -85,7 +85,7 @@
     "strip_led": {
       "pin": 18,
       "brightness": 30,
-      "num_leds": 21,
+      "num_leds": 35,
       "frequency": 800000,
       "led_indexes": {
         "is_ready": 0,
@@ -227,7 +227,7 @@
       "elevator": {
         "up_steps": 1000,
         "down_steps": -1000,
-        "speed" : 4000,
+        "speed": 4000,
         "pin_dir": 13,
         "pin_step": 14,
         "driver_pin": 15,
@@ -241,8 +241,8 @@
       "min_angle": -0.785398,
       "max_angle": 3.926991,
       "min_distance_detection": 5.0,
-      "frontal_detection_angle": 50,
-      "semi_circular_detection_angle": 100
+      "frontal_detection_angle": 0.872665,
+      "semi_circular_detection_angle": 1.745329
     }
   },
   "arena": {

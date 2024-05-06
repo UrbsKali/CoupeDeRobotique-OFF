@@ -18,11 +18,11 @@ from sensors import Lidar
 from brains.acs import AntiCollisionMode, AntiCollisionHandle
 
 
-def get_ennemy_angle(self, rads=False, relative=False) -> float | None:
+def get_ennemy_angle(self) -> float | None:
     if self.arena.ennemy_position == None:
         return None
 
-    angle_abs = (
+    angle = (
         math.atan(
             (self.arena.ennemy_position.x - self.rolling_basis.odometrie.x)
             / (self.arena.ennemy_position.y - self.rolling_basis.odometrie.y)
@@ -30,23 +30,13 @@ def get_ennemy_angle(self, rads=False, relative=False) -> float | None:
         - self.rolling_basis.odometrie.theta
     )
 
-    angle = (
-        angle_abs if not relative else angle_abs - self.rolling_basis.odometrie.theta
-    )
+    if angle > math.pi:
+        angle -= 2 * math.pi
 
-    if not rads and angle > 180:
-        angle -= 180
+    if angle < -math.pi:
+        angle += 2 * math.pi
 
-    if not rads and angle < -180:
-        angle += 180
-
-    if rads and angle > math.pi:
-        angle -= math.pi
-
-    if rads and angle < -math.pi:
-        angle += math.pi
-
-    return math.degrees(angle) if not rads else angle
+    return angle
 
 
 @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
@@ -84,7 +74,7 @@ async def compute_ennemy_position(self):
     )
 
     self.logger.log(
-        f"Ennemy position computed: {self.arena.ennemy_position if self.arena.ennemy_position is not None else 'None'}, at absolute/relative angle: {(str(round(self.get_ennemy_angle())) + '/' + str(round(self.get_ennemy_angle(relative=True)))) if self.arena.ennemy_position is not None else 'None'} and distance: {math.sqrt(pow(self.arena.ennemy_position.x - self.rolling_basis.odometrie.x, 2) + pow(self.arena.ennemy_position.y - self.rolling_basis.odometrie.y, 2)) if self.arena.ennemy_position is not None else 'None'}",
+        f"Ennemy position computed: {self.arena.ennemy_position if self.arena.ennemy_position is not None else 'None'}, at relative angle: {str(round(math.degrees(self.get_ennemy_angle()))) if self.arena.ennemy_position is not None else 'None'} and distance: {math.sqrt(pow(self.arena.ennemy_position.x - self.rolling_basis.odometrie.x, 2) + pow(self.arena.ennemy_position.y - self.rolling_basis.odometrie.y, 2)) if self.arena.ennemy_position is not None else 'None'}",
         LogLevels.DEBUG,
     )
 
@@ -102,14 +92,11 @@ async def compute_ennemy_position(self):
             if self.anticollision_mode == AntiCollisionMode.CIRCULAR:
                 trigger_acs = True
             if self.anticollision_mode == AntiCollisionMode.FRONTAL:
-                if (
-                    abs(self.get_ennemy_angle(relative=True))
-                    < CONFIG.LIDAR_FRONTAL_DETECTION_ANGLE
-                ):
+                if abs(self.get_ennemy_angle()) < CONFIG.LIDAR_FRONTAL_DETECTION_ANGLE:
                     trigger_acs = True
             if self.anticollision_mode == AntiCollisionMode.SEMI_CIRCULAR:
                 if (
-                    abs(self.get_ennemy_angle(relative=True))
+                    abs(self.get_ennemy_angle())
                     < CONFIG.LIDAR_SEMI_CIRCULAR_DETECTION_ANGLE
                 ):
                     trigger_acs = True
@@ -125,7 +112,8 @@ async def compute_ennemy_position(self):
         self.leds.acs_state(False)
 
     self.leds.lidar_direction(
-        self.get_ennemy_angle(True),
+        self.get_ennemy_angle(),
+        # Config values are centered to the right of the Lidar, but we have since switched to being centered on the front so we just balance out the extremums
         (CONFIG.LIDAR_MAX_ANGLE - CONFIG.LIDAR_MIN_ANGLE) / 2,
         -(CONFIG.LIDAR_MAX_ANGLE - CONFIG.LIDAR_MIN_ANGLE) / 2,
     )
