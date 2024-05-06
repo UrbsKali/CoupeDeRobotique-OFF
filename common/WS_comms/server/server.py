@@ -177,15 +177,7 @@ class WServer:
                 f"WServer started, url: [ws://{self.__host}:{self.__port}]",
                 LogLevels.INFO,
             )
-            if self.__ping_pong_clients_interval is not None:
-                self.add_background_task(
-                    self.__ping_pong_clients_task,
-                    interval=self.__ping_pong_clients_interval,
-                )
-                self.__logger.log(
-                    f"Ping pong mode activated, interval: [{self.__ping_pong_clients_interval}]",
-                    LogLevels.DEBUG,
-                )
+
 
             web.run_app(self._app, host=self.__host, port=self.__port)
         except Exception as error:
