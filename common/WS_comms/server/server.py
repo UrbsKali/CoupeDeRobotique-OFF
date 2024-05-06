@@ -174,4 +174,4 @@ class WServer:
             )
             time.sleep(5)
         finally:
-            loop.close()
+            self._app._loop.stop()
