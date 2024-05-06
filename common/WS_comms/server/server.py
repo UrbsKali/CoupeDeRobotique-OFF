@@ -138,6 +138,7 @@ class WServer:
 
     def run(self) -> None:
         loop = asyncio.get_event_loop()
+
         def handle_exit():
             self.__logger.log("WServer stopped by user request.", LogLevels.INFO)
             asyncio.create_task(self.stop())
