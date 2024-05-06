@@ -18,7 +18,7 @@ from sensors import Lidar
 from brains.acs import AntiCollisionMode, AntiCollisionHandle
 
 
-def get_ennemy_angle(self, relative=False):
+def get_ennemy_angle(self, rads=False, relative=False):
     angle_abs = (
         math.atan(
             (self.arena.ennemy_position.x - self.rolling_basis.odometrie.x)
@@ -27,11 +27,11 @@ def get_ennemy_angle(self, relative=False):
         - self.rolling_basis.odometrie.theta
     )
 
-    return (
-        math.degrees(angle_abs)
-        if not relative
-        else math.degrees(angle_abs - self.rolling_basis.odometrie.theta)
+    angle = (
+        angle_abs if not relative else angle_abs - self.rolling_basis.odometrie.theta
     )
+
+    return math.degrees(angle) if not rads else angle
 
 
 @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
