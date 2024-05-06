@@ -109,7 +109,11 @@ async def compute_ennemy_position(self):
         # self.logger.log("ACS not triggered", LogLevels.DEBUG)
         self.leds.acs_state(False)
 
-    self.leds.lidar_direction(self.get_ennemy_angle(True))
+    self.leds.lidar_direction(
+        self.get_ennemy_angle(True),
+        (CONFIG.LIDAR_MAX_ANGLE - CONFIG.LIDAR_MIN_ANGLE) / 2,
+        -(CONFIG.LIDAR_MAX_ANGLE - CONFIG.LIDAR_MIN_ANGLE) / 2,
+    )
 
 
 def pol_to_abs_cart(self, polars: np.ndarray) -> MultiPoint:
