@@ -18,11 +18,11 @@ class WServer:
     """
 
     def __init__(
-            self,
-            logger: Logger,
-            host: str,
-            port: int,
-            ping_pong_clients_interval: int = None,
+        self,
+        logger: Logger,
+        host: str,
+        port: int,
+        ping_pong_clients_interval: int = None,
     ) -> None:
         self.__logger = logger
 
@@ -84,7 +84,7 @@ class WServer:
         self._app.router.add_get(route, route_manager.routine)
 
     def add_background_task(
-            self, task: callable, *args, name: str = "", **kwargs
+        self, task: callable, *args, name: str = "", **kwargs
     ) -> None:
         """
         Add a new background task to the server. It is useful to execute task in parallel with the server.
@@ -150,7 +150,7 @@ class WServer:
         try:
             self.__logger.log(
                 f"WServer started, url: [ws://{self.__host}:{self.__port}]",
-                LogLevels.INFO
+                LogLevels.INFO,
             )
             # Ping pong mode does not work for now, if you want to use it,
             # you have to remove the non-unique client identifier or adapt
