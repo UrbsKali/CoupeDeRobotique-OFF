@@ -52,7 +52,7 @@ class WSender:
             # print("Error, no clients found.")
             return False
 
-        if type(clients) is not list:
+        if isinstance(clients, list):
             clients = [clients]
 
         for client in clients:
