@@ -111,20 +111,6 @@ class WServer:
         )
         self._app.on_startup.append(background_task)
 
-    def start(self) -> None:
-        """
-        Start the server. This start method allows to handle the exit signal (CTRL+C) to stop the server.
-        """
-        loop = asyncio.get_event_loop()
-
-        def handle_exit():
-            self.__logger.log("WServer stopped by user request.", LogLevels.INFO)
-            asyncio.create_task(self.stop())
-            loop.stop()
-
-        loop.add_signal_handler(signal.SIGINT, handle_exit)
-        web.run_app(self._app, host=self.__host, port=self.__port)
-
     async def stop(self):
         """
         Stop the server and all the background tasks.
@@ -151,6 +137,14 @@ class WServer:
         self._app._loop.stop()
 
     def run(self) -> None:
+        loop = asyncio.get_event_loop()
+        def handle_exit():
+            self.__logger.log("WServer stopped by user request.", LogLevels.INFO)
+            asyncio.create_task(self.stop())
+            loop.stop()
+
+        loop.add_signal_handler(signal.SIGINT, handle_exit)
+
         try:
             self.__logger.log(
                 f"WServer started, url: [ws://{self.__host}:{self.__port}]",
@@ -168,12 +162,11 @@ class WServer:
             #         f"Ping pong mode activated, interval: [{self.__ping_pong_clients_interval}]",
             #         LogLevels.DEBUG,
             #     )
-            self.start()
-
+            web.run_app(self._app, host=self.__host, port=self.__port)
         except Exception as error:
             self.__logger.log(
                 f"WServer error: ({error}), try to restart...", LogLevels.ERROR
             )
             time.sleep(5)
         finally:
-            self._app._loop.stop()
+            loop.stop()
