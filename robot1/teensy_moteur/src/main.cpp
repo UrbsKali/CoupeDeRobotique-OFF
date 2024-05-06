@@ -253,7 +253,7 @@ extern void handle_callback(Com *com);
 /******* Attach Interrupt *******/
 inline void left_motor_read_encoder()
 {
-  if (digitalRead(L_ENCB))
+  if (!digitalRead(L_ENCB)) // Reverse encoder 
       rolling_basis_ptr->left_motor->ticks--;
   else
       rolling_basis_ptr->left_motor->ticks++;
