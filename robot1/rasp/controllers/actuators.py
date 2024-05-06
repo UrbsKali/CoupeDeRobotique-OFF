@@ -42,7 +42,7 @@ class Actuators(Teensy):
         pin_dir: int,
         pin_step: int,
         pin_driver: int,
-        driver_on: bool = 0,
+        driver_on: bool = False,
     ) -> None:
         """
         Moves the stepper motor a specified number of steps. Note that the number of motor pin can change depending on the motor.
@@ -57,13 +57,13 @@ class Actuators(Teensy):
             None
         """
         if steps < 0:
-            dir = 0
+            direction = 0
         else:
-            dir = 1
+            direction = 1
         msg = (
             self.Command.StepperStep
             + struct.pack("<i", steps)
-            + struct.pack("<?", dir)
+            + struct.pack("<?", direction)
             + struct.pack("<i", speed)
             + struct.pack("<?", driver_on)
             + struct.pack("<B", pin_dir)
