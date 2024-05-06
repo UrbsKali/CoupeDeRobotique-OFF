@@ -196,8 +196,8 @@
       "solar_panel": {
         "right": {
           "pin": 8,
-          "deploy": 180,
-          "undeploy": 81,
+          "deploy_angle": 180,
+          "undeploy_angle": 81,
           "detach_delay": 500
         }
       },
