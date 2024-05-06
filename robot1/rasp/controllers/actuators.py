@@ -35,26 +35,30 @@ class Actuators(Teensy):
     #########################
 
     @Logger
-    def stepper_step(self, steps: int, dir : bool, pin_dir: int, pin_step: int) -> None:
+    def stepper_step(self, steps: int, speed : int, pin_dir: int, pin_step: int, pin_driver : int, driver_on : bool = 0) -> None:
         """
         Moves the stepper motor a specified number of steps. Note that the number of motor pin can change depending on the motor.
         2 or 5 pins are common.
 
         Args:
             steps (int): The number of steps to move the motor.
-            dir (bool): The direction of the motor.
             pin_dir (int): The pin number of the direction pin.
             pin_step (int): The pin number of the step pin.
 
         Returns:
             None
         """
+        if steps < 0: dir = 0
+        else: dir = 1
         msg = (
             self.Command.StepperStep
             + struct.pack("<i", steps)
             + struct.pack("<?", dir)
+            + struct.pack("<i", speed)
+            + struct.pack("<?", driver_on)
             + struct.pack("<B", pin_dir)
             + struct.pack("<B", pin_step)
+            + struct.pack("<B", pin_driver)
             # https://docs.python.org/3/library/struct.html#format-characters
         )
         self.send_bytes(msg)

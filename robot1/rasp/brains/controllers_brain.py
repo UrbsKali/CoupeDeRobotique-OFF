@@ -84,6 +84,9 @@ async def lift_elevator(self):
         dir=stepper["up_direction"],
         pin_dir=stepper["pin_dir"],
         pin_step=stepper["pin_step"],
+        speed=stepper["speed"],
+        driver_on=stepper["driver_on"],
+        pin_driver=stepper["pin_driver"],
     )
 
 
@@ -95,6 +98,9 @@ async def lower_elevator(self):
         dir=stepper["down_direction"],
         pin_dir=stepper["pin_dir"],
         pin_step=stepper["pin_step"],
+        speed=stepper["speed"],
+        driver_on=stepper["driver_on"],
+        pin_driver=stepper["pin_driver"],
     )
 
 

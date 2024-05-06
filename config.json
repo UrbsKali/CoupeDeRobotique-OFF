@@ -204,10 +204,13 @@
       "elevator": {
         "up_steps": 1000,
         "down_steps": -1000,
+        "speed" : 4000,
         "up_direction": 1,
         "down_direction": 0,
         "pin_dir": 21,
-        "pin_step": 22
+        "pin_step": 22,
+        "driver_pin": 20,
+        "driver_on": 0
       },
       "minimum_delay": 0.1
     },
