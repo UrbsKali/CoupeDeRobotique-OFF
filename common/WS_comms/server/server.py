@@ -18,11 +18,11 @@ class WServer:
     """
 
     def __init__(
-        self,
-        logger: Logger,
-        host: str,
-        port: int,
-        ping_pong_clients_interval: int = None,
+            self,
+            logger: Logger,
+            host: str,
+            port: int,
+            ping_pong_clients_interval: int = None,
     ) -> None:
         self.__logger = logger
 
@@ -84,7 +84,7 @@ class WServer:
         self._app.router.add_get(route, route_manager.routine)
 
     def add_background_task(
-        self, task: callable, *args, name: str = "", **kwargs
+            self, task: callable, *args, name: str = "", **kwargs
     ) -> None:
         """
         Add a new background task to the server. It is useful to execute task in parallel with the server.
@@ -123,6 +123,7 @@ class WServer:
             loop.stop()
 
         loop.add_signal_handler(signal.SIGINT, handle_exit)
+        web.run_app(self._app, host=self.__host, port=self.__port)
 
     async def stop(self):
         """
@@ -168,6 +169,7 @@ class WServer:
             #         LogLevels.DEBUG,
             #     )
             self.start()
+
         except Exception as error:
             self.__logger.log(
                 f"WServer error: ({error}), try to restart...", LogLevels.ERROR
