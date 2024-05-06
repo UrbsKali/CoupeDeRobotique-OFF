@@ -133,8 +133,8 @@ class WServer:
         await asyncio.gather(*tasks, return_exceptions=True)
 
         # Stop asyncio loop
-        asyncio.get_event_loop().stop()
-        self._app._loop.stop()
+        asyncio.get_event_loop().close()
+        self._app._loop.close()
 
     def add_background_task(
         self, task: callable, *args, name: str = "", **kwargs
@@ -179,6 +179,18 @@ class WServer:
                 f"WServer started, url: [ws://{self.__host}:{self.__port}]",
                 LogLevels.INFO,
             )
+            # Ping pong mode does not work for now, if you want to use it,
+            # you have to remove the non-unique client identifier or adapt
+            # current function to handle multiple clients with the same name
+            # if self.__ping_pong_clients_interval is not None:
+            #     self.add_background_task(
+            #         self.__ping_pong_clients_task,
+            #         interval=self.__ping_pong_clients_interval,
+            #     )
+            #     self.__logger.log(
+            #         f"Ping pong mode activated, interval: [{self.__ping_pong_clients_interval}]",
+            #         LogLevels.DEBUG,
+            #     )
             web.run_app(self._app, host=self.__host, port=self.__port)
         except Exception as error:
             self.__logger.log(
