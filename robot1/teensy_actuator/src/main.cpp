@@ -75,7 +75,7 @@ void setup()
   functions[SERVO_GO_TO] = &call_servo_go_to;
   functions[STEPPER_STEP] = &call_stepper_step;
   functions[SERVO_GO_TO_DETACH] = &call_servo_go_to_detach;
-
+  digitalWrite(15, HIGH); // Immediatly disable driver on the stepper, to prevent heating. Dirty solution.
   Serial.begin(115200);
 }
 
