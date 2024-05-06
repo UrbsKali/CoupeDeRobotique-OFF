@@ -41,6 +41,30 @@ async def undeploy_right_solar_panel(self):
 
 
 @Logger
+async def deploy_left_solar_panel(self):
+    await asyncio.sleep(CONFIG.MINIMUM_DELAY)
+    servo = CONFIG.SOLAR_PANEL_LEFT
+    self.actuators.update_servo(
+        pin=servo["pin"],
+        angle=servo["deploy_angle"],
+        detach=True,
+        detach_delay=servo["detach_delay"],
+    )
+
+
+@Logger
+async def undeploy_left_solar_panel(self):
+    await asyncio.sleep(CONFIG.MINIMUM_DELAY)
+    servo = CONFIG.SOLAR_PANEL_LEFT
+    self.actuators.update_servo(
+        pin=servo["pin"],
+        angle=servo["undeploy_angle"],
+        detach=True,
+        detach_delay=servo["detach_delay"],
+    )
+
+
+@Logger
 async def deploy_god_hand(self):
     await asyncio.sleep(CONFIG.MINIMUM_DELAY)
     servo = CONFIG.FRONT_GOD_HAND["deployment_servo"]
@@ -84,6 +108,9 @@ async def lift_elevator(self):
         dir=stepper["up_direction"],
         pin_dir=stepper["pin_dir"],
         pin_step=stepper["pin_step"],
+        speed=stepper["speed"],
+        driver_on=stepper["driver_on"],
+        pin_driver=stepper["pin_driver"],
     )
 
 
@@ -95,6 +122,9 @@ async def lower_elevator(self):
         dir=stepper["down_direction"],
         pin_dir=stepper["pin_dir"],
         pin_step=stepper["pin_step"],
+        speed=stepper["speed"],
+        driver_on=stepper["driver_on"],
+        pin_driver=stepper["pin_driver"],
     )
 
 

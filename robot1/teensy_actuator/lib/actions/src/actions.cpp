@@ -38,7 +38,9 @@ void servo_go_to(Servo *servo, int angle)
     servo->write(angle);
 }
 
-void stepper_step(Bonezegei_A4988* stepper, int steps, bool dir)
+void stepper_step(Bonezegei_A4988* stepper, int steps, bool dir, byte pin_driver, bool driver_on)
 {
+    digitalWrite(pin_driver, driver_on);
     stepper->step(dir, steps);
+    digitalWrite(pin_driver, !driver_on);
 }

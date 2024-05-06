@@ -69,6 +69,8 @@ class MainBrain(Brain):
         god_hand_demo,
         smart_go_to,
         vertical_god_hand,
+        deploy_right_solar_panel,
+        undeploy_right_solar_panel,
     )
 
     # Sensors functions

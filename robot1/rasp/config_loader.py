@@ -94,6 +94,7 @@ class CONFIG:
     MINIMUM_DELAY = ACTUATORS_CONFIG["minimum_delay"]
     ELEVATOR = ACTUATORS_CONFIG["elevator"]
     SOLAR_PANEL_RIGHT = ACTUATORS_CONFIG["solar_panel"]["right"]
+    SOLAR_PANEL_LEFT = ACTUATORS_CONFIG["solar_panel"]["left"]
 
     # Lidar
     LIDAR_CONFIG = SPECIFIC_CONFIG["lidar"]

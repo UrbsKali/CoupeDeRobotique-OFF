@@ -1,6 +1,7 @@
 from rpi_ws281x import PixelStrip, Color, RGBW
 from logger.log_tools import LogLevels
 from logger.logger import Logger
+import math
 
 LogColors = {
     LogLevels.DEBUG: Color(0, 0, 255),
@@ -92,7 +93,28 @@ class LEDStrip:
         )
 
     def acs_state(self, state):
-        self.set_color(Colors.RED if state else Colors.GREEN, self.led_indexes["acs"])
+        self.set_color(
+            Colors.RED if state else Colors.GREEN, self.led_indexes["acs_trigger"]
+        )
+
+    def lidar_direction(self, angle: float, max_angle: float, min_angle: float = 0.0):
+        """Lights up led in given direction (proportionally)
+
+        Args:
+            direction (float): angle in rads
+            max_angle (float): max possible angle
+            min_angle (float): min possible angle (default 0.0)
+        """
+        index = int(
+            (angle - min_angle)
+            / (max_angle - min_angle)
+            * len(self.led_indexes["lidar"])
+        )
+        self.set_color(
+            Color(100, 100, 100),
+            self.led_indexes["lidar"][:index] + self.led_indexes["lidar"][index + 1 :],
+        )
+        self.set_color(Color(100, 0, 0), self.led_indexes["lidar"][index])
 
     def set_progress(self, total_duration, current_progress):
         progress = int(

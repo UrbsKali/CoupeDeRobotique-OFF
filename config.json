@@ -91,7 +91,24 @@
         "is_ready": 0,
         "jack": 1,
         "team": 2,
-        "acs": 3,
+        "acs_trigger": 3,
+        "lidar": [
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34
+        ],
         "progress": [
           5,
           6,
@@ -196,18 +213,27 @@
       "solar_panel": {
         "right": {
           "pin": 8,
-          "deploy": 180,
-          "undeploy": 81,
+          "deploy_angle": 180,
+          "undeploy_angle": 81,
+          "detach_delay": 500
+        },
+        "left": {
+          "pin": 8,
+          "deploy_angle": 180,
+          "undeploy_angle": 81,
           "detach_delay": 500
         }
       },
       "elevator": {
         "up_steps": 1000,
         "down_steps": -1000,
+        "speed" : 4000,
         "up_direction": 1,
         "down_direction": 0,
         "pin_dir": 21,
-        "pin_step": 22
+        "pin_step": 22,
+        "driver_pin": 20,
+        "driver_on": 0
       },
       "minimum_delay": 0.1
     },

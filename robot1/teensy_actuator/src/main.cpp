@@ -54,9 +54,18 @@ void call_stepper_step(byte *msg, byte size)
         stepper_go_to_msg->pin_dir,
         stepper_go_to_msg->pin_step
       );
+      stepper->begin();
       steppers[stepper_go_to_msg->pin_dir]=stepper;
+      pinMode(stepper_go_to_msg->pin_driver, OUTPUT);
     }
-    stepper_step(steppers[stepper_go_to_msg->pin_dir],stepper_go_to_msg->steps,stepper_go_to_msg->dir);
+    steppers[stepper_go_to_msg->pin_dir]->setSpeed(stepper_go_to_msg->speed);
+    stepper_step(
+      steppers[stepper_go_to_msg->pin_dir],
+      stepper_go_to_msg->steps,
+      stepper_go_to_msg->dir,
+      stepper_go_to_msg->pin_driver,
+      stepper_go_to_msg->driver_on
+      );
 }
 
 
