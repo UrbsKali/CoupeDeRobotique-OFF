@@ -111,38 +111,63 @@ class WServer:
         )
         self._app.on_startup.append(background_task)
 
-    async def stop(self):
+    async def stop_server(self):
         """
         Stop the server and all the background tasks.
         :return:
         """
-        self.__logger.log("Received exit signal...", LogLevels.WARNING)
-
-        # Close all the ws connections for all the routes
-        self.__logger.log("Closing all connections...", LogLevels.INFO)
+        self.__logger.log("Received exit signal...", LogLevels.INFO)
         for route, manager in self.__route_managers.items():
-            self.__logger.log(
-                f"Closing all connections for [{route}] route.", LogLevels.DEBUG
-            )
             await manager.close_all_connections()
-
-        # End all the background tasks
         tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
         for task in tasks:
             task.cancel()
         await asyncio.gather(*tasks, return_exceptions=True)
-
-        # Stop asyncio loop
         asyncio.get_event_loop().stop()
-        asyncio.get_running_loop().stop()
         self._app._loop.stop()
+
+    async def shutdown(self, server, signal, loop):
+        print(f"Received exit signal {signal.name}...")
+        server.close()
+        await server.wait_closed()
+        await self._app.shutdown()
+        await self._app.cleanup()
+        loop.stop()
+
+    def add_background_task(
+        self, task: callable, *args, name: str = "", **kwargs
+    ) -> None:
+        """
+        Add a new background task to the server. It is useful to execute task in parallel with the server.
+        * The task have to be a coroutine (async function).
+        * To create the task we add a key in the app dictionary with the name of the task.
+        * The task will be created when the server will start.
+        * Format: add_background_task(func, (optional) func_params, (optional) name)
+        :param task:
+        :param args:
+        :param name:
+        :param kwargs:
+        :return:
+        """
+        name = task.__name__ if name == "" else name
+
+        async def background_task(app):
+            task_instance = asyncio.create_task(task(*args, **kwargs))
+            app[name] = task_instance
+            self.__background_tasks.add(task_instance)
+
+        self.__logger.log(
+            f"New background task added [{name}]",
+            LogLevels.DEBUG,
+        )
+        self._app.on_startup.append(background_task)
 
     def run(self) -> None:
         loop = asyncio.get_event_loop()
 
         def handle_exit():
             self.__logger.log("WServer stopped by user request.", LogLevels.INFO)
-            asyncio.create_task(self.stop())
+            asyncio.create_task(self.stop_server())
             loop.stop()
 
         loop.add_signal_handler(signal.SIGINT, handle_exit)
@@ -150,20 +175,18 @@ class WServer:
         try:
             self.__logger.log(
                 f"WServer started, url: [ws://{self.__host}:{self.__port}]",
-                LogLevels.INFO
+                LogLevels.INFO,
             )
-            # Ping pong mode does not work for now, if you want to use it,
-            # you have to remove the non-unique client identifier or adapt
-            # current function to handle multiple clients with the same name
-            # if self.__ping_pong_clients_interval is not None:
-            #     self.add_background_task(
-            #         self.__ping_pong_clients_task,
-            #         interval=self.__ping_pong_clients_interval,
-            #     )
-            #     self.__logger.log(
-            #         f"Ping pong mode activated, interval: [{self.__ping_pong_clients_interval}]",
-            #         LogLevels.DEBUG,
-            #     )
+            if self.__ping_pong_clients_interval is not None:
+                self.add_background_task(
+                    self.__ping_pong_clients_task,
+                    interval=self.__ping_pong_clients_interval,
+                )
+                self.__logger.log(
+                    f"Ping pong mode activated, interval: [{self.__ping_pong_clients_interval}]",
+                    LogLevels.DEBUG,
+                )
+
             web.run_app(self._app, host=self.__host, port=self.__port)
         except Exception as error:
             self.__logger.log(
@@ -171,4 +194,4 @@ class WServer:
             )
             time.sleep(5)
         finally:
-            loop.stop()
+            loop.close()
