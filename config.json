@@ -241,8 +241,8 @@
       "min_angle": -0.785398,
       "max_angle": 3.926991,
       "min_distance_detection": 5.0,
-      "frontal_detection_angle": 50,
-      "semi_circular_detection_angle": 100
+      "frontal_detection_angle": 0.872665,
+      "semi_circular_detection_angle": 1.745329
     }
   },
   "arena": {
