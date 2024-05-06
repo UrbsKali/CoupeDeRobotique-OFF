@@ -59,7 +59,7 @@ class Actuators(Teensy):
         msg = (
             self.Command.StepperStep
             + struct.pack("<i", abs(steps))
-            + struct.pack("<?", (steps < 0))
+            + struct.pack("<?", (steps >= 0))
             + struct.pack("<i", speed)
             + struct.pack("<B", pin_dir)
             + struct.pack("<B", pin_step)
