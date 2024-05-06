@@ -55,14 +55,11 @@ class Actuators(Teensy):
         Returns:
             None
         """
-        if steps < 0:
-            direction = False
-        else:
-            direction = True
+
         msg = (
             self.Command.StepperStep
-            + struct.pack("<i", steps)
-            + struct.pack("<?", direction)
+            + struct.pack("<i", abs(steps))
+            + struct.pack("<?", (steps < 0))
             + struct.pack("<i", speed)
             + struct.pack("<B", pin_dir)
             + struct.pack("<B", pin_step)
