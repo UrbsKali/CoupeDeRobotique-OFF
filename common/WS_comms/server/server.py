@@ -170,7 +170,7 @@ class WServer:
         def handle_exit():
             self.__logger.log("WServer stopped by user request.", LogLevels.INFO)
             asyncio.create_task(self.stop_server())
-            loop.stop()
+            loop.close()
 
         loop.add_signal_handler(signal.SIGINT, handle_exit)
 
