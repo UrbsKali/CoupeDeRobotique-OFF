@@ -15,6 +15,10 @@ class WServerRouteManager:
         self.receiver = receiver
         self.sender = sender
 
+        # Clients set format:
+        # {
+        #   "client_name": [client_ws_connection, ...]
+        # }
         self.clients = {}
 
     def add_client(
@@ -28,8 +32,6 @@ class WServerRouteManager:
         :param client:
         :return:
         """
-
-        # client_name = request.headers.get("sender")
         # Use get URL value instead
         client_name = request.query.get("sender")
 
@@ -38,28 +40,44 @@ class WServerRouteManager:
             raise ValueError(
                 "New client does not have a sender value in url parameter. CONNECTION REFUSED."
             )
-        if self.clients.get(client_name) is not None:
-            raise ValueError(
-                f"Client with name [{client_name}] already exists. CONNECTION REFUSED."
-            )
+        # Check if the client name already exists
+        if self.clients.get(client_name) is None:
+            self.clients[client_name] = []
 
         # Add the new client associated to the source value
-        self.clients[client_name] = client
+        self.clients[client_name].append(client)
 
+        # Old version with unique name per client
+        # if self.clients.get(client_name) is not None:
+        #    raise ValueError(
+        #        f"Client with name [{client_name}] already exists. CONNECTION REFUSED."
+        #    )
         return client_name
 
-    def get_client(self, name: str) -> aiohttp.web_ws.WebSocketResponse or None:
+    def get_client(self, name: str) -> list[aiohttp.web_ws.WebSocketResponse]:
         """
         Get a client by its source value (its name).
         :param name:
-        :return:
+        :return: list of clients associated to the source name
         """
         # if self.clients.get(name) is None:
         #    raise ValueError(f"Client with source [{name}] does not exist.")
-        return self.clients.get(name)
+        return self.clients.get(name, [])
 
     def get_all_clients(self):
-        return list(self.clients.values())
+        # Concatenate all clients in a list
+        return [item for sublist in list(self.clients.values()) for item in sublist]
+
+    async def close_all_connections(self):
+        """
+        Close all active WebSocket connections.
+        """
+        # Loop through all clients and close each WebSocket connection
+        for client_name, client in self.get_all_clients():
+            if not client.closed:
+                await client.close()
+            print(f"Closed connection for {client_name}")
+        self.clients.clear()
 
     async def routine(
         self, request: aiohttp.web_request.Request
