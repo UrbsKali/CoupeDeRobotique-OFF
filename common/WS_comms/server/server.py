@@ -116,13 +116,23 @@ class WServer:
         Stop the server and all the background tasks.
         :return:
         """
-        self.__logger.log("Received exit signal...", LogLevels.INFO)
+        self.__logger.log("Received exit signal...", LogLevels.WARNING)
+
+        # Close all the ws connections for all the routes
+        self.__logger.log("Closing all connections...", LogLevels.INFO)
         for route, manager in self.__route_managers.items():
+            self.__logger.log(
+                f"Closing all connections for [{route}] route.", LogLevels.DEBUG
+            )
             await manager.close_all_connections()
+
+        # End all the background tasks
         tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
         for task in tasks:
             task.cancel()
         await asyncio.gather(*tasks, return_exceptions=True)
+
+        # Stop asyncio loop
         asyncio.get_event_loop().stop()
         self._app._loop.stop()
 
