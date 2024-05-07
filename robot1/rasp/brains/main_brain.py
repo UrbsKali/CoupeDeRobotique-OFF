@@ -137,10 +137,10 @@ class MainBrain(Brain):
         self.rolling_basis.set_odo(
             OrientedPoint(
                 (
-                    CONFIG.START_INFO_BY_TEAM[self.team]["x"],
-                    CONFIG.START_INFO_BY_TEAM[self.team]["y"],
+                    CONFIG.START_INFO_BY_TEAM[self.team]["start_x"],
+                    CONFIG.START_INFO_BY_TEAM[self.team]["start_y"],
                 ),
-                CONFIG.START_INFO_BY_TEAM[self.team]["theta"],
+                CONFIG.START_INFO_BY_TEAM[self.team]["start_theta"],
             )
         )
 
