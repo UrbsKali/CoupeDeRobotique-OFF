@@ -358,7 +358,14 @@ class RollingBasis(Teensy):
             self.stop_and_clear_queue()
             return 1
         elif (
-            distance(self.odometrie, position if not relative else position + start_odo)
+            distance(
+                self.odometrie,
+                (
+                    position
+                    if not relative
+                    else Point(position.x + start_odo.x, self.odometrie.y + start_odo.y)
+                ),
+            )
             <= tolerance
         ):
             self.logger.log(
