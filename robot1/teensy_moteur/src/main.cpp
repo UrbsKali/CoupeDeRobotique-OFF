@@ -11,9 +11,9 @@
 
 // PID
 #define MAX_PWM 160
-#define Kp 8.0
+#define Kp 30.0
 #define Ki 0.0
-#define Kd 0.0
+#define Kd 0.4
 
 #define RIGHT_MOTOR_POWER_FACTOR 1.0
 #define LEFT_MOTOR_POWER_FACTOR 1.0
