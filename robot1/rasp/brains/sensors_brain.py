@@ -21,22 +21,13 @@ from brains.acs import AntiCollisionMode, AntiCollisionHandle
 def get_ennemy_angle(self) -> float | None:
     if self.arena.ennemy_position == None:
         return None
-
-    angle = (
-        math.atan(
-            (self.arena.ennemy_position.x - self.rolling_basis.odometrie.x)
-            / (self.arena.ennemy_position.y - self.rolling_basis.odometrie.y)
-        )
-        - self.rolling_basis.odometrie.theta
-    )
-
-    if angle > math.pi:
-        angle -= 2 * math.pi
-
-    if angle < -math.pi:
-        angle += 2 * math.pi
-
-    return angle
+    else:
+        return (
+            math.atan2(
+                self.arena.ennemy_position.y - self.rolling_basis.odometrie.y,
+                self.arena.ennemy_position.x - self.rolling_basis.odometrie.x,
+            )
+        ) - self.rolling_basis.odometrie.theta
 
 
 @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)

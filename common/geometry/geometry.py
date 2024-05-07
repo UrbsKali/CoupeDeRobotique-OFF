@@ -48,7 +48,7 @@ class OrientedPoint(Point):
     def __init__(
         self,
         x_or_coords: float | Tuple[float, float],
-        y: float | None = None,
+        y_or_theta: float | None = None,
         theta: float = 0.0,
     ) -> (
         None
@@ -57,7 +57,7 @@ class OrientedPoint(Point):
             theta=(
                 theta
                 if not isinstance(x_or_coords, Tuple)
-                else (0.0 if y is None else y)
+                else (0.0 if y_or_theta is None else y_or_theta)
             )
         )
 
