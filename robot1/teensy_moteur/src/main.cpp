@@ -353,6 +353,10 @@ void handle()
   Point current_position = rolling_basis_ptr->get_current_position();
   last_ticks_position = rolling_basis_ptr->get_current_ticks();
 
+  // Set rolling_basis state as true when the action start
+  if (current_action->state == not_started)
+    rolling_basis_ptr->IS_RUNNING = true;
+  
   current_action->handle(
     current_position,
     last_ticks_position,
@@ -360,11 +364,10 @@ void handle()
   );
 
   // ABS (anti block system) send big pulsation to the motors when they are blocked
-  if(!rolling_basis_ptr->IS_RUNNING && !current_action->is_finished())
+  if(!rolling_basis_ptr->IS_RUNNING && current_action->state == in_progress)
   {
     rolling_basis_ptr->left_motor->set_motor(-1, MAX_PWM);
     rolling_basis_ptr->right_motor->set_motor(-1, MAX_PWM);
-
   }
 
   if (current_action->is_finished())
