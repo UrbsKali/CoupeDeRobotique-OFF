@@ -78,8 +78,8 @@
     },
     "team_switch": {
       "pin": 16,
-      "team_off": 0,
-      "team_on": 3
+      "team_off": 3,
+      "team_on": 0
     },
     "strip_led": {
       "pin": 18,
