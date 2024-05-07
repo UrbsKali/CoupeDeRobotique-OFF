@@ -348,7 +348,7 @@ class RollingBasis(Teensy):
         ) and self.queue.last_deleted_id < queue_id:
             await asyncio.sleep(0.2)
 
-        if Utils.time_since(start_time) >= timeout:
+        if Utils.time_since(start_time) >= timeout and timeout >= 0:
             self.logger.log(
                 f"Reached timeout in Go_To_And_Wait, clearing queue, at: {self.odometrie}",
                 LogLevels.WARNING,
