@@ -26,41 +26,6 @@ class MainBrain(Brain):
     This brain is the main controller of ROB (robot1).
     """
 
-    def __init__(
-        self,
-        logger: Logger,
-        ws_cmd: WServerRouteManager,
-        ws_pami: WServerRouteManager,
-        actuators: Actuators,
-        rolling_basis: RollingBasis,
-        lidar: Lidar,
-        logger_arena: Logger,
-        jack: PIN,
-        team_switch: PIN,
-        leds: LEDStrip,
-    ) -> None:
-        self.anticollision_mode: AntiCollisionMode = AntiCollisionMode(
-            CONFIG.ANTICOLLISION_MODE
-        )
-        self.anticollision_handle: AntiCollisionHandle = AntiCollisionHandle(
-            CONFIG.ANTICOLLISION_HANDLE
-        )
-        self.arena: MarsArena
-
-        self.rolling_basis: RollingBasis
-        self.jack: PIN
-        self.leds: LEDStrip
-        self.logger_arena: Logger
-        self.team_switch: PIN
-
-        # Init the brain
-        super().__init__(logger, self)
-
-        # Init CONFIG
-        self.logger.log(
-            f"Mode: {'zombie' if CONFIG.ZOMBIE_MODE else 'game'}", LogLevels.INFO
-        )
-
     # Controllers functions
     from brains.controllers_brain import (
         deploy_god_hand,
@@ -90,6 +55,48 @@ class MainBrain(Brain):
     # Com functions
     from brains.com_brain import zombie_mode
 
+    def __init__(
+        self,
+        logger: Logger,
+        ws_cmd: WServerRouteManager,
+        ws_pami: WServerRouteManager,
+        actuators: Actuators,
+        rolling_basis: RollingBasis,
+        lidar: Lidar,
+        logger_arena: Logger,
+        jack: PIN,
+        team_switch: PIN,
+        leds: LEDStrip,
+    ) -> None:
+
+        self.anticollision_mode: AntiCollisionMode = AntiCollisionMode(
+            CONFIG.ANTICOLLISION_MODE
+        )
+        self.anticollision_handle: AntiCollisionHandle = AntiCollisionHandle(
+            CONFIG.ANTICOLLISION_HANDLE
+        )
+
+        # Save this for later use (when re-creating the arena)
+        self.logger_arena: Logger
+
+        self.rolling_basis: RollingBasis
+        self.jack: PIN
+        self.leds: LEDStrip
+        self.team_switch: PIN
+
+        # Init the brain
+        super().__init__(logger, self)
+
+        # A default, almost dummy starting situation
+        self.team = CONFIG.DEFAULT_TEAM
+        self.arena: MarsArena = self.generate_up_to_date_arena()
+        self.reset_odo_to_start()
+
+        # Init CONFIG
+        self.logger.log(
+            f"Mode: {'zombie' if CONFIG.ZOMBIE_MODE else 'game'}", LogLevels.INFO
+        )
+
     """
         Tasks
     """
@@ -106,40 +113,50 @@ class MainBrain(Brain):
         # Check jack state
         self.leds.set_jack(False)
         while self.jack.digital_read():
-            await self.show_team_switch()
+            await self.show_team_led()
             await asyncio.sleep(0.1)
         self.leds.set_jack(True)
 
     @Brain.task(process=False, run_on_start=False)
     async def setup_teams(self):
-        if self.team_switch.digital_read():
-            start_zone_id = CONFIG.TEAM_SWITCH_ON
-            self.team = "y"
-            self.logger.log("Team yellow", LogLevels.INFO)
-        else:
-            start_zone_id = CONFIG.TEAM_SWITCH_OFF
-            self.team = "b"
-            self.logger.log("Team blue", LogLevels.INFO)
+
+        self.get_team_from_switch()
+
+        start_zone_id = CONFIG.START_INFO_BY_TEAM[self.team]["start_zone_id"]
+        self.logger.log(f"Team {self.team}", LogLevels.INFO)
 
         self.leds.set_team(self.team)
-        self.logger.log(
-            f"Game start, zone chosen by switch : {start_zone_id}", LogLevels.INFO
-        )
+
+        self.logger.log(f"Game start, zone chosen: {start_zone_id}", LogLevels.INFO)
 
         # Arena
-        self.arena = MarsArena(
-            start_zone_id,
+        self.arena = self.generate_up_to_date_arena()
+        self.reset_odo_to_start()
+
+    def reset_odo_to_start(self) -> None:
+        self.rolling_basis.set_odo(
+            OrientedPoint(
+                (
+                    CONFIG.START_INFO_BY_TEAM[self.team]["start_x"],
+                    CONFIG.START_INFO_BY_TEAM[self.team]["start_y"],
+                ),
+                CONFIG.START_INFO_BY_TEAM[self.team]["start_theta"],
+            )
+        )
+
+    def generate_up_to_date_arena(self) -> MarsArena:
+        return MarsArena(
+            CONFIG.START_INFO_BY_TEAM[self.team]["start_zone_id"],
             logger=self.logger_arena,
             border_buffer=CONFIG.ARENA_CONFIG["border_buffer"],
             robot_buffer=CONFIG.ARENA_CONFIG["robot_buffer"],
         )
 
-        self.rolling_basis.set_odo(
-            OrientedPoint.from_Point(
-                self.arena.zones["home"].centroid,
-                math.pi / 2 if start_zone_id <= 2 else -math.pi / 2,
-            )
-        )
+    def get_team_from_switch(self) -> None:
+        if self.team_switch.digital_read():
+            self.team = CONFIG.TEAM_SWITCH_ON
+        else:
+            self.team = CONFIG.TEAM_SWITCH_OFF
 
     @Brain.task(process=False, run_on_start=not CONFIG.ZOMBIE_MODE)
     async def start(self):
@@ -163,11 +180,9 @@ class MainBrain(Brain):
         self.logger.log("Game over", LogLevels.INFO, self.leds)
         exit()
 
-    async def show_team_switch(self):
-        if self.team_switch.digital_read():
-            self.leds.set_team("y")
-        else:
-            self.leds.set_team("b")
+    async def show_team_led(self):
+        self.get_team_from_switch()
+        self.leds.set_team(self.team)
 
     async def homologate1(self):
         await self.close_god_hand()

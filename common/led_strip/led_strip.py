@@ -107,7 +107,7 @@ class LEDStrip:
             max_angle (float): max possible angle
             min_angle (float): min possible angle (default 0.0)
         """
-        print(f"angle: {angle}")
+
         if angle == None:
             self.set_color(
                 Colors.YELLOW,
@@ -119,7 +119,7 @@ class LEDStrip:
                 / (max_angle - min_angle)
                 * len(self.led_indexes["lidar"])
             )
-            print(f"index: {index}")
+
             self.set_color(
                 Colors.WHITE,
                 self.led_indexes["lidar"][:index]

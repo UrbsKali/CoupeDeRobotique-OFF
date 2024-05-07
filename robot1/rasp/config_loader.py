@@ -71,6 +71,11 @@ class CONFIG:
     JACK_CONFIG = SPECIFIC_CONFIG["jack"]
     JACK_PIN = JACK_CONFIG["pin"]
 
+    # Team config
+    TEAM_CONFIG = SPECIFIC_CONFIG["team_config"]
+    DEFAULT_TEAM: str = TEAM_CONFIG["default_team"]
+    START_INFO_BY_TEAM: dict[str, dict] = TEAM_CONFIG["start_info_by_team"]
+
     # Team switch
     TEAM_SWITCH_CONFIG = SPECIFIC_CONFIG["team_switch"]
     TEAM_SWITCH_PIN = TEAM_SWITCH_CONFIG["pin"]

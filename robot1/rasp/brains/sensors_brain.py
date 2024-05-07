@@ -21,28 +21,18 @@ from brains.acs import AntiCollisionMode, AntiCollisionHandle
 def get_ennemy_angle(self) -> float | None:
     if self.arena.ennemy_position == None:
         return None
-
-    angle = (
-        math.atan(
-            (self.arena.ennemy_position.x - self.rolling_basis.odometrie.x)
-            / (self.arena.ennemy_position.y - self.rolling_basis.odometrie.y)
-        )
-        - self.rolling_basis.odometrie.theta
-    )
-
-    if angle > math.pi:
-        angle -= 2 * math.pi
-
-    if angle < -math.pi:
-        angle += 2 * math.pi
-
-    return angle
+    else:
+        return (
+            math.atan2(
+                self.arena.ennemy_position.y - self.rolling_basis.odometrie.y,
+                self.arena.ennemy_position.x - self.rolling_basis.odometrie.x,
+            )
+        ) - self.rolling_basis.odometrie.theta
 
 
 @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)
 async def compute_ennemy_position(self):
     polars: np.ndarray = self.lidar.scan_to_polars()
-    print(polars[1], polars[-1])
     # self.logger.log(f"Polars ({polars.shape}): {polars.tolist()}", LogLevels.INFO)
     obstacles: MultiPoint | Point = self.arena.remove_outside(
         self.pol_to_abs_cart(polars)
