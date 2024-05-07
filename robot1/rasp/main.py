@@ -103,7 +103,7 @@ if __name__ == "__main__":
     # Robot
     rolling_basis = RollingBasis(logger=logger_rolling_basis)
     rolling_basis.stop_and_clear_queue()
-    rolling_basis.set_pid(4.4, 0.0, 0.05)
+    rolling_basis.set_pid(30.0, 0.0, 0.4)
 
     # Actuators
     actuators = Actuators(logger=logger_actuators)
