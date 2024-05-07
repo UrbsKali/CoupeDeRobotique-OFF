@@ -326,7 +326,7 @@ class RollingBasis(Teensy):
             int: 0 if finished normally, 1 if timed out, 2 if finished without timeout but not at target position
         """
 
-        start_odo = self.odometrie
+        start_odo = Point(self.odometrie.x, self.odometrie.y)
 
         start_time = Utils.get_ts()
         queue_id = self.go_to(
