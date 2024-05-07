@@ -150,6 +150,7 @@ async def smart_go_to(
     *,  # force keyword arguments
     tolerance: float = 5,
     timeout: float = -1,  # in seconds
+    skip_and_clear_queue: bool = False,
     forward: bool = True,
     relative: bool = False,
     max_speed: int = 160,
@@ -166,6 +167,7 @@ async def smart_go_to(
 
     result: int = await self.rolling_basis.go_to_and_wait(
         position,
+        skip_and_clear_queue=skip_and_clear_queue,
         tolerance=tolerance,
         timeout=timeout,
         forward=forward,
@@ -184,6 +186,7 @@ async def smart_go_to(
         # ACS handling strategy:
         result = await self.avoid_obstacle(
             position,
+            skip_and_clear_queue=skip_and_clear_queue,
             tolerance=tolerance,
             timeout=timeout,
             forward=forward,
@@ -207,6 +210,7 @@ async def avoid_obstacle(
     self,
     original_target: Point,
     *,  # force keyword arguments
+    skip_and_clear_queue: bool = False,
     tolerance: float = 5,
     timeout: float = -1,  # in seconds
     forward: bool = True,
@@ -231,6 +235,7 @@ async def avoid_obstacle(
         await asyncio.sleep(2)
         return await self.smart_go_to(
             original_target,
+            skip_and_clear_queue=skip_and_clear_queue,
             tolerance=tolerance,
             timeout=timeout,
             forward=forward,
@@ -246,6 +251,8 @@ async def avoid_obstacle(
             deceleration_distance=deceleration_distance,
             fails=fails + 1,
         )
+    else:
+        raise Exception("No AntiCollisionHandle implementation?")
 
 
 async def go_best_zone(self, plant_zones: list[Plants_zone]):

@@ -188,7 +188,13 @@ class RollingBasis(Teensy):
             f"Teensy does not know the command {msg.hex()}", LogLevels.WARNING
         )
 
-    def append_to_queue(self, instruction: Instruction) -> int:
+    def append_to_queue(
+        self, instruction: Instruction, skip_and_clear_queue=False
+    ) -> int:
+
+        if skip_and_clear_queue:
+            self.queue.clear()
+
         new_id = self.queue.append(instruction)
 
         if len(self.queue) == 1:
@@ -210,6 +216,7 @@ class RollingBasis(Teensy):
         self,
         position: Point,
         *,  # force keyword arguments
+        skip_and_clear_queue: bool = False,
         forward: bool = True,
         relative: bool = False,
         max_speed: int = 160,
@@ -273,13 +280,17 @@ class RollingBasis(Teensy):
         )
         # https://docs.python.org/3/library/struct.html#format-characters
 
-        return self.append_to_queue(Instruction(Command.GO_TO_POINT, msg))
+        return self.append_to_queue(
+            Instruction(Command.GO_TO_POINT, msg),
+            skip_and_clear_queue=skip_and_clear_queue,
+        )
 
     @Logger
     async def go_to_and_wait(
         self,
         position: Point,
         *,  # force keyword arguments
+        skip_and_clear_queue: bool = False,
         tolerance: float = 5,
         timeout: float = -1,  # in seconds
         forward: bool = True,
@@ -318,6 +329,7 @@ class RollingBasis(Teensy):
         start_time = Utils.get_ts()
         queue_id = self.go_to(
             position,
+            skip_and_clear_queue=skip_and_clear_queue,
             forward=forward,
             relative=relative,
             max_speed=max_speed,
