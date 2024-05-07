@@ -73,6 +73,8 @@ class MainBrain(Brain):
         undeploy_right_solar_panel,
         deploy_left_solar_panel,
         undeploy_left_solar_panel,
+        deploy_team_solar_panel,
+        undeploy_team_solar_panel,
         avoid_obstacle,
     )
 
@@ -99,6 +101,10 @@ class MainBrain(Brain):
         # Setup things
         await self.setup()
         await self.wait_for_trigger()
+
+        # Solar panels stage
+        self.logger.log("Starting solar panels stage...", LogLevels.INFO, self.leds)
+        await self.solar_panels_stage()
 
         # Plant Stage
         self.logger.log("Starting plant stage...", LogLevels.INFO, self.leds)
@@ -321,6 +327,30 @@ class MainBrain(Brain):
             self.leds,
         )
         await self.go_and_drop(drop_target)
+
+    async def solar_panels_stage(self) -> int:
+
+        solar_panels_distances = [26, 21, 21]
+
+        for i in range(len(solar_panels_distances)):
+            await self.deploy_team_solar_panel()
+            go_to_result = await self.rolling_basis.go_to_and_wait(
+                Point(solar_panels_distances[i], 0),
+                relative=True,
+                **CONFIG.SPEED_PROFILES["cruise_speed"],
+                **CONFIG.PRECISION_PROFILES["classic_precision"],
+            )
+
+            if go_to_result != 0:
+                self.logger.log(
+                    f"Error going to solar panel {i}", LogLevels.WARNING, self.leds
+                )
+                break
+
+            self.logger.log(f"Finished solar panel {i}", LogLevels.INFO, self.leds)
+
+        self.undeploy_team_solar_panel()
+        return go_to_result
 
     @Brain.task(process=False, run_on_start=False)
     async def kill_rolling_basis(self, timeout=-1):

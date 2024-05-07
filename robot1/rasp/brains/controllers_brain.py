@@ -65,6 +65,22 @@ async def undeploy_left_solar_panel(self):
 
 
 @Logger
+async def deploy_team_solar_panel(self):
+    if self.team == "y":
+        await deploy_left_solar_panel()
+    else:
+        await deploy_right_solar_panel()
+
+
+@Logger
+async def undeploy_team_solar_panel(self):
+    if self.team == "y":
+        await undeploy_left_solar_panel()
+    else:
+        await undeploy_right_solar_panel()
+
+
+@Logger
 async def deploy_god_hand(self):
     await asyncio.sleep(CONFIG.MINIMUM_DELAY)
     servo = CONFIG.FRONT_GOD_HAND["deployment_servo"]
