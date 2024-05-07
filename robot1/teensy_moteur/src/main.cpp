@@ -4,9 +4,6 @@
 #include <util/atomic.h>
 #include <messages.h>
 
-#include <string>
-
-
 #define INACTIVE_DELAY 4000
 
 // PID
