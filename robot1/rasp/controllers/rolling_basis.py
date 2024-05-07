@@ -326,6 +326,8 @@ class RollingBasis(Teensy):
             int: 0 if finished normally, 1 if timed out, 2 if finished without timeout but not at target position
         """
 
+        start_odo = self.odometrie
+
         start_time = Utils.get_ts()
         queue_id = self.go_to(
             position,
@@ -355,7 +357,10 @@ class RollingBasis(Teensy):
             )
             self.stop_and_clear_queue()
             return 1
-        elif distance(self.odometrie, position) <= tolerance:
+        elif (
+            distance(self.odometrie, position if not relative else position + start_odo)
+            <= tolerance
+        ):
             self.logger.log(
                 f"Reached target in go_to_and_wait, at: {self.odometrie}",
                 LogLevels.INFO,
