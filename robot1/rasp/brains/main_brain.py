@@ -333,17 +333,21 @@ class MainBrain(Brain):
         solar_panels_distances = [26, 21, 21]
 
         for i in range(len(solar_panels_distances)):
+            self.logger.log(f"Doing solar panel {i}", LogLevels.INFO, self.leds)
             await self.deploy_team_solar_panel()
             go_to_result = await self.rolling_basis.go_to_and_wait(
                 Point(solar_panels_distances[i], 0),
                 relative=True,
+                timeout=20.0,
                 **CONFIG.SPEED_PROFILES["cruise_speed"],
                 **CONFIG.PRECISION_PROFILES["classic_precision"],
             )
 
             if go_to_result != 0:
                 self.logger.log(
-                    f"Error going to solar panel {i}", LogLevels.WARNING, self.leds
+                    f"Error going to solar panel {i}, go_to_and_wait returned: {go_to_result}",
+                    LogLevels.WARNING,
+                    self.leds,
                 )
                 break
 
