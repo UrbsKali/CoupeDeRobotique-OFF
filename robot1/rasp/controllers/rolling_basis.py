@@ -219,7 +219,7 @@ class RollingBasis(Teensy):
         correction_trajectory_speed: int = 160,
         acceleration_start_speed: int = 160,
         acceleration_distance: float = 0,
-        deceleration_end_speed: int = 160,  
+        deceleration_end_speed: int = 160,
         deceleration_distance: float = 0,
     ) -> int:
         """
