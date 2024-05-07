@@ -8,7 +8,14 @@ from config_loader import CONFIG
 
 from brain import Brain
 
-from geometry import OrientedPoint, Point, MultiPoint, is_empty, nearest_points
+from geometry import (
+    OrientedPoint,
+    Point,
+    MultiPoint,
+    is_empty,
+    nearest_points,
+    distance,
+)
 from WS_comms import WSmsg, WSclientRouteManager
 from arena import MarsArena, Plants_zone
 from logger import Logger, LogLevels
@@ -65,7 +72,12 @@ async def compute_ennemy_position(self):
     )
 
     self.logger.log(
-        f"Ennemy position computed: {self.arena.ennemy_position if self.arena.ennemy_position is not None else 'None'}, at relative angle: {str(round(math.degrees(self.get_ennemy_angle()))) if self.arena.ennemy_position is not None else 'None'} and distance: {math.sqrt(pow(self.arena.ennemy_position.x - self.rolling_basis.odometrie.x, 2) + pow(self.arena.ennemy_position.y - self.rolling_basis.odometrie.y, 2)) if self.arena.ennemy_position is not None else 'None'}",
+        (
+            f"Ennemy position computed: {self.arena.ennemy_position if self.arena.ennemy_position is not None else 'None'}"
+            + f", at relative angle: {str(round(math.degrees(self.get_ennemy_angle())))} and distance: {distance(self.arena.ennemy_position,self.rolling_basis.odometrie.y)}"
+            if self.arena.ennemy_position is not None
+            else ""
+        ),
         LogLevels.DEBUG,
     )
 
