@@ -88,6 +88,9 @@ class OrientedPoint(Point):
     def __str__(self) -> str:
         return f"{self.wkt}, theta: {self.theta}"
 
+    def __repr__(self) -> str:
+        return self.__str__()
+
     @classmethod
     def from_Point(cls, point: Point, theta: float = 0.0):
         return cls((point.x, point.y), theta)
