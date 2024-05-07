@@ -326,7 +326,22 @@ class RollingBasis(Teensy):
             int: 0 if finished normally, 1 if timed out, 2 if finished without timeout but not at target position
         """
 
-        start_odo = Point(self.odometrie.x, self.odometrie.y)
+        target_to_compare = (
+            Point(
+                position.x + self.position_offset.x, position.y + self.position_offset.y
+            )
+            if not relative
+            else Point(
+                math.cos(self.odometrie.theta) * position.x
+                - math.sin(self.odometrie.theta) * position.y
+                + self.position_offset.x
+                + self.odometrie.x,
+                math.sin(self.odometrie.theta) * position.x
+                + math.cos(self.odometrie.theta) * position.y
+                + self.position_offset.y
+                + self.odometrie.y,
+            )
+        )
 
         start_time = Utils.get_ts()
         queue_id = self.go_to(
@@ -352,22 +367,12 @@ class RollingBasis(Teensy):
 
         if Utils.time_since(start_time) >= timeout and timeout >= 0:
             self.logger.log(
-                f"Reached timeout in Go_To_And_Wait, clearing queue, at: {self.odometrie}, {distance(self.odometrie, position)} away",
+                f"Reached timeout in Go_To_And_Wait, clearing queue, at: {self.odometrie}, {distance(self.odometrie, target_to_compare)} away",
                 LogLevels.WARNING,
             )
             self.stop_and_clear_queue()
             return 1
-        elif (
-            distance(
-                self.odometrie,
-                (
-                    position
-                    if not relative
-                    else Point(start_odo.x + position.x, start_odo.y + position.y)
-                ),
-            )
-            <= tolerance
-        ):
+        elif distance(self.odometrie, target_to_compare) <= tolerance:
             self.logger.log(
                 f"Reached target in go_to_and_wait, at: {self.odometrie}",
                 LogLevels.INFO,
@@ -375,7 +380,7 @@ class RollingBasis(Teensy):
             return 0
         else:  # Should only mean ACS triggered or unplanned behaviour
             self.logger.log(
-                f"Didn't timeout in Go_To_And_Wait but did not arrive, at: {self.odometrie}, targeting : {position if not relative else Point(start_odo.x + position.x, start_odo.y + position.y)}, {distance(self.odometrie, (position if not relative else Point(start_odo.x + position.x, start_odo.y + position.y)))} away",
+                f"Didn't timeout in Go_To_And_Wait but did not arrive, at: {self.odometrie}, targeting : {target_to_compare}, {distance(self.odometrie, target_to_compare)} away",
                 LogLevels.WARNING,
             )
             # self.stop_and_clear_queue()
