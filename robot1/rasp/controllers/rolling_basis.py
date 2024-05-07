@@ -355,9 +355,9 @@ class RollingBasis(Teensy):
             )
             self.stop_and_clear_queue()
             return 1
-        elif distance(Point(self.odometrie.x, self.odometrie.y), position) <= tolerance:
+        elif distance(self.odometrie, position) <= tolerance:
             self.logger.log(
-                f"Reached target in go_to_and_wait, at: {self.odometrie}",
+                f"Reached target in go_to_and_wait, at: {self.odometrie}, {distance(self.odometrie, position)} away",
                 LogLevels.INFO,
             )
             return 0
