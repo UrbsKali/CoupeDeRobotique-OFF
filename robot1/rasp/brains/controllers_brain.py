@@ -67,17 +67,17 @@ async def undeploy_left_solar_panel(self):
 @Logger
 async def deploy_team_solar_panel(self):
     if self.team == "y":
-        await deploy_left_solar_panel()
+        await self.deploy_left_solar_panel()
     else:
-        await deploy_right_solar_panel()
+        await self.deploy_right_solar_panel()
 
 
 @Logger
 async def undeploy_team_solar_panel(self):
     if self.team == "y":
-        await undeploy_left_solar_panel()
+        await self.undeploy_left_solar_panel()
     else:
-        await undeploy_right_solar_panel()
+        await self.undeploy_right_solar_panel()
 
 
 @Logger
