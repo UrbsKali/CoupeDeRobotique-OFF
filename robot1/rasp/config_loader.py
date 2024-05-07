@@ -94,6 +94,7 @@ class CONFIG:
     ELEVATOR = ACTUATORS_CONFIG["elevator"]
     SOLAR_PANEL_RIGHT = ACTUATORS_CONFIG["solar_panel"]["right"]
     SOLAR_PANEL_LEFT = ACTUATORS_CONFIG["solar_panel"]["left"]
+    SOLAR_PANEL_DETACH_DELAY = ACTUATORS_CONFIG["solar_panel"]["detach_delay"]
 
     # Lidar
     LIDAR_CONFIG = SPECIFIC_CONFIG["lidar"]

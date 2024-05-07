@@ -24,7 +24,7 @@ async def deploy_right_solar_panel(self):
         pin=servo["pin"],
         angle=servo["deploy_angle"],
         detach=True,
-        detach_delay=servo["detach_delay"],
+        detach_delay=CONFIG.SOLAR_PANEL_DETACH_DELAY,
     )
 
 
@@ -36,7 +36,7 @@ async def undeploy_right_solar_panel(self):
         pin=servo["pin"],
         angle=servo["undeploy_angle"],
         detach=True,
-        detach_delay=servo["detach_delay"],
+        detach_delay=CONFIG.SOLAR_PANEL_DETACH_DELAY,
     )
 
 
@@ -48,7 +48,7 @@ async def deploy_left_solar_panel(self):
         pin=servo["pin"],
         angle=servo["deploy_angle"],
         detach=True,
-        detach_delay=servo["detach_delay"],
+        detach_delay=CONFIG.SOLAR_PANEL_DETACH_DELAY,
     )
 
 
@@ -60,7 +60,7 @@ async def undeploy_left_solar_panel(self):
         pin=servo["pin"],
         angle=servo["undeploy_angle"],
         detach=True,
-        detach_delay=servo["detach_delay"],
+        detach_delay=CONFIG.SOLAR_PANEL_DETACH_DELAY,
     )
 
 
