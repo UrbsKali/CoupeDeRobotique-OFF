@@ -4,7 +4,7 @@
 #include <util/atomic.h>
 #include <messages.h>
 
-#define INACTIVE_DELAY 4000
+#define INACTIVE_DELAY 5000
 
 // PID
 #define MAX_PWM 160
@@ -358,6 +358,14 @@ void handle()
     last_ticks_position,
     &rolling_basis_ptrs
   );
+
+  // ABS (anti block system) send big pulsation to the motors when they are blocked
+  if(!rolling_basis_ptr->IS_RUNNING && !current_action->is_finished())
+  {
+    rolling_basis_ptr->left_motor->set_motor(-1, MAX_PWM);
+    rolling_basis_ptr->right_motor->set_motor(-1, MAX_PWM);
+
+  }
 
   if (current_action->is_finished())
   {

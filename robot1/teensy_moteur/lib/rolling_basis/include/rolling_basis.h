@@ -54,7 +54,6 @@ public :
     void reset_position();
 
     // Motors action function
-
     void keep_position(long current_right_ticks, long current_left_ticks);
     void shutdown_motor();
 };
