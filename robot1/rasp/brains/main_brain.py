@@ -79,11 +79,6 @@ class MainBrain(Brain):
         # Save this for later use (when re-creating the arena)
         self.logger_arena: Logger
 
-        # A default, almost dummy starting situation
-        self.team = CONFIG.DEFAULT_TEAM
-        self.arena: MarsArena = self.generate_up_to_date_arena()
-        self.reset_odo_to_start()
-
         self.rolling_basis: RollingBasis
         self.jack: PIN
         self.leds: LEDStrip
@@ -91,6 +86,11 @@ class MainBrain(Brain):
 
         # Init the brain
         super().__init__(logger, self)
+
+        # A default, almost dummy starting situation
+        self.team = CONFIG.DEFAULT_TEAM
+        self.arena: MarsArena = self.generate_up_to_date_arena()
+        self.reset_odo_to_start()
 
         # Init CONFIG
         self.logger.log(
