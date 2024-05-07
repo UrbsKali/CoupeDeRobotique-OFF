@@ -11,7 +11,10 @@ void Speed_Driver::compute_acceleration_profile(Rolling_Basis_Params *rolling_ba
     {
         byte y_delta = this->max_speed - this->acceleration_params.offset;
         float distance_to_max_speed_ticks = (this->acceleration_params.distance * rolling_basis_params->encoder_resolution) / rolling_basis_params->wheel_perimeter;
-        this->acceleration_params.gamma = (float)y_delta / distance_to_max_speed_ticks;
+        if(distance_to_max_speed_ticks == 0.0f)
+            this->acceleration_params.gamma = 0.0f;
+        else
+            this->acceleration_params.gamma = (float)y_delta / distance_to_max_speed_ticks;
     }
 
     // Compute deceleration profile
@@ -19,7 +22,10 @@ void Speed_Driver::compute_acceleration_profile(Rolling_Basis_Params *rolling_ba
     {
         byte y_delta = this->max_speed - this->deceleration_params.offset;
         float distance_to_speed_down_ticks = this->end_ticks - (this->deceleration_params.distance * rolling_basis_params->encoder_resolution) / rolling_basis_params->wheel_perimeter;
-        this->deceleration_params.gamma = (float)y_delta / distance_to_speed_down_ticks;
+        if(distance_to_speed_down_ticks == 0.0f)
+            this->deceleration_params.gamma = 0.0f;
+        else
+            this->deceleration_params.gamma = (float)y_delta / distance_to_speed_down_ticks;
     }
 }
 
