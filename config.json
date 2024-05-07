@@ -212,16 +212,16 @@
       },
       "solar_panel": {
         "right": {
-          "pin": 8,
-          "deploy_angle": 180,
-          "undeploy_angle": 81,
-          "detach_delay": 500
+          "pin": 9,
+          "deploy_angle": 100,
+          "undeploy_angle": 12,
+          "detach_delay": 200
         },
         "left": {
           "pin": 8,
-          "deploy_angle": 180,
-          "undeploy_angle": 81,
-          "detach_delay": 500
+          "deploy_angle": 0,
+          "undeploy_angle": 82,
+          "detach_delay": 200
         }
       },
       "elevator": {
