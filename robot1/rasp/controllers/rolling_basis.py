@@ -375,7 +375,7 @@ class RollingBasis(Teensy):
             return 0
         else:  # Should only mean ACS triggered or unplanned behaviour
             self.logger.log(
-                f"Didn't timeout in Go_To_And_Wait but did not arrive, at: {self.odometrie}, {distance(self.odometrie, (position if not relative else Point(start_odo.x + position.x, start_odo.y + position.y)))} away",
+                f"Didn't timeout in Go_To_And_Wait but did not arrive, at: {self.odometrie}, targeting : {position if not relative else Point(start_odo.x + position.x, start_odo.y + position.y)}, {distance(self.odometrie, (position if not relative else Point(start_odo.x + position.x, start_odo.y + position.y)))} away",
                 LogLevels.WARNING,
             )
             # self.stop_and_clear_queue()
