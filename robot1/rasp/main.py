@@ -117,6 +117,7 @@ if __name__ == "__main__":
         ws_pami=ws_pami,
         rolling_basis=rolling_basis,
         lidar=lidar,
+        logger_arena=logger_arena,
         jack=jack_pin,
         team_switch=team_switch,
         leds=leds,

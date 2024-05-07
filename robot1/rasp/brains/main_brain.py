@@ -34,22 +34,24 @@ class MainBrain(Brain):
         actuators: Actuators,
         rolling_basis: RollingBasis,
         lidar: Lidar,
-        arena: MarsArena,
+        logger_arena: Logger,
         jack: PIN,
         team_switch: PIN,
         leds: LEDStrip,
     ) -> None:
-        self.team = arena.team
         self.anticollision_mode: AntiCollisionMode = AntiCollisionMode(
             CONFIG.ANTICOLLISION_MODE
         )
         self.anticollision_handle: AntiCollisionHandle = AntiCollisionHandle(
             CONFIG.ANTICOLLISION_HANDLE
         )
-        self.arena: MarsArena = None
+        self.arena: MarsArena
 
         self.rolling_basis: RollingBasis
         self.jack: PIN
+        self.leds: LEDStrip
+        self.logger_arena: Logger
+        self.team_switch: PIN
 
         # Init the brain
         super().__init__(logger, self)
@@ -112,12 +114,14 @@ class MainBrain(Brain):
     async def setup_teams(self):
         if self.team_switch.digital_read():
             start_zone_id = CONFIG.TEAM_SWITCH_ON
+            self.team = "y"
             self.logger.log("Team yellow", LogLevels.INFO)
-            self.leds.set_team("y")
         else:
             start_zone_id = CONFIG.TEAM_SWITCH_OFF
+            self.team = "b"
             self.logger.log("Team blue", LogLevels.INFO)
-            self.leds.set_team("b")
+
+        self.leds.set_team(self.team)
         self.logger.log(
             f"Game start, zone chosen by switch : {start_zone_id}", LogLevels.INFO
         )
@@ -125,7 +129,7 @@ class MainBrain(Brain):
         # Arena
         self.arena = MarsArena(
             start_zone_id,
-            logger=logger_arena,
+            logger=self.logger_arena,
             border_buffer=CONFIG.ARENA_CONFIG["border_buffer"],
             robot_buffer=CONFIG.ARENA_CONFIG["robot_buffer"],
         )
@@ -204,7 +208,7 @@ class MainBrain(Brain):
             )
             != 0
         ):
-            self.log("Failed", LogLevels.ERROR, self.leds)
+            self.logger.log("Failed", LogLevels.ERROR, self.leds)
             return 1
         else:
             # Final approach
@@ -236,10 +240,10 @@ class MainBrain(Brain):
                 )
                 != 0
             ):
-                self.log("Failed", LogLevels.ERROR, self.leds)
+                self.logger.log("Failed", LogLevels.ERROR, self.leds)
                 return 2
             else:
-                self.log("Success", LogLevels.INFO, self.leds)
+                self.logger.log("Success", LogLevels.INFO, self.leds)
                 return 0
 
     async def go_and_drop(self, target_drop_zone: Plants_zone) -> int:  # TODO
@@ -257,7 +261,7 @@ class MainBrain(Brain):
             )
             != 0
         ):
-            self.log("Failed", LogLevels.ERROR, self.leds)
+            self.logger.log("Failed", LogLevels.ERROR, self.leds)
             return 1
         else:
 
@@ -280,10 +284,10 @@ class MainBrain(Brain):
                 )
                 != 0
             ):
-                self.log("Failed", LogLevels.ERROR, self.leds)
+                self.logger.log("Failed", LogLevels.ERROR, self.leds)
                 return 2
             else:
-                self.log("Success", LogLevels.INFO, self.leds)
+                self.logger.log("Success", LogLevels.INFO, self.leds)
                 return 0
 
     @Brain.task(process=False, run_on_start=False, timeout=100)
