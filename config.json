@@ -136,24 +136,24 @@
         "precision": {
           "high_precision": {
             "next_position_delay": 100,
-            "action_error_auth": 30,
-            "traj_precision": 10
+            "action_error_auth": 15,
+            "traj_precision": 5
           },
           "classic_precision": {
             "next_position_delay": 100,
-            "action_error_auth": 30,
-            "traj_precision": 30
+            "action_error_auth": 15,
+            "traj_precision": 15
           },
           "low_precision": {
             "next_position_delay": 100,
-            "action_error_auth": 60,
-            "traj_precision": 60
+            "action_error_auth": 20,
+            "traj_precision": 30
           }
         },
         "speed": {
           "high_speed": {
-            "max_speed": 180,
-            "correction_trajectory_speed": 160,
+            "max_speed": 200,
+            "correction_trajectory_speed": 0,
             "acceleration_start_speed": 160,
             "acceleration_distance": 15,
             "deceleration_end_speed": 160,
