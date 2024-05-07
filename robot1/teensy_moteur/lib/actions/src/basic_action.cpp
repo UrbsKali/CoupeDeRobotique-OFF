@@ -68,7 +68,6 @@ void Get_Orientation::compute(Point current_point, Ticks current_ticks, Rolling_
         theta += 2 * PI;
     }
 
-   
     // Create the step action
     this->step_action = new Step_Rotation(theta, this->speed_driver, this->precision_params);
     this->step_action = new Step_Rotation(theta, this->speed_driver, this->precision_params);

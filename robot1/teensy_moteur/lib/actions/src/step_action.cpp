@@ -1,15 +1,12 @@
 #include <step_action.h>
 #include <com.h>
 
-#include <iostream>
-#include <string>
-
 
 // Step motor action generic class
 void Step_Action::check_end_of_action(Ticks current_ticks)
 {
-    long right_error = abs(this->right_ref + this->right_sign * this->total_ticks) - abs(current_ticks.right);
-    long left_error  = abs(this->left_ref  + this->left_sign * this->total_ticks)  - abs(current_ticks.left);
+    long right_error = abs(abs(this->right_ref + this->right_sign * this->total_ticks) - abs(current_ticks.right));
+    long left_error  = abs(abs(this->left_ref  + this->left_sign * this->total_ticks)  - abs(current_ticks.left));
 
     // Check if the robot is near the target position
     if ((long)this->precision_params->error_precision >= right_error && (long)this->precision_params->error_precision >= left_error)
@@ -43,7 +40,6 @@ void Step_Action::update_action_cursor(Ticks current_ticks)
     // Correct the trajectory -> reduce motor power 
     else
         this->speed_driver->next_move_correction = true;
-    
 }
 
 void Step_Action::handle(Point current_point, Ticks current_ticks, Rolling_Basis_Ptrs *rolling_basis_ptrs)
