@@ -62,12 +62,11 @@ byte Speed_Driver::compute_local_speed(long ticks)
     }
 
     // Reduce speed is the next move is a correction
-    if (this->next_move_correction)
+    if (this->next_move_correction && this->correction_speed != 0)
     {
         this->next_move_correction = false;
         return this->correction_speed;
     }
-    
     return speed;
 }
 

@@ -74,7 +74,7 @@ void Motor::handle(long target_pos, byte max_speed)
 
     // Motor power
     float power = fabs(u * this->correction_factor);
-    if (power > max_speed)
+    if (power > max_speed * this->correction_factor)
         power = max_speed;
 
     // Increase power (to overcome friction)

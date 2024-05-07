@@ -6,6 +6,7 @@ class Speed_Driver
 {
     // How to use speed Driver:
     // Give gamma and offset
+    // Give a correction_speed with a value of 0 means according correction_speed to the dynamic speed driver (based on acc and decc ramp)
     // 2 cases:
     // 1°) Give Gamma value, it will be directly use to compute the speed (use Speed_Driver_From_Gamma class)
     // speed = gamma * ticks + offset (speed <= max_speed)
