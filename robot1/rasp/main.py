@@ -108,23 +108,6 @@ if __name__ == "__main__":
     # Actuators
     actuators = Actuators(logger=logger_actuators)
 
-    # Arena
-    start_zone_id = 0
-    arena = MarsArena(
-        start_zone_id,
-        logger=logger_arena,
-        border_buffer=CONFIG.ARENA_CONFIG["border_buffer"],
-        robot_buffer=CONFIG.ARENA_CONFIG["robot_buffer"],
-    )  # must be declared from external calculus interface or switch on the robot
-
-    # Set start position
-    start_pos = OrientedPoint.from_Point(
-        arena.drop_zones[start_zone_id].zone.centroid,
-        math.pi / 2 if start_zone_id <= 2 else -math.pi / 2,
-    )
-    rolling_basis.set_odo(start_pos)
-    logger_brain.log(f"Start position: {start_pos}", LogLevels.INFO)
-
     # Brain
     leds.is_ready()
     brain = MainBrain(
@@ -134,7 +117,6 @@ if __name__ == "__main__":
         ws_pami=ws_pami,
         rolling_basis=rolling_basis,
         lidar=lidar,
-        arena=arena,
         jack=jack_pin,
         team_switch=team_switch,
         leds=leds,

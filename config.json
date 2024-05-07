@@ -78,7 +78,6 @@
     },
     "team_switch": {
       "pin": 16,
-      "activated": true,
       "team_off": 0,
       "team_on": 3
     },

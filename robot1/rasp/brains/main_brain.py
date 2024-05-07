@@ -27,17 +27,17 @@ class MainBrain(Brain):
     """
 
     def __init__(
-        self,
-        logger: Logger,
-        ws_cmd: WServerRouteManager,
-        ws_pami: WServerRouteManager,
-        actuators: Actuators,
-        rolling_basis: RollingBasis,
-        lidar: Lidar,
-        arena: MarsArena,
-        jack: PIN,
-        team_switch: PIN,
-        leds: LEDStrip,
+            self,
+            logger: Logger,
+            ws_cmd: WServerRouteManager,
+            ws_pami: WServerRouteManager,
+            actuators: Actuators,
+            rolling_basis: RollingBasis,
+            lidar: Lidar,
+            arena: MarsArena,
+            jack: PIN,
+            team_switch: PIN,
+            leds: LEDStrip,
     ) -> None:
         self.team = arena.team
         self.anticollision_mode: AntiCollisionMode = AntiCollisionMode(
@@ -46,9 +46,9 @@ class MainBrain(Brain):
         self.anticollision_handle: AntiCollisionHandle = AntiCollisionHandle(
             CONFIG.ANTICOLLISION_HANDLE
         )
+        self.arena: MarsArena = None
 
         self.rolling_basis: RollingBasis
-        self.arena: MarsArena
         self.jack: PIN
 
         # Init the brain
@@ -75,7 +75,7 @@ class MainBrain(Brain):
         undeploy_left_solar_panel,
         deploy_team_solar_panel,
         undeploy_team_solar_panel,
-        avoid_obstacle,
+        avoid_obstacle
     )
 
     # Sensors functions
@@ -92,15 +92,59 @@ class MainBrain(Brain):
         Tasks
     """
 
+    @Brain.task(process=False, run_on_start=False)
+    async def setup_actuators(self):
+        await self.undeploy_god_hand()
+        await self.close_god_hand()
+        await self.undeploy_right_solar_panel()
+        await self.undeploy_left_solar_panel()
+
+    @Brain.task(process=False, run_on_start=False)
+    async def wait_for_trigger(self):
+        # Check jack state
+        self.leds.set_jack(False)
+        while self.jack.digital_read():
+            await self.show_team_switch()
+            await asyncio.sleep(0.1)
+        self.leds.set_jack(True)
+
+    @Brain.task(process=False, run_on_start=False)
+    async def setup_teams(self):
+        if self.team_switch.digital_read():
+            start_zone_id = CONFIG.TEAM_SWITCH_ON
+            self.logger.log("Team yellow", LogLevels.INFO)
+            self.leds.set_team("y")
+        else:
+            start_zone_id = CONFIG.TEAM_SWITCH_OFF
+            self.logger.log("Team blue", LogLevels.INFO)
+            self.leds.set_team("b")
+        self.logger.log(
+            f"Game start, zone chosen by switch : {start_zone_id}", LogLevels.INFO
+        )
+
+        # Arena
+        self.arena = MarsArena(
+            start_zone_id,
+            logger=logger_arena,
+            border_buffer=CONFIG.ARENA_CONFIG["border_buffer"],
+            robot_buffer=CONFIG.ARENA_CONFIG["robot_buffer"],
+        )
+
+        self.rolling_basis.set_odo(
+            OrientedPoint.from_Point(
+                self.arena.zones["home"].centroid,
+                math.pi / 2 if start_zone_id <= 2 else -math.pi / 2,
+            )
+        )
+
     @Brain.task(process=False, run_on_start=not CONFIG.ZOMBIE_MODE)
     async def start(self):
+        await self.setup_actuators()
 
-        # Wait for trigger
         self.logger.log("Waiting for jack trigger...", LogLevels.INFO, self.leds)
 
-        # Setup things
-        await self.setup()
         await self.wait_for_trigger()
+        await self.setup_teams()
 
         # Solar panels stage
         self.logger.log("Starting solar panels stage...", LogLevels.INFO, self.leds)
@@ -121,53 +165,9 @@ class MainBrain(Brain):
         else:
             self.leds.set_team("b")
 
-    async def setup(self):
-        if CONFIG.ENABLE_TEAM_SWITCH:
-            if self.team_switch.digital_read():
-                start_zone_id = CONFIG.TEAM_SWITCH_ON
-                self.logger.log("Team yellow", LogLevels.INFO)
-                self.leds.set_team("y")
-            else:
-                start_zone_id = CONFIG.TEAM_SWITCH_OFF
-                self.logger.log("Team blue", LogLevels.INFO)
-                self.leds.set_team("b")
-            self.logger.log(
-                f"Game start, zone chosen by switch : {start_zone_id}", LogLevels.INFO
-            )
-        else:
-            self.logger.log(
-                "Game start, waiting for start info from RC...", LogLevels.INFO
-            )
-            # Wait for RC start info
-            zone = await self.ws_cmd.receiver.get()
-            while zone == WSmsg() and zone.msg != "zone":
-                zone = await self.ws_cmd.receiver.get()
-                await asyncio.sleep(0.2)
-
-            start_zone_id = zone.data
-            self.logger.log(
-                f"Got start zone: {start_zone_id}, re-initializing arena and resetting odo...",
-                LogLevels.INFO,
-            )
-
-        self.rolling_basis.set_odo(
-            OrientedPoint.from_Point(
-                self.arena.zones["home"].centroid,
-                math.pi / 2 if start_zone_id <= 2 else -math.pi / 2,
-            )
-        )
-
     async def homologate1(self):
         await self.close_god_hand()
         await self.vertical_god_hand()
-
-    async def wait_for_trigger(self):
-        # Check jack state
-        self.leds.set_jack(False)
-        while self.jack.digital_read():
-            await self.show_team_switch()
-            await asyncio.sleep(0.1)
-        self.leds.set_jack(True)
 
     async def endgame(self):
         # Keep kill_rolling_basis outside a try to be absolutely sure to get to it
@@ -181,10 +181,10 @@ class MainBrain(Brain):
             await self.kill_rolling_basis()
 
     async def go_and_pickup(
-        self,
-        target_pickup_zone: Plants_zone,
-        distance_from_zone=15,
-        distance_final_approach=10,
+            self,
+            target_pickup_zone: Plants_zone,
+            distance_from_zone=15,
+            distance_final_approach=10,
     ) -> int:
         await self.deploy_god_hand()
         await self.open_god_hand()
@@ -196,13 +196,13 @@ class MainBrain(Brain):
         )
 
         if (
-            await self.smart_go_to(
-                position=target,
-                timeout=30,
-                **CONFIG.SPEED_PROFILES["cruise_speed"],
-                **CONFIG.PRECISION_PROFILES["classic_precision"],
-            )
-            != 0
+                await self.smart_go_to(
+                    position=target,
+                    timeout=30,
+                    **CONFIG.SPEED_PROFILES["cruise_speed"],
+                    **CONFIG.PRECISION_PROFILES["classic_precision"],
+                )
+                != 0
         ):
             self.log("Failed", LogLevels.ERROR, self.leds)
             return 1
@@ -226,15 +226,15 @@ class MainBrain(Brain):
 
             # Step back
             if (
-                await self.smart_go_to(
-                    Point(-100, 0),
-                    timeout=10,
-                    forward=False,
-                    **CONFIG.SPEED_PROFILES["cruise_speed"],
-                    **CONFIG.PRECISION_PROFILES["classic_precision"],
-                    relative=True,
-                )
-                != 0
+                    await self.smart_go_to(
+                        Point(-100, 0),
+                        timeout=10,
+                        forward=False,
+                        **CONFIG.SPEED_PROFILES["cruise_speed"],
+                        **CONFIG.PRECISION_PROFILES["classic_precision"],
+                        relative=True,
+                    )
+                    != 0
             ):
                 self.log("Failed", LogLevels.ERROR, self.leds)
                 return 2
@@ -249,13 +249,13 @@ class MainBrain(Brain):
         )
 
         if (
-            await self.smart_go_to(
-                position=target,
-                timeout=30,
-                **CONFIG.SPEED_PROFILES["cruise_speed"],
-                **CONFIG.PRECISION_PROFILES["classic_precision"],
-            )
-            != 0
+                await self.smart_go_to(
+                    position=target,
+                    timeout=30,
+                    **CONFIG.SPEED_PROFILES["cruise_speed"],
+                    **CONFIG.PRECISION_PROFILES["classic_precision"],
+                )
+                != 0
         ):
             self.log("Failed", LogLevels.ERROR, self.leds)
             return 1
@@ -270,15 +270,15 @@ class MainBrain(Brain):
 
             # Step back
             if (
-                await self.smart_go_to(
-                    Point(-30, 0),
-                    timeout=10,
-                    forward=False,
-                    **CONFIG.SPEED_PROFILES["cruise_speed"],
-                    **CONFIG.PRECISION_PROFILES["classic_precision"],
-                    relative=True,
-                )
-                != 0
+                    await self.smart_go_to(
+                        Point(-30, 0),
+                        timeout=10,
+                        forward=False,
+                        **CONFIG.SPEED_PROFILES["cruise_speed"],
+                        **CONFIG.PRECISION_PROFILES["classic_precision"],
+                        relative=True,
+                    )
+                    != 0
             ):
                 self.log("Failed", LogLevels.ERROR, self.leds)
                 return 2
