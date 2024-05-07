@@ -337,6 +337,7 @@ class MainBrain(Brain):
         solar_panels_distances = [26, 21, 21]
 
         for i in range(len(solar_panels_distances)):
+
             self.logger.log(f"Doing solar panel {i}", LogLevels.INFO, self.leds)
             await self.deploy_team_solar_panel()
             go_to_result = await self.rolling_basis.go_to_and_wait(
@@ -357,7 +358,7 @@ class MainBrain(Brain):
 
             self.logger.log(f"Finished solar panel {i}", LogLevels.INFO, self.leds)
 
-        self.undeploy_team_solar_panel()
+        await self.undeploy_team_solar_panel()
         return go_to_result
 
     @Brain.task(process=False, run_on_start=False)

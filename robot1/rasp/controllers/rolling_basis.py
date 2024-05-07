@@ -350,20 +350,20 @@ class RollingBasis(Teensy):
 
         if Utils.time_since(start_time) >= timeout and timeout >= 0:
             self.logger.log(
-                f"Reached timeout in Go_To_And_Wait, clearing queue, at: {self.odometrie}",
+                f"Reached timeout in Go_To_And_Wait, clearing queue, at: {self.odometrie}, {distance(self.odometrie, position)} away",
                 LogLevels.WARNING,
             )
             self.stop_and_clear_queue()
             return 1
         elif distance(self.odometrie, position) <= tolerance:
             self.logger.log(
-                f"Reached target in go_to_and_wait, at: {self.odometrie}, {distance(self.odometrie, position)} away",
+                f"Reached target in go_to_and_wait, at: {self.odometrie}",
                 LogLevels.INFO,
             )
             return 0
         else:  # Should only mean ACS triggered or unplanned behaviour
             self.logger.log(
-                f"Didn't timeout in Go_To_And_Wait but did not arrive, at: {self.odometrie}",
+                f"Didn't timeout in Go_To_And_Wait but did not arrive, at: {self.odometrie}, {distance(self.odometrie, position)} away",
                 LogLevels.WARNING,
             )
             # self.stop_and_clear_queue()
