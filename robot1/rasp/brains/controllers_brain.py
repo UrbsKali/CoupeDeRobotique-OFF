@@ -20,7 +20,7 @@ from controllers import RollingBasis, Actuators
 async def deploy_right_solar_panel(self, override_angle: float | None = None):
     await asyncio.sleep(CONFIG.MINIMUM_DELAY)
     servo = CONFIG.SOLAR_PANEL_RIGHT
-    self.actuators.update_servo(
+    await self.actuators.update_servo(
         pin=servo["pin"],
         angle=servo["deploy_angle"] if override_angle is None else override_angle,
         detach=True,
@@ -32,7 +32,7 @@ async def deploy_right_solar_panel(self, override_angle: float | None = None):
 async def undeploy_right_solar_panel(self, override_angle: float | None = None):
     await asyncio.sleep(CONFIG.MINIMUM_DELAY)
     servo = CONFIG.SOLAR_PANEL_RIGHT
-    self.actuators.update_servo(
+    await self.actuators.update_servo(
         pin=servo["pin"],
         angle=servo["undeploy_angle"] if override_angle is None else override_angle,
         detach=True,
@@ -44,7 +44,7 @@ async def undeploy_right_solar_panel(self, override_angle: float | None = None):
 async def deploy_left_solar_panel(self, override_angle: float | None = None):
     await asyncio.sleep(CONFIG.MINIMUM_DELAY)
     servo = CONFIG.SOLAR_PANEL_LEFT
-    self.actuators.update_servo(
+    await self.actuators.update_servo(
         pin=servo["pin"],
         angle=servo["deploy_angle"] if override_angle is None else override_angle,
         detach=True,
@@ -56,7 +56,7 @@ async def deploy_left_solar_panel(self, override_angle: float | None = None):
 async def undeploy_left_solar_panel(self, override_angle: float | None = None):
     await asyncio.sleep(CONFIG.MINIMUM_DELAY)
     servo = CONFIG.SOLAR_PANEL_LEFT
-    self.actuators.update_servo(
+    await self.actuators.update_servo(
         pin=servo["pin"],
         angle=servo["undeploy_angle"] if override_angle is None else override_angle,
         detach=True,
@@ -84,42 +84,42 @@ async def undeploy_team_solar_panel(self, override_angle: float | None = None):
 async def deploy_god_hand(self):
     await asyncio.sleep(CONFIG.MINIMUM_DELAY)
     servo = CONFIG.FRONT_GOD_HAND["deployment_servo"]
-    self.actuators.update_servo(servo["pin"], servo["deploy_angle"])
+    await self.actuators.update_servo(servo["pin"], servo["deploy_angle"])
 
 
 @Logger
 async def undeploy_god_hand(self):
     await asyncio.sleep(CONFIG.MINIMUM_DELAY)
     servo = CONFIG.FRONT_GOD_HAND["deployment_servo"]
-    self.actuators.update_servo(servo["pin"], servo["undeploy_angle"])
+    await self.actuators.update_servo(servo["pin"], servo["undeploy_angle"])
 
 
 @Logger
 async def vertical_god_hand(self):
     await asyncio.sleep(CONFIG.MINIMUM_DELAY)
     servo = CONFIG.FRONT_GOD_HAND["deployment_servo"]
-    self.actuators.update_servo(servo["pin"], servo["vertical_angle"])
+    await self.actuators.update_servo(servo["pin"], servo["vertical_angle"])
 
 
 @Logger
 async def open_god_hand(self):
     for servo in CONFIG.FRONT_GOD_HAND["take_servo"]:
         await asyncio.sleep(CONFIG.MINIMUM_DELAY)
-        self.actuators.update_servo(servo["pin"], servo["open_angle"])
+        await self.actuators.update_servo(servo["pin"], servo["open_angle"])
 
 
 @Logger
 async def close_god_hand(self):
     for servo in CONFIG.FRONT_GOD_HAND["take_servo"]:
         await asyncio.sleep(CONFIG.MINIMUM_DELAY)
-        self.actuators.update_servo(servo["pin"], servo["close_angle"])
+        await self.actuators.update_servo(servo["pin"], servo["close_angle"])
 
 
 @Logger
 async def lift_elevator(self):
     await asyncio.sleep(CONFIG.MINIMUM_DELAY)
     stepper = CONFIG.ELEVATOR
-    self.actuators.stepper_step(
+    await self.actuators.stepper_step(
         steps=stepper["up_steps"],
         pin_dir=stepper["pin_dir"],
         pin_step=stepper["pin_step"],
@@ -132,7 +132,7 @@ async def lift_elevator(self):
 async def lower_elevator(self):
     await asyncio.sleep(CONFIG.MINIMUM_DELAY)
     stepper = CONFIG.ELEVATOR
-    self.actuators.stepper_step(
+    await self.actuators.stepper_step(
         steps=stepper["down_steps"],
         pin_dir=stepper["pin_dir"],
         pin_step=stepper["pin_step"],

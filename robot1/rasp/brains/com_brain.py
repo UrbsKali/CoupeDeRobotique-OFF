@@ -31,7 +31,6 @@ async def zombie_mode(self):
         )
 
         if cmd.msg == "eval":
-
             instructions = []
             if isinstance(cmd.data, str):
                 instructions.append(cmd.data)

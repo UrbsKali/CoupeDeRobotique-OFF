@@ -21,6 +21,8 @@ class Actuators(Teensy):
         super().__init__(
             logger, ser=ser, vid=vid, pid=pid, baudrate=baudrate, crc=crc, dummy=dummy
         )
+        # Admit that default elevator position is at the bottom
+        self.elevator_ticks = 0
 
     class Command:  # values must correspond to the one defined on the teensy
         Update_servo = b"\x01"
@@ -33,9 +35,25 @@ class Actuators(Teensy):
     #########################
     # User facing functions #
     #########################
+    async def elevator_top(self, speed: int = CONFIG.ELEVATOR["speed"]) -> None:
+        await self.stepper_step(
+            CONFIG.ELEVATOR["top_steps"] - self.elevator_ticks, speed
+        )
+
+    async def elevator_bottom(self, speed: int = CONFIG.ELEVATOR["speed"]) -> None:
+        await self.stepper_step(
+            CONFIG.ELEVATOR["bottom_steps"] - self.elevator_ticks, speed
+        )
+
+    async def elevator_intermediate(
+        self, speed: int = CONFIG.ELEVATOR["speed"]
+    ) -> None:
+        await self.stepper_step(
+            CONFIG.ELEVATOR["intermediate_steps"] - self.elevator_ticks, speed
+        )
 
     @Logger
-    def stepper_step(self, steps: int, speed: int) -> None:
+    async def stepper_step(self, steps: int, speed: int) -> None:
         """
         Moves the stepper motor a specified number of steps. Note that the number of motor pin can change depending on the motor.
         2 or 5 pins are common.
@@ -48,6 +66,8 @@ class Actuators(Teensy):
         Returns:
             None
         """
+        # Update elevator theorical steps
+        self.elevator_ticks += steps
 
         # WARNING: pin_driver is also defined in the C++ code, because it needs to receive a HIGH from the beginning or it will start heating up
         pin_dir = 13
