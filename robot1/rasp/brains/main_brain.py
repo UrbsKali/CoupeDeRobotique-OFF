@@ -186,9 +186,43 @@ class MainBrain(Brain):
         self.get_team_from_switch()
         self.leds.set_team(self.team)
 
-    async def homologate1(self):
+    async def undeploy_all(self):
         await self.close_god_hand()
         await self.vertical_god_hand()
+        await self.undeploy_left_solar_panel()
+        await self.undeploy_right_solar_panel()
+
+    async def back_and_forth(self, distance: float = 50.0):
+        await self.rolling_basis.go_to_and_wait(
+            Point(distance, 0.0),
+            forward=True,
+            max_speed=160,
+            next_position_delay=100,
+            action_error_auth=100,
+            traj_precision=50,
+            correction_trajectory_speed=0,
+            acceleration_start_speed=160,
+            acceleration_distance=0,
+            deceleration_end_speed=160,
+            deceleration_distance=0,
+            relative=True,
+        )
+
+        await asyncio.sleep(2)
+        await self.rolling_basis.go_to_and_wait(
+            Point(-distance, 0.0),
+            forward=True,
+            max_speed=160,
+            next_position_delay=100,
+            action_error_auth=100,
+            traj_precision=50,
+            correction_trajectory_speed=0,
+            acceleration_start_speed=160,
+            acceleration_distance=0,
+            deceleration_end_speed=160,
+            deceleration_distance=0,
+            relative=True,
+        )
 
     async def endgame(self):
         # Keep kill_rolling_basis outside a try to be absolutely sure to get to it
