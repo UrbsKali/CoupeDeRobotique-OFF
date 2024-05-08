@@ -45,7 +45,7 @@ async def compute_ennemy_position(self):
         self.pol_to_abs_cart(polars)
     )
 
-    # self.logger.log(f"obstacles: {obstacles}", LogLevels.INFO)
+    self.logger.log(f"obstacles: {obstacles}", LogLevels.INFO)
 
     # asyncio.create_task(
     #     self.ws_lidar.sender.send(
