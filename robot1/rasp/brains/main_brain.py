@@ -244,7 +244,7 @@ class MainBrain(Brain):
         target_pickup_zone: Plants_zone,
         distance_from_zone=15,
         distance_final_approach=10,
-    ) -> int:
+    ) -> None:
         await self.deploy_god_hand()
         await self.open_god_hand()
 
@@ -254,96 +254,50 @@ class MainBrain(Brain):
             delta=distance_from_zone,
         )
 
-        if (
-            await self.smart_go_to(
-                position=target,
-                timeout=30,
-                **CONFIG.SPEED_PROFILES["cruise_speed"],
-                **CONFIG.PRECISION_PROFILES["classic_precision"],
-            )
-            != 0
-        ):
-            self.logger.log("Failed", LogLevels.ERROR, self.leds)
-            return 1
-        else:
-            # Final approach
-            await self.smart_go_to(
-                Point(distance_final_approach, 0),
-                timeout=10,
-                **CONFIG.SPEED_PROFILES["cruise_speed"],
-                **CONFIG.PRECISION_PROFILES["classic_precision"],
-                relative=True,
-            )
+        await self.smart_go_to(
+            position=target,
+            timeout=30,
+            **CONFIG.SPEED_PROFILES["cruise_speed"],
+            **CONFIG.PRECISION_PROFILES["classic_precision"],
+        )
 
-            # Grab plants
-            await self.close_god_hand()
-            await asyncio.sleep(0.2)
-            await self.undeploy_god_hand()
+        # Grab plants
+        await self.close_god_hand()
+        await asyncio.sleep(0.1)
+        await self.undeploy_god_hand()
 
-            # Account for removed plants
-            target_pickup_zone.take_plants(5)
+        # Account for removed plants
+        target_pickup_zone.take_plants(5)
 
-            # Step back
-            if (
-                await self.smart_go_to(
-                    Point(-100, 0),
-                    timeout=10,
-                    forward=False,
-                    **CONFIG.SPEED_PROFILES["cruise_speed"],
-                    **CONFIG.PRECISION_PROFILES["classic_precision"],
-                    relative=True,
-                )
-                != 0
-            ):
-                self.logger.log("Failed", LogLevels.ERROR, self.leds)
-                return 2
-            else:
-                self.logger.log("Success", LogLevels.INFO, self.leds)
-                return 0
-
-    async def go_and_drop(self, target_drop_zone: Plants_zone) -> int:  # TODO
+    async def go_and_drop(self, target_drop_zone: Plants_zone) -> None:  # TODO
 
         target = self.arena.compute_go_to_destination(
             start_point=self.rolling_basis.odometrie, zone=target_drop_zone.zone
         )
 
-        if (
-            await self.smart_go_to(
-                position=target,
-                timeout=30,
-                **CONFIG.SPEED_PROFILES["cruise_speed"],
-                **CONFIG.PRECISION_PROFILES["classic_precision"],
-            )
-            != 0
-        ):
-            self.logger.log("Failed", LogLevels.ERROR, self.leds)
-            return 1
-        else:
+        await self.smart_go_to(
+            position=target,
+            timeout=30,
+            **CONFIG.SPEED_PROFILES["cruise_speed"],
+            **CONFIG.PRECISION_PROFILES["classic_precision"],
+        )
 
-            # Drop plants
-            await self.deploy_god_hand()
-            await self.open_god_hand()
+        # Drop plants
+        await self.deploy_god_hand()
+        await self.open_god_hand()
 
-            # Account for removed plants
-            target_drop_zone.drop_plants(5)
+        # Account for removed plants
+        target_drop_zone.drop_plants(5)
 
-            # Step back
-            if (
-                await self.smart_go_to(
-                    Point(-30, 0),
-                    timeout=10,
-                    forward=False,
-                    **CONFIG.SPEED_PROFILES["cruise_speed"],
-                    **CONFIG.PRECISION_PROFILES["classic_precision"],
-                    relative=True,
-                )
-                != 0
-            ):
-                self.logger.log("Failed", LogLevels.ERROR, self.leds)
-                return 2
-            else:
-                self.logger.log("Success", LogLevels.INFO, self.leds)
-                return 0
+        # Step back
+        await self.smart_go_to(
+            Point(-30, 0),
+            timeout=10,
+            forward=False,
+            **CONFIG.SPEED_PROFILES["cruise_speed"],
+            **CONFIG.PRECISION_PROFILES["classic_precision"],
+            relative=True,
+        )
 
     @Brain.task(process=False, run_on_start=False, timeout=60)
     async def plant_stage(self):
