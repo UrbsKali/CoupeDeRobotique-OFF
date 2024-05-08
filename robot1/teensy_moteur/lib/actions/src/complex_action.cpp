@@ -63,11 +63,18 @@ void Go_To::compute(Point current_point, Ticks current_ticks, Rolling_Basis_Para
     //  1°) rotate to be in front of the target point
     //  2°) go to the target point
     this->alloc_memory(2);
+
+    // Define fix params for rotation 
+    Precision_Params orientation_precision_params{100, 10, 20};
+    Profil_params acceleration {140, -1.0f, 0};
+    Profil_params deceleration {140, -1.0f, 0};
+    Speed_Driver_From_Distance speed_driver = Speed_Driver_From_Distance(140, 0, acceleration, deceleration);
+    
     this->basic_movements[0] = new Get_Orientation(
         this->target_point.x, this->target_point.y,
         &this->direction,
-        &this->speed_driver,
-        &this->precision_params
+        &speed_driver,
+        &orientation_precision_params
     );
 
     this->basic_movements[1] = new Move_Straight(
