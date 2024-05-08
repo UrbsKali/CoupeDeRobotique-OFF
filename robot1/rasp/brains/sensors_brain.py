@@ -76,9 +76,11 @@ async def compute_ennemy_position(self):
     self.logger.log(
         (
             f"Ennemy position computed: {self.arena.ennemy_position if self.arena.ennemy_position is not None else 'None'}"
-            + ""
-            if self.arena.ennemy_position is None
-            else f", at relative angle: {str(round(math.degrees(self.get_ennemy_angle())))} and distance: {distance(self.arena.ennemy_position,self.rolling_basis.odometrie)}"
+            + (
+                ""
+                if self.arena.ennemy_position is None
+                else f", at relative angle: {str(round(math.degrees(self.get_ennemy_angle())))} and distance: {distance(self.arena.ennemy_position,self.rolling_basis.odometrie)}"
+            )
         ),
         LogLevels.DEBUG,
     )
