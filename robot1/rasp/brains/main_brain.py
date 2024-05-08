@@ -413,10 +413,19 @@ class MainBrain(Brain):
     @Brain.task(process=False, run_on_start=True, refresh_rate=2)
     async def update_return_eta(self):
 
+        target = self.compute_return_target()
+
+        print("Calculating delta")
+        delta = distance(self.rolling_basis.odometrie, target)
+        self.return_eta = 5 + 0.05 * delta
+
+    def compute_return_target(self):
+        print("Sorting drop zones")
         sorted_zones = self.arena.sort_drop_zone(
             self.rolling_basis.odometrie, friendly_only=True, maxi_plants=20
         )
 
+        print("Picking zone")
         picked_zone = (
             sorted_zones[0]
             if sorted_zones[0]
@@ -424,13 +433,12 @@ class MainBrain(Brain):
             else sorted_zones[1]
         )
 
-        target = self.arena.compute_go_to_destination(
+        print("Computing target point")
+        return self.arena.compute_go_to_destination(
             self.rolling_basis.odometrie,
             picked_zone.zone,
             20.0,
         )
-        delta = distance(self.rolling_basis.odometrie, target)
-        self.return_eta = 5 + 0.05 * delta
 
     @Brain.task(process=False, run_on_start=False)
     async def kill_rolling_basis(self, timeout=-1):
