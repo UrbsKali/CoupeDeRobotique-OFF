@@ -185,7 +185,7 @@ class MainBrain(Brain):
         await self.solar_panels_stage()
 
         # Virage contre le mur
-        await self.drift(left=not self.team == "y")
+        await self.drift()
 
         # Plant Stage
         self.logger.log("Starting plant stage...", LogLevels.INFO, self.leds)
@@ -212,9 +212,11 @@ class MainBrain(Brain):
         await self.endgame()
 
     @Brain.task(process=False, run_on_start=False, timeout=10)
-    async def drift(self, left: bool):
+    async def drift(self):
         await self.rolling_basis.go_to_and_wait(
-            Point(0, (1 if left else -1) * CONFIG.ARENA_CONFIG["robot_buffer"]),
+            Point(
+                0, (-1 if self.team == "y" else 1) * CONFIG.ARENA_CONFIG["robot_buffer"]
+            ),
             relative=True,
             **CONFIG.SPEED_PROFILES["cruise_speed"],
             **CONFIG.PRECISION_PROFILES["classic_precision"],
