@@ -506,7 +506,7 @@ class MainBrain(Brain):
         already_there = (
             Point(self.rolling_basis.odometrie.x, self.rolling_basis.odometrie.y)
             .buffer(CONFIG.ARENA_CONFIG["robot_buffer"])
-            .intersects(picked_zone)
+            .intersects(picked_zone.zone)
         )
 
         return already_there, (
