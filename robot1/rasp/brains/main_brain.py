@@ -415,25 +415,23 @@ class MainBrain(Brain):
 
         target = self.compute_return_target()
 
-        print("Calculating delta")
         delta = distance(self.rolling_basis.odometrie, target)
         self.return_eta = 5 + 0.05 * delta
 
     def compute_return_target(self):
-        print("Sorting drop zones")
         sorted_zones = self.arena.sort_drop_zone(
             self.rolling_basis.odometrie, friendly_only=True, maxi_plants=20
         )
 
-        print("Picking zone")
         picked_zone = (
             sorted_zones[0]
             if sorted_zones[0]
-            == self.arena.drop_zones[CONFIG.TEAM_CONFIG[self.team]["start_zone_id"]]
+            == self.arena.drop_zones[
+                CONFIG.START_INFO_BY_TEAM[self.team]["start_zone_id"]
+            ]
             else sorted_zones[1]
         )
 
-        print("Computing target point")
         return self.arena.compute_go_to_destination(
             self.rolling_basis.odometrie,
             picked_zone.zone,
