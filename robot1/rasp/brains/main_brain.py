@@ -338,24 +338,15 @@ class MainBrain(Brain):
 
         @dataclass
         class Objective:
-            type: str  # objective type ("pickup","drop_to_zone","drop_to_gardener")
+            task: str  # objective type ("pickup","drop_to_zone","drop_to_gardener")
             target: int  # index of the target
             time_estimate: float = -1.0  # time estimate (won't try if it's too late)
             raise_elevator_after: bool = (
                 False  # For pickups, whether to start raising the elevator after
             )
 
-        objectives: list[Objective] = [
-            Objective(
-                "pickup", 0 if in_yellow_team else 4, 8.0, raise_elevator_after=True
-            ),  # First zone
-            Objective("drop_to_zone", 0 if in_yellow_team else 4, 15.0),  # First drop
-            Objective("pickup", 1 if in_yellow_team else 3, 12.0),  # etc
-            Objective("drop_to_zone", 2 if in_yellow_team else 5, 15.0),
-        ]
-
         async def engage_objective(objective: Objective):
-            match objective.type:
+            match objective.task:
                 case "pickup":
 
                     self.logger.log(
@@ -389,6 +380,15 @@ class MainBrain(Brain):
 
                     raise Exception("Unknown objective type")
 
+        objectives: list[Objective] = [
+            Objective(
+                "pickup", 0 if in_yellow_team else 4, 8.0, raise_elevator_after=True
+            ),  # First zone
+            Objective("drop_to_zone", 0 if in_yellow_team else 4, 15.0),  # First drop
+            Objective("pickup", 1 if in_yellow_team else 3, 12.0),  # etc
+            Objective("drop_to_zone", 2 if in_yellow_team else 5, 15.0),
+        ]
+
         for current_objective in objectives:
             self.logger.log(
                 f"Considering objective: {current_objective}", LogLevels.INFO
@@ -397,6 +397,7 @@ class MainBrain(Brain):
             if (
                 Utils.time_since(start_stage_time) + current_objective.time_estimate
                 > 60
+                and current_objective.time_estimate >= 0
             ):
                 self.logger.log(
                     "Not enough time, gotta go fast; leaving plant_stage",
