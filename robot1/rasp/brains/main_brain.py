@@ -300,7 +300,7 @@ class MainBrain(Brain):
         target = self.arena.compute_go_to_destination(
             start_point=self.rolling_basis.odometrie,
             zone=target_pickup_zone.zone,
-            delta=15,
+            delta=-10,
         )
 
         await self.smart_go_to(
