@@ -14,8 +14,8 @@ from sys import maxsize
 
 class Plants_zone:
     def __init__(self, zone, nb_plant: int = 0) -> None:
-        self.zone = zone
-        self.nb_plant = nb_plant
+        self.zone: Polygon = zone
+        self.nb_plant: int = nb_plant
 
     def __str__(self) -> str:
         return f"zone : {self.zone.__str__()}, nb_plant {self.nb_plant}"
@@ -84,20 +84,30 @@ class MarsArena(Arena):
         self.gardeners: list[Plants_zone] = [
             (
                 Plants_zone(
-                    create_straight_rectangle(Point(155, -15), Point(122.5, -3)),
+                    create_straight_rectangle(Point(45, -15), Point(77.5, -3)),
                 )
-            ),  # 0 - Yellow
-            (
-                Plants_zone(create_straight_rectangle(Point(77.5, -15), Point(45, -3)))
-            ),  # 1 - Blue
+            ),  # 0 - Blue
             (
                 Plants_zone(
-                    create_straight_rectangle(Point(155, 303), Point(122.5, 315))
+                    create_straight_rectangle(Point(122.5, -15), Point(155, -3))
                 )
+            ),  # 1 - Yellow
+            (
+                Plants_zone(create_straight_rectangle(Point(203, 45), Point(215, 77.5)))
             ),  # 2 - Yellow
             (
-                Plants_zone(create_straight_rectangle(Point(77.5, 303), Point(45, 315)))
-            ),  # 3 - Blue
+                Plants_zone(create_straight_rectangle(Point(45, 315), Point(77.5, 303)))
+            ),  # 3 - Yellow
+            (
+                Plants_zone(
+                    create_straight_rectangle(Point(122.5, 315), Point(155, 303))
+                )
+            ),  # 4 - Blue
+            (
+                Plants_zone(
+                    create_straight_rectangle(Point(203, 255), Point(215, 222.5))
+                )
+            ),  # 5 - Blue
         ]
         if self.start_zone_id % 2 == 0:
             forbidden = self.drop_zones[3].zone

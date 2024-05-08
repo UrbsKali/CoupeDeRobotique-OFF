@@ -189,6 +189,15 @@ class MainBrain(Brain):
         self.logger.log("Starting plant stage...", LogLevels.INFO, self.leds)
         await self.plant_stage()
 
+        # Custom return to let PAMIs do their thing
+        custom_return_zone = self.arena.drop_zones[2 if self.team == "y" else 5].zone
+        await self.smart_go_to(
+            Point(
+                custom_return_zone.bounds[0],
+                custom_return_zone.bounds[3 if self.team == "y" else 1],
+            )
+        )
+
         await self.go_to_endzone()
 
         # Clean up
@@ -297,7 +306,7 @@ class MainBrain(Brain):
         self.actuators.stepper_step(350, 5000)
 
     @Logger
-    async def go_and_drop(self, target_drop_zone: Plants_zone) -> None:  # TODO
+    async def go_and_drop_to_zone(self, target_drop_zone: Plants_zone) -> None:
 
         target = self.arena.compute_go_to_destination(
             start_point=self.rolling_basis.odometrie, zone=target_drop_zone.zone
@@ -329,6 +338,46 @@ class MainBrain(Brain):
 
         self.actuators.stepper_step(-350, 5000)
 
+    @Logger
+    async def go_and_drop_to_gardener(self, target_gardener: Plants_zone) -> None:
+        # WARNING: only fit for the top gardeners
+
+        approach_target: Point = Point(
+            200 - CONFIG.ARENA_CONFIG["robot_buffer"], target_gardener.zone.centroid.y
+        )
+
+        await self.smart_go_to(
+            approach_target,
+            **CONFIG.SPEED_PROFILES["cruise_speed"],
+            **CONFIG.PRECISION_PROFILES["classic_precision"],
+        )
+
+        final_target: Point = Point(200 - 12.75, target_gardener.zone.centroid.y)
+
+        await self.smart_go_to(
+            final_target,
+            **CONFIG.SPEED_PROFILES["cruise_speed"],
+            **CONFIG.PRECISION_PROFILES["classic_precision"],
+        )
+
+        await self.deploy_god_hand()
+        await self.actuators.elevator_intermediate()
+        await self.open_god_hand()
+
+        # Step back
+        await self.smart_go_to(
+            Point(-CONFIG.ARENA_CONFIG["robot_buffer"], 0),
+            timeout=10,
+            forward=False,
+            **CONFIG.SPEED_PROFILES["cruise_speed"],
+            **CONFIG.PRECISION_PROFILES["classic_precision"],
+            relative=True,
+        )
+
+        target_gardener.drop_plants(5)
+
+        await self.actuators.elevator_bottom()
+
     @Brain.task(process=False, run_on_start=False, timeout=60)
     async def plant_stage(self):
         start_stage_time = Utils.get_ts()
@@ -346,7 +395,6 @@ class MainBrain(Brain):
         async def engage_objective(objective: Objective):
             match objective.task:
                 case "pickup":
-
                     self.logger.log(
                         f"Going to pickup zone {objective.target}",
                         LogLevels.INFO,
@@ -360,31 +408,37 @@ class MainBrain(Brain):
                         pass
 
                 case "drop_to_zone":
-
                     self.logger.log(
                         f"Going to drop zone {objective.target}",
                         LogLevels.INFO,
                         self.leds,
                     )
 
-                    await self.go_and_drop(self.arena.drop_zones[objective.target])
+                    await self.go_and_drop_to_zone(
+                        self.arena.drop_zones[objective.target]
+                    )
                     self.score_estimate += 3
 
                 case "drop_to_gardener":
-                    # TODO
-                    pass
+                    self.logger.log(
+                        f"Going to gardener {objective.target}",
+                        LogLevels.INFO,
+                        self.leds,
+                    )
+
+                    await self.go_and_drop_to_gardener()
+                    self.score_estimate += 12
 
                 case _:
-
                     raise Exception("Unknown objective type")
 
         objectives: list[Objective] = [
             Objective(
                 "pickup", 0 if in_yellow_team else 4, 8.0, raise_elevator_after=True
             ),  # First zone
-            Objective("drop_to_zone", 0 if in_yellow_team else 4, 15.0),  # First drop
+            Objective("drop_to_zone", 2 if in_yellow_team else 5, 15.0),  # First drop
             Objective("pickup", 1 if in_yellow_team else 3, 12.0),  # etc
-            Objective("drop_to_zone", 2 if in_yellow_team else 5, 15.0),
+            Objective("drop_to_gardener", 2 if in_yellow_team else 5, 15.0),
         ]
 
         for current_objective in objectives:
