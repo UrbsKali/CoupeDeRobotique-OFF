@@ -93,7 +93,7 @@ class MarsArena(Arena):
                 )
             ),  # 1 - Yellow
             (
-                Plants_zone(create_straight_rectangle(Point(203, 45), Point(215, 77.5)))
+                Plants_zone(create_straight_rectangle(Point(203, 60), Point(215, 92.5)))
             ),  # 2 - Yellow
             (
                 Plants_zone(create_straight_rectangle(Point(45, 315), Point(77.5, 303)))
@@ -105,7 +105,7 @@ class MarsArena(Arena):
             ),  # 4 - Blue
             (
                 Plants_zone(
-                    create_straight_rectangle(Point(203, 255), Point(215, 222.5))
+                    create_straight_rectangle(Point(203, 240), Point(215, 207.5))
                 )
             ),  # 5 - Blue
         ]

@@ -217,7 +217,7 @@ class MainBrain(Brain):
     async def drift(self):
         await self.rolling_basis.go_to_and_wait(
             Point(
-                30,
+                5,
                 (-1 if self.team == "y" else 1) * CONFIG.ARENA_CONFIG["robot_buffer"],
             ),
             relative=True,
