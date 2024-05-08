@@ -360,7 +360,8 @@ class MainBrain(Brain):
         # WARNING: only fit for the top gardeners
 
         approach_target: Point = Point(
-            200 - CONFIG.ARENA_CONFIG["robot_buffer"], target_gardener.zone.centroid.y
+            200 - CONFIG.ARENA_CONFIG["robot_buffer_with_god_hand_deployed"],
+            target_gardener.zone.centroid.y,
         )
 
         await self.smart_go_to(
