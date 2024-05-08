@@ -435,12 +435,10 @@ class MainBrain(Brain):
         start_time = Utils.get_ts()
         while Utils.time_since(start_time) < solar_panel_timeout:
             await asyncio.sleep(0.1)
-            print("loop")
             if (
                 min([abs(self.rolling_basis.odometrie.y - y) for y in solar_panels_y])
                 > 5
             ):
-                print("deploy")
                 await self.deploy_team_solar_panel()
 
     @Brain.task(process=False, run_on_start=False, timeout=30)
@@ -473,14 +471,11 @@ class MainBrain(Brain):
     @Brain.task(process=False, run_on_start=True, refresh_rate=2)
     async def update_return_eta(self):
 
-        print("Getting target")
         already_there, target = self.compute_return_target()
 
         if already_there:
-            print("Arrived")
             self.return_eta = 0
         else:
-            print("Estimating")
             delta = distance(
                 Point(self.rolling_basis.odometrie.x, self.rolling_basis.odometrie.y),
                 target,
