@@ -304,7 +304,7 @@ class MainBrain(Brain):
                 self.logger.log("Success", LogLevels.INFO, self.leds)
                 return 0
 
-    @Brain.task(process=False, run_on_start=False, timeout=100)
+    @Brain.task(process=False, run_on_start=False, timeout=60)
     async def plant_stage(self):
         start_stage_time = Utils.get_ts()
         in_yellow_team = self.team == "y"
@@ -346,18 +346,17 @@ class MainBrain(Brain):
         )
         await self.go_and_drop(drop_target)
 
+    @Brain.task(process=False, run_on_start=False, timeout=30)
     async def solar_panels_stage(self) -> int:
-
         solar_panels_distances = [26, 21, 21]
 
         for i in range(len(solar_panels_distances)):
-
             self.logger.log(f"Doing solar panel {i}", LogLevels.INFO, self.leds)
             await self.deploy_team_solar_panel()
             go_to_result = await self.rolling_basis.go_to_and_wait(
                 Point(solar_panels_distances[i], 0),
                 relative=True,
-                timeout=20.0,
+                timeout=7.0,
                 **CONFIG.SPEED_PROFILES["cruise_speed"],
                 **CONFIG.PRECISION_PROFILES["classic_precision"],
             )
@@ -369,7 +368,6 @@ class MainBrain(Brain):
                     self.leds,
                 )
                 break
-
             self.logger.log(f"Finished solar panel {i}", LogLevels.INFO, self.leds)
 
         await self.undeploy_team_solar_panel()
