@@ -122,8 +122,8 @@ class MarsArena(Arena):
         self,
         zones_to_sort: list[Plants_zone],
         actual_position: OrientedPoint,
-        mini=-1,
-        maxi=maxsize,
+        mini_plants=-1,
+        maxi_plants=maxsize,
         reverse=False,
     ):
         zones: list[Plants_zone] = []
@@ -131,7 +131,7 @@ class MarsArena(Arena):
         zones = [
             zone
             for zone in zones_to_sort
-            if zone.nb_plant > mini and zone.nb_plant < maxi
+            if zone.nb_plant > mini_plants and zone.nb_plant < maxi_plants
         ]
 
         zones = sorted(
@@ -157,12 +157,16 @@ class MarsArena(Arena):
         return self.sort_plant_zones(
             actual_position=actual_position,
             zones_to_sort=zones_to_sort,
-            maxi=maxi,
+            maxi_plants=maxi,
             reverse=reverse,
         )
 
     def sort_drop_zone(
-        self, actual_position: OrientedPoint, friendly_only=True, maxi=6, reverse=False
+        self,
+        actual_position: OrientedPoint,
+        friendly_only=True,
+        maxi_plants=6,
+        reverse=False,
     ):
         zones_to_sort = (
             [
@@ -176,20 +180,20 @@ class MarsArena(Arena):
         return self.sort_plant_zones(
             actual_position=actual_position,
             zones_to_sort=zones_to_sort,
-            maxi=maxi,
+            maxi_plants=maxi_plants,
             reverse=reverse,
         )
 
     def sort_pickup_zone(
         self,
         actual_position: OrientedPoint,
-        mini=2,
+        mini_plants=2,
         reverse=False,
     ):
         return self.sort_plant_zones(
             actual_position=actual_position,
             zones_to_sort=self.pickup_zones,
-            mini=mini,
+            mini_plants=mini_plants,
             reverse=reverse,
         )
 

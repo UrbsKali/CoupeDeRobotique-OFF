@@ -9,7 +9,7 @@ from config_loader import CONFIG
 from brain import Brain
 
 from WS_comms import WSmsg, WSclientRouteManager, WServerRouteManager
-from geometry import OrientedPoint, Point
+from geometry import OrientedPoint, Point, distance
 from arena import MarsArena, Plants_zone
 from logger import Logger, LogLevels
 from led_strip import LEDStrip
@@ -84,6 +84,7 @@ class MainBrain(Brain):
         self.jack: PIN
         self.leds: LEDStrip
         self.team_switch: PIN
+        self.actuators: Actuators
 
         # Init the brain
         super().__init__(logger, self)
@@ -92,6 +93,11 @@ class MainBrain(Brain):
         self.team = CONFIG.DEFAULT_TEAM
         self.arena: MarsArena = self.generate_up_to_date_arena()
         self.reset_odo_to_start()
+
+        # The regularly updated variable to estimate time left
+        self.return_eta: float = -1.0
+
+        self.score_estimate: int = 0
 
         # Init CONFIG
         self.logger.log(
@@ -145,6 +151,8 @@ class MainBrain(Brain):
         )
 
     def generate_up_to_date_arena(self) -> MarsArena:
+        self.get_team_from_switch()
+        self.leds.set_team(self.team)
         return MarsArena(
             CONFIG.START_INFO_BY_TEAM[self.team]["start_zone_id"],
             logger=self.logger_arena,
@@ -159,7 +167,11 @@ class MainBrain(Brain):
             self.team = CONFIG.TEAM_SWITCH_OFF
 
     @Brain.task(process=False, run_on_start=not CONFIG.ZOMBIE_MODE)
-    async def start(self):
+    async def game(self):
+
+        # No matter what, kill rolling_basis ans everything else in 90s
+        asyncio.create_task(self.time_bomb(90))
+
         await self.setup_actuators()
 
         self.logger.log("Waiting for jack trigger...", LogLevels.INFO, self.leds)
@@ -171,22 +183,76 @@ class MainBrain(Brain):
         self.logger.log("Starting solar panels stage...", LogLevels.INFO, self.leds)
         await self.solar_panels_stage()
 
+        # TODO Virage contre le mur
+
         # Plant Stage
         self.logger.log("Starting plant stage...", LogLevels.INFO, self.leds)
         await self.plant_stage()
+
+        await self.go_to_endzone()
 
         # Clean up
         self.logger.log("Game over", LogLevels.INFO, self.leds)
         await self.endgame()
         exit()
 
+    @Brain.task(process=False, run_on_start=False)
+    async def time_bomb(self, time_until_forced_endgame):
+        await asyncio.sleep(time_until_forced_endgame)
+        await self.endgame()
+
+    @Brain.task(process=False, run_on_start=False)
+    async def go_to_endzone(self):
+        already_there, target = self.compute_return_target()
+
+        if not already_there:
+            await self.smart_go_to(
+                target,
+                **CONFIG.SPEED_PROFILES["cruise_speed"],
+                **CONFIG.PRECISION_PROFILES["classic_precision"],
+            )
+
     async def show_team_led(self):
         self.get_team_from_switch()
         self.leds.set_team(self.team)
 
-    async def homologate1(self):
+    async def undeploy_all(self):
         await self.close_god_hand()
         await self.vertical_god_hand()
+        await self.undeploy_left_solar_panel()
+        await self.undeploy_right_solar_panel()
+
+    async def back_and_forth(self, distance: float = 50.0):
+        await self.rolling_basis.go_to_and_wait(
+            Point(distance, 0.0),
+            forward=True,
+            max_speed=160,
+            next_position_delay=100,
+            action_error_auth=100,
+            traj_precision=50,
+            correction_trajectory_speed=0,
+            acceleration_start_speed=160,
+            acceleration_distance=0,
+            deceleration_end_speed=160,
+            deceleration_distance=0,
+            relative=True,
+        )
+
+        await asyncio.sleep(2)
+        await self.rolling_basis.go_to_and_wait(
+            Point(-distance, 0.0),
+            forward=True,
+            max_speed=160,
+            next_position_delay=100,
+            action_error_auth=100,
+            traj_precision=50,
+            correction_trajectory_speed=0,
+            acceleration_start_speed=160,
+            acceleration_distance=0,
+            deceleration_end_speed=160,
+            deceleration_distance=0,
+            relative=True,
+        )
 
     async def endgame(self):
         # Keep kill_rolling_basis outside a try to be absolutely sure to get to it
@@ -199,12 +265,13 @@ class MainBrain(Brain):
         finally:
             await self.kill_rolling_basis()
 
+    @Logger
     async def go_and_pickup(
         self,
         target_pickup_zone: Plants_zone,
         distance_from_zone=15,
         distance_final_approach=10,
-    ) -> int:
+    ) -> None:
         await self.deploy_god_hand()
         await self.open_god_hand()
 
@@ -214,96 +281,55 @@ class MainBrain(Brain):
             delta=distance_from_zone,
         )
 
-        if (
-            await self.smart_go_to(
-                position=target,
-                timeout=30,
-                **CONFIG.SPEED_PROFILES["cruise_speed"],
-                **CONFIG.PRECISION_PROFILES["classic_precision"],
-            )
-            != 0
-        ):
-            self.logger.log("Failed", LogLevels.ERROR, self.leds)
-            return 1
-        else:
-            # Final approach
-            await self.smart_go_to(
-                Point(distance_final_approach, 0),
-                timeout=10,
-                **CONFIG.SPEED_PROFILES["cruise_speed"],
-                **CONFIG.PRECISION_PROFILES["classic_precision"],
-                relative=True,
-            )
+        await self.smart_go_to(
+            position=target,
+            timeout=30,
+            **CONFIG.SPEED_PROFILES["cruise_speed"],
+            **CONFIG.PRECISION_PROFILES["classic_precision"],
+        )
 
-            # Grab plants
-            await self.close_god_hand()
-            await asyncio.sleep(0.2)
-            await self.undeploy_god_hand()
+        # Grab plants
+        await self.close_god_hand()
+        await asyncio.sleep(0.1)
+        await self.undeploy_god_hand()
 
-            # Account for removed plants
-            target_pickup_zone.take_plants(5)
+        # Account for removed plants
+        target_pickup_zone.take_plants(5)
 
-            # Step back
-            if (
-                await self.smart_go_to(
-                    Point(-100, 0),
-                    timeout=10,
-                    forward=False,
-                    **CONFIG.SPEED_PROFILES["cruise_speed"],
-                    **CONFIG.PRECISION_PROFILES["classic_precision"],
-                    relative=True,
-                )
-                != 0
-            ):
-                self.logger.log("Failed", LogLevels.ERROR, self.leds)
-                return 2
-            else:
-                self.logger.log("Success", LogLevels.INFO, self.leds)
-                return 0
+        self.actuators.stepper_step(350, 5000)
 
-    async def go_and_drop(self, target_drop_zone: Plants_zone) -> int:  # TODO
+    @Logger
+    async def go_and_drop(self, target_drop_zone: Plants_zone) -> None:  # TODO
 
         target = self.arena.compute_go_to_destination(
             start_point=self.rolling_basis.odometrie, zone=target_drop_zone.zone
         )
 
-        if (
-            await self.smart_go_to(
-                position=target,
-                timeout=30,
-                **CONFIG.SPEED_PROFILES["cruise_speed"],
-                **CONFIG.PRECISION_PROFILES["classic_precision"],
-            )
-            != 0
-        ):
-            self.logger.log("Failed", LogLevels.ERROR, self.leds)
-            return 1
-        else:
+        await self.smart_go_to(
+            position=target,
+            timeout=30,
+            **CONFIG.SPEED_PROFILES["cruise_speed"],
+            **CONFIG.PRECISION_PROFILES["classic_precision"],
+        )
 
-            # Drop plants
-            await self.deploy_god_hand()
-            await self.open_god_hand()
+        # Drop plants
+        await self.open_god_hand()
+        await self.deploy_god_hand()
 
-            # Account for removed plants
-            target_drop_zone.drop_plants(5)
+        # Account for removed plants
+        target_drop_zone.drop_plants(5)
 
-            # Step back
-            if (
-                await self.smart_go_to(
-                    Point(-30, 0),
-                    timeout=10,
-                    forward=False,
-                    **CONFIG.SPEED_PROFILES["cruise_speed"],
-                    **CONFIG.PRECISION_PROFILES["classic_precision"],
-                    relative=True,
-                )
-                != 0
-            ):
-                self.logger.log("Failed", LogLevels.ERROR, self.leds)
-                return 2
-            else:
-                self.logger.log("Success", LogLevels.INFO, self.leds)
-                return 0
+        # Step back
+        await self.smart_go_to(
+            Point(-30, 0),
+            timeout=10,
+            forward=False,
+            **CONFIG.SPEED_PROFILES["cruise_speed"],
+            **CONFIG.PRECISION_PROFILES["classic_precision"],
+            relative=True,
+        )
+
+        self.actuators.stepper_step(-350, 5000)
 
     @Brain.task(process=False, run_on_start=False, timeout=60)
     async def plant_stage(self):
@@ -373,8 +399,45 @@ class MainBrain(Brain):
                         raise Exception("Unknown objective type")
 
 
+        self.score_estimate += 20
+
     @Brain.task(process=False, run_on_start=False, timeout=30)
-    async def solar_panels_stage(self) -> int:
+    async def solar_panels_stage(self) -> None:
+        asyncio.create_task(self.control_solar_panels())
+        go_to_result = await self.rolling_basis.go_to_and_wait(
+            Point(80, 0),
+            relative=True,
+            timeout=15.0,
+            **CONFIG.SPEED_PROFILES["low_speed"],
+            **CONFIG.PRECISION_PROFILES["classic_precision"],
+        )
+
+        if go_to_result == 0:
+            # Great success!
+            self.score_estimate += 15
+        elif go_to_result == 1:
+            # Timed out
+            self.score_estimate += 5
+        else:
+            # ACS triggered
+            self.score_estimate += 10
+
+    @Brain.task(process=False, run_on_start=False, timeout=30)
+    async def control_solar_panels(self, solar_panel_timeout: float = 25.0) -> None:
+        solar_panels_y: list[float] = [30, 50, 70]
+        start_time = Utils.get_ts()
+        while Utils.time_since(start_time) < solar_panel_timeout:
+            await asyncio.sleep(0.1)
+            print("loop")
+            if (
+                min([abs(self.rolling_basis.odometrie.y - y) for y in solar_panels_y])
+                > 5
+            ):
+                print("deploy")
+                await self.deploy_team_solar_panel()
+
+    @Brain.task(process=False, run_on_start=False, timeout=30)
+    async def old_solar_panels_stage(self) -> int:
         solar_panels_distances = [26, 21, 21]
 
         for i in range(len(solar_panels_distances)):
@@ -399,6 +462,47 @@ class MainBrain(Brain):
 
         await self.undeploy_team_solar_panel()
         return go_to_result
+
+    @Brain.task(process=False, run_on_start=True, refresh_rate=2)
+    async def update_return_eta(self):
+
+        already_there, target = self.compute_return_target()
+
+        if already_there:
+            self.return_eta = 0
+        else:
+            delta = distance(self.rolling_basis.odometrie, target)
+            self.return_eta = 5 + 0.05 * delta
+
+        self.logger.log(f"Estimated ETA: {self.return_eta}", LogLevels.DEBUG)
+
+    def compute_return_target(self) -> tuple[bool, Point]:
+        sorted_zones = self.arena.sort_drop_zone(
+            self.rolling_basis.odometrie, friendly_only=True, maxi_plants=20
+        )
+
+        picked_zone = (
+            sorted_zones[0]
+            if sorted_zones[0]
+            != self.arena.drop_zones[
+                CONFIG.START_INFO_BY_TEAM[self.team]["start_zone_id"]
+            ]
+            else sorted_zones[1]
+        )
+
+        already_there = self.rolling_basis.odometrie.buffer(
+            CONFIG.ARENA_CONFIG["robot_buffer"]
+        ).intesects(picked_zone)
+
+        return already_there, (
+            self.arena.compute_go_to_destination(
+                self.rolling_basis.odometrie,
+                picked_zone.zone,
+                20.0,
+            )
+            if not already_there
+            else self.rolling_basis.odometrie
+        )
 
     @Brain.task(process=False, run_on_start=False)
     async def kill_rolling_basis(self, timeout=-1):

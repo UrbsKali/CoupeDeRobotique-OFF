@@ -17,67 +17,67 @@ from controllers import RollingBasis, Actuators
 
 
 @Logger
-async def deploy_right_solar_panel(self):
+async def deploy_right_solar_panel(self, override_angle: float | None = None):
     await asyncio.sleep(CONFIG.MINIMUM_DELAY)
     servo = CONFIG.SOLAR_PANEL_RIGHT
     self.actuators.update_servo(
         pin=servo["pin"],
-        angle=servo["deploy_angle"],
+        angle=servo["deploy_angle"] if override_angle is None else override_angle,
         detach=True,
         detach_delay=CONFIG.SOLAR_PANEL_DETACH_DELAY,
     )
 
 
 @Logger
-async def undeploy_right_solar_panel(self):
+async def undeploy_right_solar_panel(self, override_angle: float | None = None):
     await asyncio.sleep(CONFIG.MINIMUM_DELAY)
     servo = CONFIG.SOLAR_PANEL_RIGHT
     self.actuators.update_servo(
         pin=servo["pin"],
-        angle=servo["undeploy_angle"],
+        angle=servo["undeploy_angle"] if override_angle is None else override_angle,
         detach=True,
         detach_delay=CONFIG.SOLAR_PANEL_DETACH_DELAY,
     )
 
 
 @Logger
-async def deploy_left_solar_panel(self):
+async def deploy_left_solar_panel(self, override_angle: float | None = None):
     await asyncio.sleep(CONFIG.MINIMUM_DELAY)
     servo = CONFIG.SOLAR_PANEL_LEFT
     self.actuators.update_servo(
         pin=servo["pin"],
-        angle=servo["deploy_angle"],
+        angle=servo["deploy_angle"] if override_angle is None else override_angle,
         detach=True,
         detach_delay=CONFIG.SOLAR_PANEL_DETACH_DELAY,
     )
 
 
 @Logger
-async def undeploy_left_solar_panel(self):
+async def undeploy_left_solar_panel(self, override_angle: float | None = None):
     await asyncio.sleep(CONFIG.MINIMUM_DELAY)
     servo = CONFIG.SOLAR_PANEL_LEFT
     self.actuators.update_servo(
         pin=servo["pin"],
-        angle=servo["undeploy_angle"],
+        angle=servo["undeploy_angle"] if override_angle is None else override_angle,
         detach=True,
         detach_delay=CONFIG.SOLAR_PANEL_DETACH_DELAY,
     )
 
 
 @Logger
-async def deploy_team_solar_panel(self):
+async def deploy_team_solar_panel(self, override_angle: float | None = None):
     if self.team == "y":
-        await self.deploy_left_solar_panel()
+        await self.deploy_left_solar_panel(override_angle)
     else:
-        await self.deploy_right_solar_panel()
+        await self.deploy_right_solar_panel(override_angle)
 
 
 @Logger
-async def undeploy_team_solar_panel(self):
+async def undeploy_team_solar_panel(self, override_angle: float | None = None):
     if self.team == "y":
-        await self.undeploy_left_solar_panel()
+        await self.undeploy_left_solar_panel(override_angle)
     else:
-        await self.undeploy_right_solar_panel()
+        await self.undeploy_right_solar_panel(override_angle)
 
 
 @Logger
