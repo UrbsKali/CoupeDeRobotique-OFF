@@ -19,6 +19,7 @@ from geometry import (
 from WS_comms import WSmsg, WSclientRouteManager
 from arena import MarsArena, Plants_zone
 from logger import Logger, LogLevels
+from utils import Utils
 
 # Import from local path
 from sensors import Lidar
@@ -75,7 +76,7 @@ async def compute_ennemy_position(self):
 
     self.logger.log(
         (
-            f"Ennemy position computed: {self.arena.ennemy_position if self.arena.ennemy_position is not None else 'None'}"
+            f"Ennemy position computed: {Utils.geom_to_str(self.arena.ennemy_position) if self.arena.ennemy_position is not None else 'None'}"
             + (
                 ""
                 if self.arena.ennemy_position is None
@@ -145,6 +146,6 @@ def pol_to_abs_cart(self, polars: np.ndarray) -> MultiPoint:
 @Brain.task(process=False, run_on_start=True, refresh_rate=2)
 async def print_odometer(self):
     self.logger.log(
-        f"Odometer: {self.rolling_basis.odometrie}",
+        f"Odometer: {Utils.geom_to_str(self.rolling_basis.odometrie)}",
         LogLevels.DEBUG,
     )
