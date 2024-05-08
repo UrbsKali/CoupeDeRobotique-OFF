@@ -12,7 +12,7 @@
 #define L_Ki 0.0
 #define L_Kd 0.4
 
-#define R_Kp 30.0
+#define R_Kp 15.0
 #define R_Ki 0.0
 #define R_Kd 0.4
 
