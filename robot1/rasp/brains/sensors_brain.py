@@ -68,7 +68,7 @@ async def compute_ennemy_position(self):
     self.arena.ennemy_position = (
         None
         if is_empty(obstacles)
-        else nearest_points(self.rolling_basis.odometrie, obstacles)[1]
+        else nearest_points(Point(self.rolling_basis.odometrie), obstacles)[1]
     )
 
     self.logger.log(
