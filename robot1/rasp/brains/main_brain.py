@@ -166,7 +166,11 @@ class MainBrain(Brain):
             self.team = CONFIG.TEAM_SWITCH_OFF
 
     @Brain.task(process=False, run_on_start=not CONFIG.ZOMBIE_MODE)
-    async def start(self):
+    async def game(self):
+
+        # No matter what, kill rolling_basis ans everything else in 90s
+        asyncio.create_task(self.time_bomb(90))
+
         await self.setup_actuators()
 
         self.logger.log("Waiting for jack trigger...", LogLevels.INFO, self.leds)
@@ -178,14 +182,34 @@ class MainBrain(Brain):
         self.logger.log("Starting solar panels stage...", LogLevels.INFO, self.leds)
         await self.solar_panels_stage()
 
+        # TODO Virage contre le mur
+
         # Plant Stage
         self.logger.log("Starting plant stage...", LogLevels.INFO, self.leds)
         await self.plant_stage()
+
+        await self.go_to_endzone()
 
         # Clean up
         await self.endgame()
         self.logger.log("Game over", LogLevels.INFO, self.leds)
         exit()
+
+    @Brain.task(process=False, run_on_start=False)
+    async def time_bomb(self, time_until_forced_endgame):
+        await asyncio.sleep(time_until_forced_endgame)
+        await self.endgame()
+
+    @Brain.task(process=False, run_on_start=False)
+    async def go_to_endzone(self):
+        already_there, target = self.compute_return_target()
+
+        if not already_there:
+            await self.smart_go_to(
+                target,
+                **CONFIG.SPEED_PROFILES["cruise_speed"],
+                **CONFIG.PRECISION_PROFILES["classic_precision"],
+            )
 
     async def show_team_led(self):
         self.get_team_from_switch()
@@ -415,13 +439,17 @@ class MainBrain(Brain):
     @Brain.task(process=False, run_on_start=True, refresh_rate=2)
     async def update_return_eta(self):
 
-        target = self.compute_return_target()
+        already_there, target = self.compute_return_target()
 
-        delta = distance(self.rolling_basis.odometrie, target)
-        self.return_eta = 5 + 0.05 * delta
+        if already_there:
+            self.return_eta = 0
+        else:
+            delta = distance(self.rolling_basis.odometrie, target)
+            self.return_eta = 5 + 0.05 * delta
+
         self.logger.log(f"Estimated ETA: {self.return_eta}", LogLevels.DEBUG)
 
-    def compute_return_target(self):
+    def compute_return_target(self) -> tuple[bool, Point]:
         sorted_zones = self.arena.sort_drop_zone(
             self.rolling_basis.odometrie, friendly_only=True, maxi_plants=20
         )
@@ -429,16 +457,24 @@ class MainBrain(Brain):
         picked_zone = (
             sorted_zones[0]
             if sorted_zones[0]
-            == self.arena.drop_zones[
+            != self.arena.drop_zones[
                 CONFIG.START_INFO_BY_TEAM[self.team]["start_zone_id"]
             ]
             else sorted_zones[1]
         )
 
-        return self.arena.compute_go_to_destination(
-            self.rolling_basis.odometrie,
-            picked_zone.zone,
-            20.0,
+        already_there = self.rolling_basis.odometrie.buffer(
+            CONFIG.ARENA_CONFIG["robot_buffer"]
+        ).intesects(picked_zone)
+
+        return already_there, (
+            self.arena.compute_go_to_destination(
+                self.rolling_basis.odometrie,
+                picked_zone.zone,
+                20.0,
+            )
+            if not already_there
+            else self.rolling_basis.odometrie
         )
 
     @Brain.task(process=False, run_on_start=False)
