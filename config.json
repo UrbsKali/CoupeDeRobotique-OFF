@@ -81,14 +81,14 @@
       "start_info_by_team": {
         "y": {
           "start_zone_id": 0,
-          "start_x": 22.0,
-          "start_y": 22.0,
+          "start_x": 19.27,
+          "start_y": 12.75,
           "start_theta": 1.5707963267948966
         },
         "b": {
           "start_zone_id": 3,
-          "start_x": 22.0,
-          "start_y": 275.0,
+          "start_x": 19.27,
+          "start_y": 287.25,
           "start_theta": -1.5707963267948966
         }
       }
