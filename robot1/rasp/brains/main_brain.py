@@ -178,12 +178,14 @@ class MainBrain(Brain):
 
         await self.wait_for_trigger()
         await self.setup_teams()
+        await asyncio.sleep(0.1)
 
         # Solar panels stage
         self.logger.log("Starting solar panels stage...", LogLevels.INFO, self.leds)
         await self.solar_panels_stage()
 
-        # TODO Virage contre le mur
+        # Virage contre le mur
+        await self.drift(left=not self.team == "y")
 
         # Plant Stage
         self.logger.log("Starting plant stage...", LogLevels.INFO, self.leds)
@@ -205,10 +207,18 @@ class MainBrain(Brain):
         await self.endgame()
         exit()
 
-    @Brain.task(process=False, run_on_start=False)
     async def time_bomb(self, time_until_forced_endgame):
         await asyncio.sleep(time_until_forced_endgame)
         await self.endgame()
+
+    @Brain.task(process=False, run_on_start=False, timeout=10)
+    async def drift(self, left: bool):
+        await self.rolling_basis.go_to_and_wait(
+            Point(0, (1 if left else -1) * CONFIG.ARENA_CONFIG["robot_buffer"]),
+            relative=True,
+            **CONFIG.SPEED_PROFILES["cruise_speed"],
+            **CONFIG.PRECISION_PROFILES["classic_precision"],
+        )
 
     @Brain.task(process=False, run_on_start=False)
     async def go_to_endzone(self):
