@@ -498,7 +498,7 @@ class MainBrain(Brain):
         asyncio.create_task(self.control_solar_panels())
         go_to_result = await self.rolling_basis.go_to_and_wait(
             Point(
-                80 - CONFIG.TEAM_CONFIG["y"]["start_y"], 0
+                80 - CONFIG.START_INFO_BY_TEAM["y"]["start_y"], 0
             ),  # Using "y" because it is the one starting from 0, and the movement is relative
             relative=True,
             timeout=15.0,
