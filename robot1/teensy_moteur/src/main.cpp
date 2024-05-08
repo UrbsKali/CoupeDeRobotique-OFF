@@ -8,9 +8,13 @@
 
 // PID
 #define MAX_PWM 160
-#define Kp 30.0
-#define Ki 0.0
-#define Kd 0.4
+#define L_Kp 30.0
+#define L_Ki 0.0
+#define L_Kd 0.4
+
+#define R_Kp 30.0
+#define R_Ki 0.0
+#define R_Kd 0.4
 
 #define RIGHT_MOTOR_POWER_FACTOR 1.0
 #define LEFT_MOTOR_POWER_FACTOR 1.0
@@ -220,13 +224,13 @@ void set_pid(byte *msg, byte size)
 {
   msg_Set_PID *pid_msg = (msg_Set_PID *)msg;
   // Update motors PID
-  rolling_basis_ptr->right_motor->kp = pid_msg->kp;
-  rolling_basis_ptr->right_motor->ki = pid_msg->ki;
-  rolling_basis_ptr->right_motor->kd = pid_msg->kd;
+  rolling_basis_ptr->left_motor->kp = pid_msg->l_kp;
+  rolling_basis_ptr->left_motor->ki = pid_msg->l_ki;
+  rolling_basis_ptr->left_motor->kd = pid_msg->l_kd;
 
-  rolling_basis_ptr->left_motor->kp = pid_msg->kp;
-  rolling_basis_ptr->left_motor->ki = pid_msg->ki;
-  rolling_basis_ptr->left_motor->kd = pid_msg->kd;
+  rolling_basis_ptr->right_motor->kp = pid_msg->r_kp;
+  rolling_basis_ptr->right_motor->ki = pid_msg->r_ki;
+  rolling_basis_ptr->right_motor->kd = pid_msg->r_kd;
 
   msg_Action_Finished fin_msg;
   fin_msg.action_id = SET_PID;
@@ -295,8 +299,8 @@ void setup()
   analogWriteFrequency(L_PWM, 40000);
 
   // Init motors
-  rolling_basis_ptr->init_right_motor(R_IN1, R_IN2, R_PWM, R_ENCA, R_ENCB, Kp, Ki, Kd, RIGHT_MOTOR_POWER_FACTOR, 0);
-  rolling_basis_ptr->init_left_motor(L_IN1, L_IN2, L_PWM, L_ENCA, L_ENCB, Kp, Ki, Kd, LEFT_MOTOR_POWER_FACTOR, 0);
+  rolling_basis_ptr->init_right_motor(R_IN1, R_IN2, R_PWM, R_ENCA, R_ENCB, R_Kp, R_Ki, R_Kd, RIGHT_MOTOR_POWER_FACTOR, 0);
+  rolling_basis_ptr->init_left_motor(L_IN1, L_IN2, L_PWM, L_ENCA, L_ENCB, L_Kp, L_Ki, L_Kd, LEFT_MOTOR_POWER_FACTOR, 0);
   rolling_basis_ptr->init_motors();
 
   rolling_basis_ptrs = {

@@ -94,9 +94,13 @@ struct msg_Action_Finished
 struct msg_Set_PID
 {
     byte command = SET_PID;
-    float kp;
-    float ki;
-    float kd;
+    float l_kp;
+    float l_ki;
+    float l_kd; 
+    
+    float r_kp;
+    float r_ki;
+    float r_kd;
 };
 
 struct msg_String
