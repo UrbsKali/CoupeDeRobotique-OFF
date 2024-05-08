@@ -300,7 +300,7 @@ class MainBrain(Brain):
         target = self.arena.compute_go_to_destination(
             start_point=self.rolling_basis.odometrie,
             zone=target_pickup_zone.zone,
-            delta=-10,
+            delta=-5,
         )
 
         await self.smart_go_to(
@@ -467,7 +467,7 @@ class MainBrain(Brain):
                 "pickup", 0 if in_yellow_team else 4, 8.0, raise_elevator_after=True
             ),  # First zone
             Objective("drop_to_zone", 2 if in_yellow_team else 5, 15.0),  # First drop
-            Objective("pickup", 1 if in_yellow_team else 3, 12.0),  # etc
+            Objective("pickup", 1 if in_yellow_team else 3, 12.0, True),  # etc
             Objective("drop_to_gardener", 2 if in_yellow_team else 5, 15.0),
         ]
 

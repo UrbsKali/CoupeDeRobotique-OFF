@@ -259,6 +259,6 @@
   },
   "arena": {
     "border_buffer": -10,
-    "robot_buffer": 18
+    "robot_buffer": 20
   }
 }
