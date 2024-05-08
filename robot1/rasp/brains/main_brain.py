@@ -240,6 +240,7 @@ class MainBrain(Brain):
         finally:
             await self.kill_rolling_basis()
 
+    @Logger
     async def go_and_pickup(
         self,
         target_pickup_zone: Plants_zone,
@@ -270,8 +271,9 @@ class MainBrain(Brain):
         # Account for removed plants
         target_pickup_zone.take_plants(5)
 
-        await self.actuators.stepper_step(-350, 5000)
+        self.actuators.stepper_step(350, 5000)
 
+    @Logger
     async def go_and_drop(self, target_drop_zone: Plants_zone) -> None:  # TODO
 
         target = self.arena.compute_go_to_destination(
@@ -302,7 +304,7 @@ class MainBrain(Brain):
             relative=True,
         )
 
-        await self.actuators.stepper_step(350, 5000)
+        self.actuators.stepper_step(-350, 5000)
 
     @Brain.task(process=False, run_on_start=False, timeout=60)
     async def plant_stage(self):
