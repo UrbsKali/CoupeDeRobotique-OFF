@@ -95,6 +95,8 @@ class MainBrain(Brain):
         # The regularly updated variable to estimate time left
         self.return_eta: float = -1.0
 
+        self.score_estimate: int = 0
+
         # Init CONFIG
         self.logger.log(
             f"Mode: {'zombie' if CONFIG.ZOMBIE_MODE else 'game'}", LogLevels.INFO
@@ -383,8 +385,40 @@ class MainBrain(Brain):
         )
         await self.go_and_drop(drop_target)
 
+        self.score_estimate += 20
+
     @Brain.task(process=False, run_on_start=False, timeout=30)
-    async def solar_panels_stage(self) -> int:
+    async def solar_panels_stage(self) -> None:
+        asyncio.create_task(self.control_solar_panels())
+        go_to_result = await self.rolling_basis.go_to_and_wait(
+            Point(80, 0),
+            relative=True,
+            timeout=15.0,
+            **CONFIG.SPEED_PROFILES["slow_speed"],
+            **CONFIG.PRECISION_PROFILES["classic_precision"],
+        )
+
+        if go_to_result == 0:
+            # Great success!
+            self.score_estimate += 15
+        elif go_to_result == 1:
+            # Timed out
+            self.score_estimate += 5
+        else:
+            # ACS triggered
+            self.score_estimate += 10
+
+    @Brain.task(process=False, run_on_start=False, timeout=30)
+    async def control_solar_panels(self, solar_panel_timeout: float = 25.0) -> None:
+        solar_panels_y: list[float] = [30, 50, 70]
+        start_time = Utils.get_ts()
+        while Utils.time_since(start_time) < solar_panel_timeout:
+            await asyncio.sleep(0.1)
+            if min([abs(self.rolling_basis.odometrie - y) for y in solar_panels_y]) > 5:
+                self.deploy_team_solar_panel()
+
+    @Brain.task(process=False, run_on_start=False, timeout=30)
+    async def old_solar_panels_stage(self) -> int:
         solar_panels_distances = [26, 21, 21]
 
         for i in range(len(solar_panels_distances)):
@@ -417,6 +451,7 @@ class MainBrain(Brain):
 
         delta = distance(self.rolling_basis.odometrie, target)
         self.return_eta = 5 + 0.05 * delta
+        self.logger.log(f"Estimated ETA: {self.return_eta}", LogLevels.DEBUG)
 
     def compute_return_target(self):
         sorted_zones = self.arena.sort_drop_zone(

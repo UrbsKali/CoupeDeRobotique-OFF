@@ -122,7 +122,7 @@ class Brain:
         process: bool,
         run_on_start: bool,
         # Params with default value
-        refresh_rate: float or int = -1,
+        refresh_rate: float | int = -1,
         timeout: int = -1,
         define_loop_later: bool = False,
         start_loop_marker="# ---Loop--- #",
