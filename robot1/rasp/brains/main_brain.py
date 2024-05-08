@@ -500,7 +500,7 @@ class MainBrain(Brain):
 
         already_there = self.rolling_basis.odometrie.buffer(
             CONFIG.ARENA_CONFIG["robot_buffer"]
-        ).intesects(picked_zone)
+        ).intersects(picked_zone)
 
         return already_there, (
             self.arena.compute_go_to_destination(
