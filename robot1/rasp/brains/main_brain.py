@@ -479,7 +479,10 @@ class MainBrain(Brain):
         if already_there:
             self.return_eta = 0
         else:
-            delta = self.rolling_basis.odometrie.distance(target)
+            delta = distance(
+                Point(self.rolling_basis.odometrie.x, self.rolling_basis.odometrie.y),
+                target,
+            )
             self.return_eta = 5 + 0.05 * delta
 
         self.logger.log(f"Estimated ETA: {self.return_eta}", LogLevels.DEBUG)
@@ -498,9 +501,11 @@ class MainBrain(Brain):
             else sorted_zones[1]
         )
 
-        already_there = self.rolling_basis.odometrie.buffer(
-            CONFIG.ARENA_CONFIG["robot_buffer"]
-        ).intersects(picked_zone)
+        already_there = (
+            Point(self.rolling_basis.odometrie.x, self.rolling_basis.odometrie.y)
+            .buffer(CONFIG.ARENA_CONFIG["robot_buffer"])
+            .intersects(picked_zone)
+        )
 
         return already_there, (
             self.arena.compute_go_to_destination(
@@ -509,7 +514,7 @@ class MainBrain(Brain):
                 20.0,
             )
             if not already_there
-            else self.rolling_basis.odometrie
+            else Point(self.rolling_basis.odometrie.x, self.rolling_basis.odometrie.y)
         )
 
     @Brain.task(process=False, run_on_start=False)
