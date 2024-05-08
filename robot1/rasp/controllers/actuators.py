@@ -87,7 +87,7 @@ class Actuators(Teensy):
         self.send_bytes(msg)
 
     @Logger
-    def update_servo(
+    async def update_servo(
         self,
         pin: int,
         angle: int,
