@@ -192,22 +192,22 @@ void keep_current_position(byte *msg, byte size)
   com->send_msg((byte *)&fin_msg, sizeof(msg_Action_Finished));
 }
 
-void disable_pid(byte *msg, byte size)
+void disable_pids(byte *msg, byte size)
 {
   keep_curr_pos_when_no_action = false;
-
+  
   msg_Action_Finished fin_msg;
-  fin_msg.action_id = DISABLE_PID;
+  fin_msg.action_id = DISABLE_PIDS;
   com->send_msg((byte *)&fin_msg, sizeof(msg_Action_Finished));
 }
 
-void enable_pid(byte *msg, byte size)
+void enable_pids(byte *msg, byte size)
 {
   // last_ticks_position = rolling_basis_ptr->get_current_ticks();
   keep_curr_pos_when_no_action = true;
 
   msg_Action_Finished fin_msg;
-  fin_msg.action_id = ENABLE_PID;
+  fin_msg.action_id = ENABLE_PIDS;
   com->send_msg((byte *)&fin_msg, sizeof(msg_Action_Finished));
 }
 
@@ -220,9 +220,9 @@ void reset_odo(byte *msg, byte size)
   com->send_msg((byte *)&fin_msg, sizeof(msg_Action_Finished));
 }
 
-void set_pid(byte *msg, byte size)
+void set_pids(byte *msg, byte size)
 {
-  msg_Set_PID *pid_msg = (msg_Set_PID *)msg;
+  msg_Set_PIDs *pid_msg = (msg_Set_PIDs *)msg;
   // Update motors PID
   rolling_basis_ptr->left_motor->kp = pid_msg->l_kp;
   rolling_basis_ptr->left_motor->ki = pid_msg->l_ki;
@@ -233,7 +233,7 @@ void set_pid(byte *msg, byte size)
   rolling_basis_ptr->right_motor->kd = pid_msg->r_kd;
 
   msg_Action_Finished fin_msg;
-  fin_msg.action_id = SET_PID;
+  fin_msg.action_id = SET_PIDS;
   com->send_msg((byte *)&fin_msg, sizeof(msg_Action_Finished));
 }
 
@@ -285,10 +285,10 @@ void setup()
   functions[GO_TO] = &go_to,
   //functions[CURVE_GO_TO] = &curve_go_to,
   functions[KEEP_CURRENT_POSITION] = &keep_current_position,
-  functions[DISABLE_PID] = &disable_pid,
-  functions[ENABLE_PID] = &enable_pid,
+  functions[DISABLE_PIDS] = &disable_pids,
+  functions[ENABLE_PIDS] = &enable_pids,
   functions[RESET_ODO] = &reset_odo,
-  functions[SET_PID] = &set_pid,
+  functions[SET_PIDS] = &set_pids,
   functions[SET_HOME] = &set_home,
   functions[GET_ORIENTATION] = &get_orientation;
 

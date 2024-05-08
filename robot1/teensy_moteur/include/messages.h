@@ -60,13 +60,13 @@ struct msg_Keep_Current_Position
     byte command = KEEP_CURRENT_POSITION;
 };
 
-struct msg_Disable_Pid
+struct msg_Disable_PIDs
 {
-    byte command = DISABLE_PID;
+    byte command = DISABLE_PIDS;
 };
-struct msg_Enable_Pid
+struct msg_Enable_PIDs
 {
-    byte command = ENABLE_PID;
+    byte command = ENABLE_PIDS;
 };
 
 struct msg_Update_Position
@@ -91,9 +91,9 @@ struct msg_Action_Finished
     byte action_id;
 };
 
-struct msg_Set_PID
+struct msg_Set_PIDs
 {
-    byte command = SET_PID;
+    byte command = SET_PIDS;
     float l_kp;
     float l_ki;
     float l_kd; 

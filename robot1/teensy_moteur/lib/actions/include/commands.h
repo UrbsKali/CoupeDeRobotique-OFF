@@ -5,10 +5,10 @@
 #define GO_TO 0
 #define CURVE_GO_TO 1
 #define KEEP_CURRENT_POSITION 2
-#define DISABLE_PID 3
-#define ENABLE_PID 4
+#define DISABLE_PIDS 3
+#define ENABLE_PIDS 4
 #define RESET_ODO 5
-#define SET_PID 6
+#define SET_PIDS 6
 #define SET_HOME 7
 #define GET_ORIENTATION 8
 #define GET_PID 9
