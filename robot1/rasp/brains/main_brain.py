@@ -8,7 +8,7 @@ from config_loader import CONFIG
 from brain import Brain
 
 from WS_comms import WSmsg, WSclientRouteManager, WServerRouteManager
-from geometry import OrientedPoint, Point
+from geometry import OrientedPoint, Point, distance
 from arena import MarsArena, Plants_zone
 from logger import Logger, LogLevels
 from led_strip import LEDStrip
@@ -91,6 +91,9 @@ class MainBrain(Brain):
         self.team = CONFIG.DEFAULT_TEAM
         self.arena: MarsArena = self.generate_up_to_date_arena()
         self.reset_odo_to_start()
+
+        # The regularly updated variable to estimate time left
+        self.return_eta: float = -1.0
 
         # Init CONFIG
         self.logger.log(
@@ -372,6 +375,28 @@ class MainBrain(Brain):
 
         await self.undeploy_team_solar_panel()
         return go_to_result
+
+    @Brain.task(process=False, run_on_start=True, refresh_rate=2)
+    async def update_return_eta(self):
+
+        sorted_zones = self.arena.sort_drop_zone(
+            self.rolling_basis.odometrie, friendly_only=True, maxi_plants=20
+        )
+
+        picked_zone = (
+            sorted_zones[0]
+            if sorted_zones[0]
+            == self.arena.drop_zones[CONFIG.TEAM_CONFIG[self.team]["start_zone_id"]]
+            else sorted_zones[1]
+        )
+
+        target = self.arena.compute_go_to_destination(
+            self.rolling_basis.odometrie,
+            picked_zone.zone,
+            20.0,
+        )
+        delta = distance(self.rolling_basis.odometrie, target)
+        self.return_eta = 5 + 0.05 * delta
 
     @Brain.task(process=False, run_on_start=False)
     async def kill_rolling_basis(self, timeout=-1):
