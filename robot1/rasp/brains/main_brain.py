@@ -310,13 +310,13 @@ class MainBrain(Brain):
             **CONFIG.SPEED_PROFILES["cruise_speed"],
             **CONFIG.PRECISION_PROFILES["classic_precision"],
         )
-        
-        final_target = self.arena.compute_go_to_destination( # Da da-da daaa
+
+        final_target = self.arena.compute_go_to_destination(  # Da da-da daaa
             start_point=self.rolling_basis.odometrie,
             zone=target_pickup_zone.zone,
             delta=-5,
         )
-        
+
         await self.smart_go_to(
             position=final_target,
             timeout=30,
