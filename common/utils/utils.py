@@ -27,8 +27,12 @@ class Utils:
 
         else:
             try:
-                r = str(
-                    [Utils.geom_to_str(smaller_geom) for smaller_geom in geom.geoms]
+                r = (
+                    "["
+                    + ", ".join(
+                        [Utils.geom_to_str(smaller_geom) for smaller_geom in geom.geoms]
+                    )
+                    + "]"
                 )
             except:
                 r = str(geom)
