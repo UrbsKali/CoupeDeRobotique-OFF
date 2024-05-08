@@ -418,7 +418,7 @@ class MainBrain(Brain):
                 min([abs(self.rolling_basis.odometrie.y - y) for y in solar_panels_y])
                 > 5
             ):
-                self.deploy_team_solar_panel()
+                await self.deploy_team_solar_panel()
 
     @Brain.task(process=False, run_on_start=False, timeout=30)
     async def old_solar_panels_stage(self) -> int:
