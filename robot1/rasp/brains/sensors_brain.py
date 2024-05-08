@@ -45,7 +45,7 @@ async def compute_ennemy_position(self):
         self.pol_to_abs_cart(polars)
     )
 
-    self.logger.log(f"obstacles: {obstacles}", LogLevels.DEBUG)
+    # self.logger.log(f"obstacles: {obstacles}", LogLevels.DEBUG)
 
     # asyncio.create_task(
     #     self.ws_lidar.sender.send(
@@ -71,14 +71,14 @@ async def compute_ennemy_position(self):
         else nearest_points(self.rolling_basis.odometrie, obstacles)[1]
     )
 
-    self.logger.log(f"Ennemy position: {self.arena.ennemy_position}", LogLevels.INFO)
+    # self.logger.log(f"Ennemy position: {self.arena.ennemy_position}", LogLevels.INFO)
 
     self.logger.log(
         (
             f"Ennemy position computed: {self.arena.ennemy_position if self.arena.ennemy_position is not None else 'None'}"
             + ""
             if self.arena.ennemy_position is None
-            else f", at relative angle: {str(round(math.degrees(self.get_ennemy_angle())))} and distance: {distance(self.arena.ennemy_position,self.rolling_basis.odometrie.y)}"
+            else f", at relative angle: {str(round(math.degrees(self.get_ennemy_angle())))} and distance: {distance(self.arena.ennemy_position,self.rolling_basis.odometrie)}"
         ),
         LogLevels.DEBUG,
     )
