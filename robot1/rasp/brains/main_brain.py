@@ -400,7 +400,7 @@ class MainBrain(Brain):
         @dataclass
         class Objective:
             task: str  # objective type ("pickup","drop_to_zone","drop_to_gardener")
-            target: int  # index of the target
+            target_index: int  # index of the target
             time_estimate: float = -1.0  # time estimate (won't try if it's too late)
             raise_elevator_after: bool = (
                 False  # For pickups, whether to start raising the elevator after
@@ -408,7 +408,7 @@ class MainBrain(Brain):
 
             def __str__(self):
                 return (
-                    f"{self.task}, at {self.target}, estimated time: {self.time_estimate}"
+                    f"{self.task}, at {self.target_index}, estimated time: {self.time_estimate}"
                     + (
                         ""
                         if not self.raise_elevator_after
@@ -420,12 +420,14 @@ class MainBrain(Brain):
             match objective.task:
                 case "pickup":
                     self.logger.log(
-                        f"Going to pickup zone {objective.target}",
+                        f"Going to pickup zone {objective.target_index}",
                         LogLevels.INFO,
                         self.leds,
                     )
 
-                    await self.go_and_pickup(self.arena.pickup_zones[objective.target])
+                    await self.go_and_pickup(
+                        self.arena.pickup_zones[objective.target_index]
+                    )
 
                     if objective.raise_elevator_after:
                         # TODO
@@ -433,24 +435,26 @@ class MainBrain(Brain):
 
                 case "drop_to_zone":
                     self.logger.log(
-                        f"Going to drop zone {objective.target}",
+                        f"Going to drop zone {objective.target_index}",
                         LogLevels.INFO,
                         self.leds,
                     )
 
                     await self.go_and_drop_to_zone(
-                        self.arena.drop_zones[objective.target]
+                        self.arena.drop_zones[objective.target_index]
                     )
                     self.score_estimate += 3
 
                 case "drop_to_gardener":
                     self.logger.log(
-                        f"Going to gardener {objective.target}",
+                        f"Going to gardener {objective.target_index}",
                         LogLevels.INFO,
                         self.leds,
                     )
 
-                    await self.go_and_drop_to_gardener(objective.target)
+                    await self.go_and_drop_to_gardener(
+                        self.arena.gardeners[objective.target_index]
+                    )
                     self.score_estimate += 12
 
                 case _:
