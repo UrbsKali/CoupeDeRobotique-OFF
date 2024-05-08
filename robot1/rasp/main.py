@@ -98,7 +98,7 @@ if __name__ == "__main__":
 
     # Team switch
     team_switch = PIN(CONFIG.TEAM_SWITCH_PIN)
-    team_switch.setup("input_pulldown")
+    team_switch.setup("input_pulldown", reverse_state=True)
 
     # Robot
     rolling_basis = RollingBasis(logger=logger_rolling_basis)
