@@ -479,7 +479,7 @@ class MainBrain(Brain):
         if already_there:
             self.return_eta = 0
         else:
-            delta = distance(self.rolling_basis.odometrie, target)
+            delta = self.rolling_basis.odometrie.distance(target)
             self.return_eta = 5 + 0.05 * delta
 
         self.logger.log(f"Estimated ETA: {self.return_eta}", LogLevels.DEBUG)
