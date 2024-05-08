@@ -433,8 +433,7 @@ class MainBrain(Brain):
                     )
 
                     if objective.raise_elevator_after:
-                        # TODO
-                        pass
+                        await self.actuators.elevator_top()
 
                 case "drop_to_zone":
                     self.logger.log(
