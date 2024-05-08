@@ -473,11 +473,14 @@ class MainBrain(Brain):
     @Brain.task(process=False, run_on_start=True, refresh_rate=2)
     async def update_return_eta(self):
 
+        print("Getting target")
         already_there, target = self.compute_return_target()
 
         if already_there:
+            print("Arrived")
             self.return_eta = 0
         else:
+            print("Estimating")
             delta = distance(
                 Point(self.rolling_basis.odometrie.x, self.rolling_basis.odometrie.y),
                 target,
