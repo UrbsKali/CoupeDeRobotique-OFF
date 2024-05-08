@@ -335,19 +335,23 @@ class MainBrain(Brain):
     async def plant_stage(self):
         start_stage_time = Utils.get_ts()
         in_yellow_team = self.team == "y"
-        
+
         @dataclass
         class Objective:
-            type: str # objective type ("pickup","drop_to_zone","drop_to_gardener")
-            target: int # index of the target
-            time_estimate: float =-1.0 # time estimate (won't try if it's too late)
-            raise_elevator_after: bool=False # For pickups, whether to start raising the elevator after
-            
-        objectives:list[Objective] = [
-            Objective("pickup",0 if in_yellow_team else 4, 8.0, raise_elevator_after=True), # First zone
-            Objective("drop_to_zone",0 if in_yellow_team else 4, 15.0), # First drop
-            Objective("pickup",1 if in_yellow_team else 3, 12.0), # etc
-            Objective("drop_to_zone",2 if in_yellow_team else 5, 15.0),
+            type: str  # objective type ("pickup","drop_to_zone","drop_to_gardener")
+            target: int  # index of the target
+            time_estimate: float = -1.0  # time estimate (won't try if it's too late)
+            raise_elevator_after: bool = (
+                False  # For pickups, whether to start raising the elevator after
+            )
+
+        objectives: list[Objective] = [
+            Objective(
+                "pickup", 0 if in_yellow_team else 4, 8.0, raise_elevator_after=True
+            ),  # First zone
+            Objective("drop_to_zone", 0 if in_yellow_team else 4, 15.0),  # First drop
+            Objective("pickup", 1 if in_yellow_team else 3, 12.0),  # etc
+            Objective("drop_to_zone", 2 if in_yellow_team else 5, 15.0),
         ]
         
         async def engage_objective(objective: Objective):
