@@ -242,11 +242,7 @@
       "elevator": {
         "up_steps": 1000,
         "down_steps": -1000,
-        "speed": 4000,
-        "pin_dir": 13,
-        "pin_step": 14,
-        "driver_pin": 15,
-        "driver_on": 0
+        "speed": 4000
       },
       "minimum_delay": 0.1
     },

@@ -119,7 +119,6 @@ class MainBrain(Brain):
 
     @Brain.task(process=False, run_on_start=False)
     async def setup_teams(self):
-
         self.get_team_from_switch()
 
         start_zone_id = CONFIG.START_INFO_BY_TEAM[self.team]["start_zone_id"]
