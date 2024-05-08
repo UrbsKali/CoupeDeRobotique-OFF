@@ -126,6 +126,8 @@ class LEDStrip:
                 / ((max_angle - min_angle) % math.tau)
                 * len(self.led_indexes["lidar"])
             )
+            
+            if index==len(self.led_indexes) : index-=1 # Edge case
 
             self.set_color(
                 Colors.WHITE,
