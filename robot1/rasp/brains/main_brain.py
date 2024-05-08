@@ -394,7 +394,7 @@ class MainBrain(Brain):
             Point(80, 0),
             relative=True,
             timeout=15.0,
-            **CONFIG.SPEED_PROFILES["slow_speed"],
+            **CONFIG.SPEED_PROFILES["low_speed"],
             **CONFIG.PRECISION_PROFILES["classic_precision"],
         )
 
