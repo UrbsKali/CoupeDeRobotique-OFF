@@ -353,34 +353,34 @@ class MainBrain(Brain):
             Objective("pickup", 1 if in_yellow_team else 3, 12.0),  # etc
             Objective("drop_to_zone", 2 if in_yellow_team else 5, 15.0),
         ]
-        
+
         async def engage_objective(objective: Objective):
             match objective.type:
                 case "pickup":
-                    
+
                     self.logger.log(
-                    f"Going to pickup zone {objective.target}",
-                    LogLevels.INFO,
-                    self.leds,
+                        f"Going to pickup zone {objective.target}",
+                        LogLevels.INFO,
+                        self.leds,
                     )
-                    
+
                     await self.go_and_pickup(self.arena.pickup_zones[objective.target])
-                    
+
                     if objective.raise_elevator_after:
                         # TODO
                         pass
-                                    
+
                 case "drop_to_zone":
-                    
+
                     self.logger.log(
                         f"Going to drop zone {objective.target}",
                         LogLevels.INFO,
                         self.leds,
                     )
-                    
+
                     await self.go_and_drop(self.arena.drop_zones[objective.target])
-                    self.score_estimate+=3
-                
+                    self.score_estimate += 3
+
                 case "drop_to_gardener":
                     # TODO
                     pass
@@ -388,20 +388,26 @@ class MainBrain(Brain):
                 case _:
 
                     raise Exception("Unknown objective type")
-        
+
         for current_objective in objectives:
-            self.logger.log(f"Considering objective: {current_objective}", LogLevels.INFO)
-            
-            if Utils.time_since(start_stage_time) + current_objective.time_estimate > 60:
-                self.logger.log("Not enough time, gotta go fast; leaving plant_stage", LogLevels.INFO)
+            self.logger.log(
+                f"Considering objective: {current_objective}", LogLevels.INFO
+            )
+
+            if (
+                Utils.time_since(start_stage_time) + current_objective.time_estimate
+                > 60
+            ):
+                self.logger.log(
+                    "Not enough time, gotta go fast; leaving plant_stage",
+                    LogLevels.INFO,
+                )
                 # TODO consider what to do if still holding plants
                 break
-            
+
             else:
                 self.logger.log("Engaging objective", LogLevels.INFO)
                 await engage_objective(current_objective)
-                
-
 
     @Brain.task(process=False, run_on_start=False, timeout=30)
     async def solar_panels_stage(self) -> None:
