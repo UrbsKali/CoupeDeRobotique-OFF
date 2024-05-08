@@ -554,7 +554,7 @@ class RollingBasis(Teensy):
         skip_queue=False,
     ):
         msg = Command.SET_PIDS.value + struct.pack(
-            "<fff", l_Kp, l_Ki, l_Kd, r_Kp, r_Ki, r_Kd
+            "<ffffff", l_Kp, l_Ki, l_Kd, r_Kp, r_Ki, r_Kd
         )
         if skip_queue:
             self.queue.insert(0, Instruction(Command.SET_PIDS, msg))
