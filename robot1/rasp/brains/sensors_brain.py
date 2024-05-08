@@ -74,9 +74,9 @@ async def compute_ennemy_position(self):
     self.logger.log(
         (
             f"Ennemy position computed: {self.arena.ennemy_position if self.arena.ennemy_position is not None else 'None'}"
-            + f", at relative angle: {str(round(math.degrees(self.get_ennemy_angle())))} and distance: {distance(self.arena.ennemy_position,self.rolling_basis.odometrie.y)}"
-            if self.arena.ennemy_position is not None
-            else ""
+            + ""
+            if self.arena.ennemy_position is None
+            else f", at relative angle: {str(round(math.degrees(self.get_ennemy_angle())))} and distance: {distance(self.arena.ennemy_position,self.rolling_basis.odometrie.y)}"
         ),
         LogLevels.DEBUG,
     )
@@ -89,7 +89,7 @@ async def compute_ennemy_position(self):
         and self.arena.ennemy_position is not None
     ):
         if (
-            self.rolling_basis.odometrie.distance(self.arena.ennemy_position)
+            distance(self.rolling_basis.odometrie, self.arena.ennemy_position)
             < CONFIG.STOP_TRESHOLD
         ):
             if self.anticollision_mode == AntiCollisionMode.CIRCULAR:
