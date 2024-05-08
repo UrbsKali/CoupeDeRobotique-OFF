@@ -269,8 +269,6 @@ class MainBrain(Brain):
     async def go_and_pickup(
         self,
         target_pickup_zone: Plants_zone,
-        distance_from_zone=15,
-        distance_final_approach=10,
     ) -> None:
         await self.deploy_god_hand()
         await self.open_god_hand()
@@ -278,7 +276,7 @@ class MainBrain(Brain):
         target = self.arena.compute_go_to_destination(
             start_point=self.rolling_basis.odometrie,
             zone=target_pickup_zone.zone,
-            delta=distance_from_zone,
+            delta=15,
         )
 
         await self.smart_go_to(
