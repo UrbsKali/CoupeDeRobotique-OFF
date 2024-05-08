@@ -2,6 +2,7 @@
 import asyncio
 import time
 import math
+from dataclasses import dataclass
 
 # Import from common
 from config_loader import CONFIG
@@ -175,8 +176,8 @@ class MainBrain(Brain):
         await self.plant_stage()
 
         # Clean up
-        await self.endgame()
         self.logger.log("Game over", LogLevels.INFO, self.leds)
+        await self.endgame()
         exit()
 
     async def show_team_led(self):
@@ -308,43 +309,69 @@ class MainBrain(Brain):
     async def plant_stage(self):
         start_stage_time = Utils.get_ts()
         in_yellow_team = self.team == "y"
+        
+        @dataclass
+        class Objective:
+            type: str # objective type ("pickup","drop_to_zone","drop_to_gardener")
+            target: int # index of the target
+            time_estimate: float =-1.0 # time estimate (won't try if it's too late)
+            raise_elevator_after: bool=False # For pickups, whether to start raising the elevator after
+            
+        objectives:list[Objective] = [
+            Objective("pickup",0 if in_yellow_team else 4, 8.0, raise_elevator_after=True), # First zone
+            Objective("drop_to_zone",0 if in_yellow_team else 4, 15.0), # First drop
+            Objective("pickup",1 if in_yellow_team else 3, 12.0), # etc
+            Objective("drop_to_zone",2 if in_yellow_team else 5, 15.0),
+        ]
+        
+        for current_objective in objectives:
+            self.logger.log(f"Considering objective: {current_objective}", LogLevels.INFO)
+            
+            if Utils.time_since(start_stage_time) + current_objective.time_estimate > 60:
+                self.logger.log("Not enough time, gotta go fast; leaving plant_stage", LogLevels.INFO)
+                break # TODO consider what to do id still holding plants
+            
+            else:
+                self.logger.log("Engaging objective", LogLevels.INFO)
+                match current_objective.type:
+                    
+                    case "pickup":
+                        
+                        self.logger.log(
+                        f"Going to pickup zone {current_objective.target}",
+                        LogLevels.INFO,
+                        self.leds,
+                        )
+                        
+                        await self.go_and_pickup(self.arena.pickup_zones[current_objective.target])
+                        
+                        if current_objective.raise_elevator_after:
+                            # TODO
+                            pass
+                        
+                        break
+                    
+                    case "drop_to_zone":
+                        
+                        self.logger.log(
+                            f"Going to drop zone {current_objective.target}",
+                            LogLevels.INFO,
+                            self.leds,
+                        )
+                        
+                        await self.go_and_drop(self.arena.drop_zones[current_objective.target])
+                    
+                        break
 
-        # Closest pickup zone
-        pickup_target: Plants_zone = self.arena.pickup_zones[0 if in_yellow_team else 4]
-        self.logger.log(
-            f"Going to pickup zone {0 if in_yellow_team else 4}",
-            LogLevels.INFO,
-            self.leds,
-        )
-        await self.go_and_pickup(pickup_target)
+                    case "drop_to_gardener":
 
-        drop_target: Plants_zone = self.arena.drop_zones[0 if in_yellow_team else 3]
 
-        self.logger.log(
-            f"Going to drop zone {0 if in_yellow_team else 3}",
-            LogLevels.INFO,
-            self.leds,
-        )
-        await self.go_and_drop(drop_target)
+                        break
 
-        # Next pickup zone
-        pickup_target = self.arena.pickup_zones[1 if in_yellow_team else 3]
+                    case _:
 
-        self.logger.log(
-            f"Going to pickup zone {1 if in_yellow_team else 3}",
-            LogLevels.INFO,
-            self.leds,
-        )
-        await self.go_and_pickup(pickup_target)
+                        raise Exception("Unknown objective type")
 
-        drop_target = self.arena.drop_zones[2 if in_yellow_team else 5]
-
-        self.logger.log(
-            f"Going to drop zone {2 if in_yellow_team else 5}",
-            LogLevels.INFO,
-            self.leds,
-        )
-        await self.go_and_drop(drop_target)
 
     @Brain.task(process=False, run_on_start=False, timeout=30)
     async def solar_panels_stage(self) -> int:
