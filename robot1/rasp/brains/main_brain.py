@@ -192,6 +192,7 @@ class MainBrain(Brain):
         await self.plant_stage()
 
         # Custom return to let PAMIs do their thing
+        self.logger.log("Going to custom endzone", LogLevels.INFO)
         custom_return_zone = self.arena.drop_zones[2 if self.team == "y" else 5].zone
         await self.smart_go_to(
             Point(
@@ -200,6 +201,7 @@ class MainBrain(Brain):
             )
         )
 
+        self.logger.log("Going to regular endzone if needed", LogLevels.INFO)
         await self.go_to_endzone()
 
         # Clean up
@@ -404,6 +406,16 @@ class MainBrain(Brain):
                 False  # For pickups, whether to start raising the elevator after
             )
 
+            def __str__(self):
+                return (
+                    f"{self.task}, at {self.target}, estimated time: {self.time_estimate}"
+                    + (
+                        ""
+                        if not self.raise_elevator_after
+                        else ", then raising elevator for next objective"
+                    )
+                )
+
         async def engage_objective(objective: Objective):
             match objective.task:
                 case "pickup":
@@ -438,7 +450,7 @@ class MainBrain(Brain):
                         self.leds,
                     )
 
-                    await self.go_and_drop_to_gardener()
+                    await self.go_and_drop_to_gardener(objective.target)
                     self.score_estimate += 12
 
                 case _:
