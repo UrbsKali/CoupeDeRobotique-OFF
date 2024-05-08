@@ -149,6 +149,8 @@ class MainBrain(Brain):
         )
 
     def generate_up_to_date_arena(self) -> MarsArena:
+        self.get_team_from_switch()
+        self.leds.set_team(self.team)
         return MarsArena(
             CONFIG.START_INFO_BY_TEAM[self.team]["start_zone_id"],
             logger=self.logger_arena,
