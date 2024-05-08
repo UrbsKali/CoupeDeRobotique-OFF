@@ -464,11 +464,11 @@ class MainBrain(Brain):
                     raise Exception("Unknown objective type")
 
         objectives: list[Objective] = [
-            Objective(
-                "pickup", 0 if in_yellow_team else 4, 8.0, raise_elevator_after=True
-            ),  # First zone
+            Objective("pickup", 0 if in_yellow_team else 4, 8.0),  # First zone
             Objective("drop_to_zone", 2 if in_yellow_team else 5, 15.0),  # First drop
-            Objective("pickup", 1 if in_yellow_team else 3, 12.0, True),  # etc
+            Objective(
+                "pickup", 1 if in_yellow_team else 3, 12.0, raise_elevator_after=True
+            ),  # etc
             Objective("drop_to_gardener", 2 if in_yellow_team else 5, 15.0),
         ]
 
