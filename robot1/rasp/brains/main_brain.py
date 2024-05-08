@@ -217,7 +217,7 @@ class MainBrain(Brain):
     async def drift(self):
         await self.rolling_basis.go_to_and_wait(
             Point(
-                5,
+                10,
                 (-1 if self.team == "y" else 1) * CONFIG.ARENA_CONFIG["robot_buffer"],
             ),
             relative=True,
@@ -284,6 +284,7 @@ class MainBrain(Brain):
             # Open and deploy god hand, to macimize odds of being in home zone and to let go af any plant still held by accident
             await self.deploy_god_hand()
             await self.open_god_hand()
+            await self.actuators.elevator_bottom()
         except Exception:
             pass
         finally:
