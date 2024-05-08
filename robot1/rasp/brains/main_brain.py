@@ -382,5 +382,5 @@ class MainBrain(Brain):
 
         self.logger.log("Killing rolling basis", LogLevels.WARNING)
         self.rolling_basis.stop_and_clear_queue()
-        self.rolling_basis.set_pid(0.0, 0.0, 0.0)
+        self.rolling_basis.set_pids(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
         self.rolling_basis = None

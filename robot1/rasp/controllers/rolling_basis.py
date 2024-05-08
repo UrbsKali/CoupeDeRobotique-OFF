@@ -18,10 +18,10 @@ class Command(Enum):
     GO_TO_POINT = b"\x00"
     CURVE_GO_TO = b"\x01"
     KEEP_CURRENT_POSITION = b"\02"
-    DISABLE_PID = b"\03"
-    ENABLE_PID = b"\04"
+    DISABLE_PIDS = b"\03"
+    ENABLE_PIDS = b"\04"
     RESET_POSITION = b"\05"
-    SET_PID = b"\06"
+    SET_PIDS = b"\06"
     SET_HOME = b"\07"
     GET_ORIENTATION = b"\08"
     STOP = b"\x7E"  # 7E = 126
@@ -504,19 +504,19 @@ class RollingBasis(Teensy):
 
     @Logger
     def disable_pid(self, skip_queue=False):
-        msg = Command.DISABLE_PID.value
+        msg = Command.DISABLE_PIDS.value
         if skip_queue:
-            self.insert_in_queue(0, Instruction(Command.DISABLE_PID, msg), True)
+            self.insert_in_queue(0, Instruction(Command.DISABLE_PIDS, msg), True)
         else:
-            self.queue.append(Instruction(Command.DISABLE_PID, msg))
+            self.queue.append(Instruction(Command.DISABLE_PIDS, msg))
 
     @Logger
     def enable_pid(self, skip_queue=False):
-        msg = Command.ENABLE_PID.value
+        msg = Command.ENABLE_PIDS.value
         if skip_queue:
-            self.insert_in_queue(0, Instruction(Command.ENABLE_PID, msg), True)
+            self.insert_in_queue(0, Instruction(Command.ENABLE_PIDS, msg), True)
         else:
-            self.append_to_queue(Instruction(Command.ENABLE_PID, msg))
+            self.append_to_queue(Instruction(Command.ENABLE_PIDS, msg))
 
     @Logger
     def reset_odo(self, skip_queue=False):
@@ -543,9 +543,20 @@ class RollingBasis(Teensy):
         else:
             self.append_to_queue(Instruction(Command.SET_HOME, msg))
 
-    def set_pid(self, Kp: float, Ki: float, Kd: float, skip_queue=False):
-        msg = Command.SET_PID.value + struct.pack("<fff", Kp, Ki, Kd)
+    def set_pids(
+        self,
+        l_Kp: float,
+        l_Ki: float,
+        l_Kd: float,
+        r_Kp: float,
+        r_Ki: float,
+        r_Kd: float,
+        skip_queue=False,
+    ):
+        msg = Command.SET_PIDS.value + struct.pack(
+            "<fff", l_Kp, l_Ki, l_Kd, r_Kp, r_Ki, r_Kd
+        )
         if skip_queue:
-            self.queue.insert(0, Instruction(Command.SET_PID, msg))
+            self.queue.insert(0, Instruction(Command.SET_PIDS, msg))
         else:
-            self.append_to_queue(Instruction(Command.SET_PID, msg))
+            self.append_to_queue(Instruction(Command.SET_PIDS, msg))

@@ -31,11 +31,14 @@ def get_ennemy_angle(self) -> float | None:
         return None
     else:
         return (
-            math.atan2(
-                self.arena.ennemy_position.y - self.rolling_basis.odometrie.y,
-                self.arena.ennemy_position.x - self.rolling_basis.odometrie.x,
+            (
+                math.atan2(
+                    self.arena.ennemy_position.y - self.rolling_basis.odometrie.y,
+                    self.arena.ennemy_position.x - self.rolling_basis.odometrie.x,
+                )
             )
-        ) - self.rolling_basis.odometrie.theta
+            - self.rolling_basis.odometrie.theta
+        ) % math.tau
 
 
 @Brain.task(process=False, run_on_start=True, refresh_rate=0.5)

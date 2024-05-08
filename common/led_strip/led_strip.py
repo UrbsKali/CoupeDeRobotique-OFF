@@ -114,9 +114,12 @@ class LEDStrip:
                 self.led_indexes["lidar"],
             )
         else:
+            angle %= math.tau
+            min_angle %= math.tau
+            max_angle %= math.tau
             index = int(
-                (angle - min_angle)
-                / (max_angle - min_angle)
+                ((angle - min_angle) % math.tau)
+                / ((max_angle - min_angle) % math.tau)
                 * len(self.led_indexes["lidar"])
             )
 
