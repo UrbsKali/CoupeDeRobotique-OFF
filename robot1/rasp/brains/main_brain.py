@@ -288,8 +288,8 @@ class MainBrain(Brain):
         )
 
         # Drop plants
-        await self.deploy_god_hand()
         await self.open_god_hand()
+        await self.deploy_god_hand()
 
         # Account for removed plants
         target_drop_zone.drop_plants(5)
