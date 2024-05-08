@@ -324,7 +324,9 @@ class MainBrain(Brain):
     async def go_and_drop_to_zone(self, target_drop_zone: Plants_zone) -> None:
 
         target = self.arena.compute_go_to_destination(
-            start_point=self.rolling_basis.odometrie, zone=target_drop_zone.zone
+            start_point=self.rolling_basis.odometrie,
+            zone=target_drop_zone.zone,
+            delta=10,
         )
 
         await self.smart_go_to(
