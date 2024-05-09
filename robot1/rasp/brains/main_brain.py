@@ -215,6 +215,7 @@ class MainBrain(Brain):
 
     @Brain.task(process=False, run_on_start=False, timeout=10)
     async def drift(self):
+        self.rolling_basis.stop_and_clear_queue()
         await self.rolling_basis.go_to_and_wait(
             Point(
                 10,
@@ -229,6 +230,7 @@ class MainBrain(Brain):
         already_there, target = self.compute_return_target()
 
         if not already_there:
+            self.rolling_basis.stop_and_clear_queue()
             await self.smart_go_to(
                 target,
                 **CONFIG.GO_TO_PROFILES["fast"],
