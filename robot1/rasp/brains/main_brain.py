@@ -548,7 +548,7 @@ class MainBrain(Brain):
             )
             if (
                 min([abs(self.rolling_basis.odometrie.y - y) for y in solar_panels_y])
-                > 5
+                < 5
             ):
                 print("deploy")
                 await self.deploy_team_solar_panel()
