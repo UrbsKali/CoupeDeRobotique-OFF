@@ -247,6 +247,7 @@ class RollingBasis(Teensy):
         :param traj_precision: la précision du déplacement, defaults to 50
         :type traj_precision: int, optional
         """
+        self.logger.log(f"go_to: {position}", LogLevels.DEBUG)
         pos = (
             Point(
                 position.x + self.position_offset.x, position.y + self.position_offset.y
