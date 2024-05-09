@@ -533,7 +533,7 @@ class MainBrain(Brain):
     @Brain.task(process=False, run_on_start=False, timeout=30)
     async def control_solar_panels(self, solar_panel_timeout: float = 25.0) -> None:
         solar_panels_y: list[float] = (
-            [30, 50, 70] if self.team == "y" else [270, 250, 230]
+            [27.5, 50, 72.5] if self.team == "y" else [272.5, 250, 227.5]
         )
 
         start_time = Utils.get_ts()
