@@ -169,14 +169,14 @@ class MainBrain(Brain):
     @Brain.task(process=False, run_on_start=not CONFIG.ZOMBIE_MODE)
     async def game(self):
 
-        # No matter what, kill rolling_basis ans everything else in 90s
-        asyncio.create_task(self.time_bomb(90))
-
         await self.setup_actuators()
 
         self.logger.log("Waiting for jack trigger...", LogLevels.INFO, self.leds)
 
         await self.wait_for_trigger()
+        # No matter what, kill rolling_basis ans everything else in 90s
+        asyncio.create_task(self.time_bomb(90))
+
         await self.setup_teams()
         await asyncio.sleep(0.1)
 
