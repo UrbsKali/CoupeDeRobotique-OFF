@@ -265,14 +265,14 @@
           }
         },
         "slow_and_precise": {
-          "max_speed": 120,
+          "max_speed": 140,
           "correction_trajectory_speed": 0,
           "acceleration_start_speed": 120,
           "acceleration_distance": 0,
           "deceleration_end_speed": 110,
           "deceleration_distance": 10,
           "next_position_delay": 100,
-          "action_error_auth": 15,
+          "action_error_auth": 20,
           "traj_precision": 10
         },
         "plant_pickup": {
