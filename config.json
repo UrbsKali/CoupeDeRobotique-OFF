@@ -284,7 +284,7 @@
           "deceleration_distance": 30,
           "next_position_delay": 100,
           "action_error_auth": 20,
-          "traj_precision": 40
+          "traj_precision": 20
         },
         "garden_approach": {
           "max_speed": 160,
