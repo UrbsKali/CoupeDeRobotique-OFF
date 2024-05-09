@@ -120,7 +120,7 @@ class MainBrain(Brain):
         # Check jack state
         self.leds.set_jack(False)
         while self.jack.digital_read():
-            await self.show_team_led()
+            self.show_team_led()
             await asyncio.sleep(0.1)
         self.leds.set_jack(True)
 
@@ -178,11 +178,11 @@ class MainBrain(Brain):
         asyncio.create_task(self.time_bomb(90))
 
         await self.setup_teams()
-        await asyncio.sleep(0.1)
 
         # Solar panels stage
         self.logger.log("Starting solar panels stage...", LogLevels.INFO, self.leds)
         await self.solar_panels_stage()
+        asyncio.create_task(self.undeploy_team_solar_panel())
 
         # Virage contre le mur
         await self.drift()
@@ -236,15 +236,15 @@ class MainBrain(Brain):
                 **CONFIG.PRECISION_PROFILES["classic_precision"],
             )
 
-    async def show_team_led(self):
+    def show_team_led(self):
         self.get_team_from_switch()
         self.leds.set_team(self.team)
 
     async def undeploy_all(self):
-        await self.close_god_hand()
-        await self.vertical_god_hand()
-        await self.undeploy_left_solar_panel()
-        await self.undeploy_right_solar_panel()
+        asyncio.create_task(self.close_god_hand())
+        asyncio.create_task(self.vertical_god_hand())
+        asyncio.create_task(self.undeploy_left_solar_panel())
+        asyncio.create_task(self.undeploy_right_solar_panel())
 
     async def back_and_forth(self, distance: float = 50.0):
         await self.rolling_basis.go_to_and_wait(
@@ -282,9 +282,9 @@ class MainBrain(Brain):
         # Keep kill_rolling_basis outside a try to be absolutely sure to get to it
         try:
             # Open and deploy god hand, to macimize odds of being in home zone and to let go af any plant still held by accident
-            await self.deploy_god_hand()
-            await self.open_god_hand()
-            await self.actuators.elevator_bottom()
+            asyncio.create_task(self.deploy_god_hand())
+            asyncio.create_task(self.open_god_hand())
+            asyncio.create_task(self.actuators.elevator_bottom())
             self.leds.set_score(self.score_estimate)
         except Exception:
             pass
@@ -296,8 +296,8 @@ class MainBrain(Brain):
         self,
         target_pickup_zone: Plants_zone,
     ) -> None:
-        await self.deploy_god_hand()
-        await self.open_god_hand()
+        asyncio.create_task(self.deploy_god_hand())
+        asyncio.create_task(self.open_god_hand())
 
         approach_target = self.arena.compute_go_to_destination(
             start_point=self.rolling_basis.odometrie,
@@ -326,9 +326,9 @@ class MainBrain(Brain):
         )
 
         # Grab plants
-        await self.close_god_hand()
+        asyncio.create_task(self.close_god_hand())
         await asyncio.sleep(0.1)
-        await self.undeploy_god_hand()
+        asyncio.create_task(self.undeploy_god_hand())
 
         # Account for removed plants
         target_pickup_zone.take_plants(5)
@@ -352,8 +352,9 @@ class MainBrain(Brain):
         )
 
         # Drop plants
-        await self.deploy_god_hand()
-        await self.open_god_hand()
+        asyncio.create_task(self.deploy_god_hand())
+        await asyncio.sleep(0.1)
+        asyncio.create_task(self.open_god_hand())
 
         # Account for removed plants
         target_drop_zone.drop_plants(5)
@@ -409,7 +410,7 @@ class MainBrain(Brain):
 
         target_gardener.drop_plants(5)
 
-        await self.actuators.elevator_bottom()
+        asyncio.create_task(self.actuators.elevator_bottom())
 
     @Brain.task(process=False, run_on_start=False, timeout=60)
     async def plant_stage(self):
@@ -449,7 +450,7 @@ class MainBrain(Brain):
                     )
 
                     if objective.raise_elevator_after:
-                        await self.actuators.elevator_top()
+                        asyncio.create_task(self.actuators.elevator_top())
 
                 case "drop_to_zone":
                     self.logger.log(
@@ -545,33 +546,6 @@ class MainBrain(Brain):
                     solar_panels_y.pop(i)
                     await self.deploy_team_solar_panel()
                     break
-
-    @Brain.task(process=False, run_on_start=False, timeout=30)
-    async def old_solar_panels_stage(self) -> int:
-        solar_panels_distances = [26, 21, 21]
-
-        for i in range(len(solar_panels_distances)):
-            self.logger.log(f"Doing solar panel {i}", LogLevels.INFO, self.leds)
-            await self.deploy_team_solar_panel()
-            go_to_result = await self.rolling_basis.go_to_and_wait(
-                Point(solar_panels_distances[i], 0),
-                relative=True,
-                timeout=7.0,
-                **CONFIG.SPEED_PROFILES["cruise_speed"],
-                **CONFIG.PRECISION_PROFILES["classic_precision"],
-            )
-
-            if go_to_result != 0:
-                self.logger.log(
-                    f"Error going to solar panel {i}, go_to_and_wait returned: {go_to_result}",
-                    LogLevels.WARNING,
-                    self.leds,
-                )
-                break
-            self.logger.log(f"Finished solar panel {i}", LogLevels.INFO, self.leds)
-
-        await self.undeploy_team_solar_panel()
-        return go_to_result
 
     @Brain.task(process=False, run_on_start=not CONFIG.ZOMBIE_MODE, refresh_rate=2)
     async def update_return_eta(self):

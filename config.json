@@ -317,7 +317,7 @@
         "bottom_steps": 0,
         "speed": 4000
       },
-      "minimum_delay": 0.1
+      "minimum_delay": 0.05
     },
     "lidar": {
       "distances_unit": "cm",
