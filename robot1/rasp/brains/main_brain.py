@@ -306,7 +306,7 @@ class MainBrain(Brain):
         await self.smart_go_to(
             position=approach_target,
             timeout=30,
-            **CONFIG.GO_TO_PROFILES["plant_pickup"]
+            **CONFIG.GO_TO_PROFILES["plant_pickup"],
         )
 
         # Grab plants
@@ -347,7 +347,7 @@ class MainBrain(Brain):
             Point(-30, 0),
             timeout=10,
             forward=False,
-            **CONFIG.GO_TO_PROFILES["fast"]
+            **CONFIG.GO_TO_PROFILES["fast"],
             relative=True,
         )
 
@@ -362,10 +362,7 @@ class MainBrain(Brain):
             target_gardener.zone.centroid.y,
         )
 
-        await self.smart_go_to(
-            approach_target,
-            **CONFIG.GO_TO_PROFILES["fast"]
-        )
+        await self.smart_go_to(approach_target, **CONFIG.GO_TO_PROFILES["fast"])
 
         final_target: Point = Point(200 - 12.75, target_gardener.zone.centroid.y)
 
