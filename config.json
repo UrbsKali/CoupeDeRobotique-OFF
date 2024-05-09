@@ -263,6 +263,39 @@
             "deceleration_end_speed": 120,
             "deceleration_distance": 0
           }
+        },
+        "slow_and_precise": {
+          "max_speed": 120,
+          "correction_trajectory_speed": 0,
+          "acceleration_start_speed": 120,
+          "acceleration_distance": 0,
+          "deceleration_end_speed": 110,
+          "deceleration_distance": 10,
+          "next_position_delay": 100,
+          "action_error_auth": 15,
+          "traj_precision": 10
+        },
+        "plant_pickup": {
+          "max_speed": 180,
+          "correction_trajectory_speed": 0,
+          "acceleration_start_speed": 130,
+          "acceleration_distance": 10,
+          "deceleration_end_speed": 100,
+          "deceleration_distance": 30,
+          "next_position_delay": 100,
+          "action_error_auth": 20,
+          "traj_precision": 50
+        },
+        "fast": {
+          "max_speed": 180,
+          "correction_trajectory_speed": 0,
+          "acceleration_start_speed": 130,
+          "acceleration_distance": 10,
+          "deceleration_end_speed": 130,
+          "deceleration_distance": 10,
+          "next_position_delay": 100,
+          "action_error_auth": 20,
+          "traj_precision": 80
         }
       }
     },
