@@ -247,7 +247,7 @@ async def avoid_obstacle(
     elif self.anticollision_handle == AntiCollisionHandle.WAIT_AND_FAIL:
         await asyncio.sleep(5)
         return 2
-    elif self.anticollision_handle == AntiCollisionHandle.WAIT_AND_RETRY and fails < 2:
+    elif self.anticollision_handle == AntiCollisionHandle.WAIT_AND_RETRY and fails < 1:
         await asyncio.sleep(2)
         return await self.smart_go_to(
             original_target,
