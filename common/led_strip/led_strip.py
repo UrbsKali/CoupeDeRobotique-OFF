@@ -40,7 +40,12 @@ class LEDStrip:
         self.is_ready(False)
         self.set_jack(False)
 
-        self.log_history = [Colors.BLACK for _ in self.led_indexes["log"]]
+        self.log_size = 7
+        self.is_ready_index = 7
+        self.jeck_index = 8
+        self.team_index = 9
+
+        self.log_history = [Colors.BLACK for _ in list(range(self.log_size))]
 
     def set_color(
         self, color: RGBW | list[RGBW] | tuple[int], index: list | int | None = None
@@ -76,33 +81,75 @@ class LEDStrip:
     def clear(self):
         self.set_color(Color(0, 0, 0))
 
+    def set_pillars(
+        self, color: RGBW | list[RGBW] | tuple[int], index: list | int | None = None
+    ):
+        self.set_color(color, self.get_pillars_indexes(index))
+
+    def get_pillars_indexes(self, index: int | list[int] | None) -> list[int]:
+        indexes: list[int] = []
+        pillar_names = [
+            "inside_front_right",
+            "inside_back_right",
+            "inside_back_left",
+            "inside_front_left",
+        ]
+
+        if index is None:
+            index = [
+                i
+                for i in range(
+                    max(
+                        [
+                            len(self.led_indexes[pillar_name])
+                            for pillar_name in pillar_names
+                        ]
+                    )
+                )
+            ]
+
+        if isinstance(index, list):
+            for i in index:
+                for pillar_name in pillar_names:
+                    if i < len(self.led_indexes[pillar_name]):
+                        indexes.append(self.led_indexes[pillar_name][i])
+
+        else:  # Case int
+            for pillar_name in [
+                "inside_front_right",
+                "inside_back_right",
+                "inside_back_left",
+                "inside_front_left",
+            ]:
+                if index < len(self.led_indexes[pillar_name]):
+                    indexes.append(self.led_indexes[pillar_name][index])
+
+        return indexes
+
     def log(self, log_level: LogLevels):
         self.log_history.insert(0, LogColors[log_level])
         del self.log_history[-1]
-        self.set_color(self.log_history, self.led_indexes["log"])
+        self.set_pillars(self.log_history, list(range(7)))
 
     def is_ready(self, state=True):
-        self.set_color(
+        self.set_pillars(
             Colors.GREEN if state else Colors.RED,
-            self.led_indexes["is_ready"],
+            self.is_ready_index,
         )
 
     def set_jack(self, state):
-        self.set_color(Colors.GREEN if state else Colors.RED, self.led_indexes["jack"])
+        self.set_pillars(Colors.GREEN if state else Colors.RED, self.jeck_index)
 
     def set_team(self, team):
         # print(f"Set team to {team}")
-        self.set_color(
-            Colors.YELLOW if team == "y" else Colors.BLUE, self.led_indexes["team"]
-        )
+        self.set_pillars(Colors.YELLOW if team == "y" else Colors.BLUE, self.team_index)
 
-    def acs_state(self, state):
-        self.set_color(
-            Colors.RED if state else Colors.GREEN, self.led_indexes["acs_trigger"]
-        )
-
-    def lidar_direction(
-        self, angle: float | None, max_angle: float, min_angle: float = 0.0
+    def lidar_info(
+        self,
+        triggered: bool = False,
+        angle: float | None = None,
+        max_angle: float = 2 * math.pi,
+        min_angle: float = 0.0,
     ):
         """Lights up led in given direction (proportionally)
 
@@ -114,7 +161,7 @@ class LEDStrip:
 
         if angle == None:
             self.set_color(
-                Colors.YELLOW,
+                Colors.ORANGE if triggered else Colors.BLACK,
                 self.led_indexes["lidar"],
             )
         else:
@@ -131,15 +178,8 @@ class LEDStrip:
                 index -= 1  # Edge case
 
             self.set_color(
-                Colors.WHITE,
+                Colors.YELLOW if triggered else Colors.WHITE,
                 self.led_indexes["lidar"][:index]
                 + self.led_indexes["lidar"][index + 1 :],
             )
             self.set_color(Colors.RED, self.led_indexes["lidar"][index])
-
-    def set_progress(self, total_duration, current_progress):
-        progress = int(
-            (current_progress / total_duration) * len(self.led_indexes["progress"])
-        )
-        self.set_color(Colors.ORANGE, self.led_indexes["progress"][:progress])
-        self.set_color(Colors.BLACK, self.led_indexes["progress"][progress:])

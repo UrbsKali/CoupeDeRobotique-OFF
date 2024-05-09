@@ -117,12 +117,12 @@ async def compute_ennemy_position(self):
             "ACS triggered, performing emergency stop", LogLevels.WARNING, self.leds
         )
         self.rolling_basis.stop_and_clear_queue()
-        self.leds.acs_state(True)
     else:
         # self.logger.log("ACS not triggered", LogLevels.DEBUG)
-        self.leds.acs_state(False)
+        pass
 
-    self.leds.lidar_direction(
+    self.leds.lidar_info(
+        trigger_acs,
         self.get_ennemy_angle(),
         # Config values are centered to the right of the Lidar, but we have since switched to being centered on the front so we just balance out the extremums
         (CONFIG.LIDAR_MAX_ANGLE - CONFIG.LIDAR_MIN_ANGLE) / 2,
