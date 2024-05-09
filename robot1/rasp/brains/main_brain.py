@@ -135,6 +135,7 @@ class MainBrain(Brain):
         await self.undeploy_right_solar_panel()
         await self.undeploy_left_solar_panel()
         await self.actuators.elevator_intermediate()
+        await asyncio.sleep(3)
         await self.vertical_god_hand()
 
     @Brain.task(process=False, run_on_start=False)
