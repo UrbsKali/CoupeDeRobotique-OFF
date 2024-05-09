@@ -216,15 +216,28 @@ class MainBrain(Brain):
     @Brain.task(process=False, run_on_start=False, timeout=10)
     async def drift(self):
         self.rolling_basis.stop_and_clear_queue()
-        await self.rolling_basis.go_to_and_wait(
-            Point(
-                10,
-                (-1 if self.team == "y" else 1) * CONFIG.ARENA_CONFIG["robot_buffer"],
-            ),
-            relative=True,
-            **CONFIG.GO_TO_PROFILES["fast"],
-            timeout=5,
-        )
+        distance = 5
+        angle = (-1 if self.team == "y" else 1) * math.pi / 6
+        if (
+            await self.rolling_basis.go_to_and_wait(
+                Point(
+                    distance * math.cos(angle),
+                    distance * math.sin(angle),
+                ),
+                relative=True,
+                **CONFIG.GO_TO_PROFILES["fast"],
+                timeout=5,
+            )
+        ) == 1:
+            await self.rolling_basis.go_to_and_wait(
+                Point(
+                    10,
+                    0,
+                ),
+                relative=True,
+                **CONFIG.GO_TO_PROFILES["fast"],
+                timeout=2,
+            )
 
     @Brain.task(process=False, run_on_start=False)
     async def go_to_endzone(self):
