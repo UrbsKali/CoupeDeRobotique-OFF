@@ -317,8 +317,6 @@ class MainBrain(Brain):
         # Account for removed plants
         target_pickup_zone.take_plants(5)
 
-        self.actuators.stepper_step(350, 5000)
-
     @Logger
     async def go_and_drop_to_zone(self, target_drop_zone: Plants_zone) -> None:
 
@@ -350,8 +348,6 @@ class MainBrain(Brain):
             **CONFIG.GO_TO_PROFILES["fast"],
             relative=True,
         )
-
-        self.actuators.stepper_step(-350, 5000)
 
     @Logger
     async def go_and_drop_to_gardener(self, target_gardener: Plants_zone) -> None:
