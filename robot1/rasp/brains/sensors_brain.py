@@ -51,23 +51,6 @@ async def compute_ennemy_position(self):
 
     # self.logger.log(f"obstacles: {obstacles}", LogLevels.DEBUG)
 
-    # asyncio.create_task(
-    #     self.ws_lidar.sender.send(
-    #         WSmsg(
-    #             msg="obstacles",
-    #             data=(
-    #                 []
-    #                 if is_empty(obstacles)
-    #                 else (
-    #                     [(geom.x, geom.y) for geom in obstacles.geoms]
-    #                     if isinstance(obstacles, MultiPoint)
-    #                     else (obstacles.x, obstacles.y)
-    #                 )
-    #             ),
-    #         )
-    #     )
-    # )
-
     # For now, the closest will be the enemy position
     self.arena.ennemy_position = (
         None
