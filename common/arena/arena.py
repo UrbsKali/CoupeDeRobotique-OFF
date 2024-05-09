@@ -234,9 +234,9 @@ class Arena:
 
                 intersections = circle_delta.intersection(line)
 
-                self.logger.log(
-                    f"Computed intersections: {intersections}", LogLevels.DEBUG
-                )
+                # self.logger.log(
+                #     f"Computed intersections: {intersections}", LogLevels.DEBUG
+                # )
 
                 assert (
                     isinstance(intersections, MultiPoint)
