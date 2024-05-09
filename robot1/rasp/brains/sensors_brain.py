@@ -121,7 +121,7 @@ async def compute_ennemy_position(self):
         # self.logger.log("ACS not triggered", LogLevels.DEBUG)
         pass
 
-    self.leds.lidar_info(
+    self.leds.set_lidar_info(
         trigger_acs,
         self.get_ennemy_angle(),
         # Config values are centered to the right of the Lidar, but we have since switched to being centered on the front so we just balance out the extremums

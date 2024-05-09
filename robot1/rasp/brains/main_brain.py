@@ -285,6 +285,7 @@ class MainBrain(Brain):
             await self.deploy_god_hand()
             await self.open_god_hand()
             await self.actuators.elevator_bottom()
+            self.leds.set_score(self.score_estimate)
         except Exception:
             pass
         finally:

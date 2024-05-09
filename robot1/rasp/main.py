@@ -109,7 +109,7 @@ if __name__ == "__main__":
     actuators = Actuators(logger=logger_actuators)
 
     # Brain
-    leds.is_ready()
+    leds.set_is_ready()
     brain = MainBrain(
         actuators=actuators,
         logger=logger_brain,

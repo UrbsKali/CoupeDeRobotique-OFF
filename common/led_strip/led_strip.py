@@ -37,7 +37,7 @@ class LEDStrip:
         self.set_color(Color(0, 0, 0))
         self.led_indexes = led_indexes
 
-        self.is_ready(False)
+        self.set_is_ready(False)
         self.set_jack(False)
 
         self.log_size = 7
@@ -131,7 +131,7 @@ class LEDStrip:
         del self.log_history[-1]
         self.set_pillars(self.log_history, list(range(7)))
 
-    def is_ready(self, state=True):
+    def set_is_ready(self, state=True):
         self.set_pillars(
             Colors.GREEN if state else Colors.RED,
             self.is_ready_index,
@@ -144,7 +144,7 @@ class LEDStrip:
         # print(f"Set team to {team}")
         self.set_pillars(Colors.YELLOW if team == "y" else Colors.BLUE, self.team_index)
 
-    def lidar_info(
+    def set_lidar_info(
         self,
         triggered: bool = False,
         angle: float | None = None,
@@ -183,3 +183,16 @@ class LEDStrip:
                 + self.led_indexes["lidar"][index + 1 :],
             )
             self.set_color(Colors.RED, self.led_indexes["lidar"][index])
+
+    def set_score(self, score: int):
+        self.set_color(
+            Colors.BLACK,
+            self.led_indexes["score"]["tens"] + self.led_indexes["score"]["units"],
+        )
+        tens = score / 10
+        units = score % 10
+        if tens >= 10:
+            tens = 9
+
+        self.set_color(Colors.WHITE, self.led_indexes["score"]["tens"][tens])
+        self.set_color(Colors.WHITE, self.led_indexes["score"]["units"][units])
