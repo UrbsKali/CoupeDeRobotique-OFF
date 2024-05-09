@@ -325,7 +325,7 @@ class MainBrain(Brain):
         target = self.arena.compute_go_to_destination(
             start_point=self.rolling_basis.odometrie,
             zone=target_drop_zone.zone,
-            delta=10,
+            delta=15,
         )
 
         await self.smart_go_to(
