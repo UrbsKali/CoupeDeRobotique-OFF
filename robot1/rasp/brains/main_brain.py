@@ -339,8 +339,6 @@ class MainBrain(Brain):
 
         # Grab plants
         await self.close_god_hand()
-        await asyncio.sleep(0.1)
-        await self.undeploy_god_hand()
 
         # Account for removed plants
         target_pickup_zone.take_plants(5)
@@ -454,6 +452,8 @@ class MainBrain(Brain):
 
                     if objective.raise_elevator_after:
                         asyncio.create_task(self.actuators.elevator_top())
+                    else:
+                        asyncio.create_task(self.undeploy_god_hand())
 
                 case "drop_to_zone":
                     self.logger.log(
