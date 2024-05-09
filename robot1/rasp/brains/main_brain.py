@@ -317,7 +317,7 @@ class MainBrain(Brain):
         approach_target = self.arena.compute_go_to_destination(
             start_point=self.rolling_basis.odometrie,
             zone=target_pickup_zone.zone,
-            delta=20,
+            delta=25,
         )
         await self.smart_go_to(
             position=approach_target,
@@ -338,8 +338,8 @@ class MainBrain(Brain):
         )
 
         # Grab plants
-        asyncio.create_task(self.close_god_hand())
-
+        await self.close_god_hand()
+        await asyncio.sleep(0.1)
         await self.undeploy_god_hand()
 
         # Account for removed plants

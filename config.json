@@ -287,7 +287,7 @@
           "traj_precision": 40
         },
         "plant_pickup": {
-          "max_speed": 110,
+          "max_speed": 120,
           "correction_trajectory_speed": 0,
           "acceleration_start_speed": 110,
           "acceleration_distance": 0,
