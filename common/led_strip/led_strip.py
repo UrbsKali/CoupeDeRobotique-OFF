@@ -34,11 +34,7 @@ class LEDStrip:
             num=num_leds, pin=pin, freq_hz=frequency, brightness=brightness
         )
         self._strip.begin()
-        self.set_color(Color(0, 0, 0))
         self.led_indexes = led_indexes
-
-        self.set_is_ready(False)
-        self.set_jack(False)
 
         self.log_size = 7
         self.is_ready_index = 7
@@ -46,6 +42,11 @@ class LEDStrip:
         self.team_index = 9
 
         self.log_history = [Colors.BLACK for _ in list(range(self.log_size))]
+
+        self.set_color(Color(0, 0, 0))
+        self.set_is_ready(False)
+        self.set_jack(False)
+        self.set_pillars(Color(20, 20, 20))
 
     def set_color(
         self, color: RGBW | list[RGBW] | tuple[int], index: list | int | None = None
