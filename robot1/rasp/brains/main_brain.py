@@ -535,23 +535,16 @@ class MainBrain(Brain):
         solar_panels_y: list[float] = (
             [30, 50, 70] if self.team == "y" else [270, 250, 230]
         )
+
         start_time = Utils.get_ts()
         while Utils.time_since(start_time) < solar_panel_timeout:
             await asyncio.sleep(0.1)
-            print(
-                "mins list",
-                [abs(self.rolling_basis.odometrie.y - y) for y in solar_panels_y],
-            )
-            print(
-                "min value",
-                min([abs(self.rolling_basis.odometrie.y - y) for y in solar_panels_y]),
-            )
-            if (
-                min([abs(self.rolling_basis.odometrie.y - y) for y in solar_panels_y])
-                < 5
-            ):
-                print("deploy")
-                await self.deploy_team_solar_panel()
+            for i, y in enumerate(solar_panels_y):
+                if abs(self.rolling_basis.odometrie.y - y) < 5:
+                    solar_panels_y.pop(i)
+                    await self.deploy_team_solar_panel()
+                    print("deploy", i, y)
+                    break
 
     @Brain.task(process=False, run_on_start=False, timeout=30)
     async def old_solar_panels_stage(self) -> int:
