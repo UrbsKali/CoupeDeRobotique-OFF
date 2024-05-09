@@ -194,6 +194,7 @@ class LEDStrip:
         units = score % 10
         if tens >= 10:
             tens = 9
+            units = 9
 
         self.set_color(Colors.WHITE, self.led_indexes["score"]["tens"][tens])
         self.set_color(Colors.WHITE, self.led_indexes["score"]["units"][units])
