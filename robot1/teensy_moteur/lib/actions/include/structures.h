@@ -89,6 +89,10 @@ public:
 struct Profil_params
 {
     byte offset;
-    float gamma; // Gamma is the slope of the affine line representing the acceleration profile
     float distance;
+
+    float a; // Propotionnal offset
+    float p; // Variation strenght
+    float b; // Center to 0
+    float c; // Slope
 };
