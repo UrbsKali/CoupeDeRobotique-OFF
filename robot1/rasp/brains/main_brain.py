@@ -573,7 +573,7 @@ class MainBrain(Brain):
         await self.undeploy_team_solar_panel()
         return go_to_result
 
-    @Brain.task(process=False, run_on_start=True, refresh_rate=2)
+    @Brain.task(process=False, run_on_start=not CONFIG.ZOMBIE_MODE, refresh_rate=2)
     async def update_return_eta(self):
 
         already_there, target = self.compute_return_target()
