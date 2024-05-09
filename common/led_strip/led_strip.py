@@ -190,7 +190,7 @@ class LEDStrip:
             Colors.BLACK,
             self.led_indexes["score"]["tens"] + self.led_indexes["score"]["units"],
         )
-        tens = score / 10
+        tens = score // 10
         units = score % 10
         if tens >= 10:
             tens = 9
