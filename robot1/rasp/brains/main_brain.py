@@ -223,6 +223,7 @@ class MainBrain(Brain):
             ),
             relative=True,
             **CONFIG.GO_TO_PROFILES["fast"],
+            timeout=5,
         )
 
     @Brain.task(process=False, run_on_start=False)
@@ -307,14 +308,14 @@ class MainBrain(Brain):
 
         await self.smart_go_to(
             position=approach_target,
-            timeout=30,
+            timeout=15,
             **CONFIG.GO_TO_PROFILES["plant_pickup"],
         )
 
         # Grab plants
         asyncio.create_task(self.close_god_hand())
-        await asyncio.sleep(0.1)
-        asyncio.create_task(self.undeploy_god_hand())
+
+        await self.undeploy_god_hand()
 
         # Account for removed plants
         target_pickup_zone.take_plants(5)
@@ -330,7 +331,7 @@ class MainBrain(Brain):
 
         await self.smart_go_to(
             position=target,
-            timeout=30,
+            timeout=15,
             **CONFIG.GO_TO_PROFILES["fast"],
         )
 
@@ -345,7 +346,7 @@ class MainBrain(Brain):
         # Step back
         await self.smart_go_to(
             Point(-30, 0),
-            timeout=10,
+            timeout=5,
             forward=False,
             **CONFIG.GO_TO_PROFILES["plant_pickup"],
             relative=True,
@@ -360,15 +361,16 @@ class MainBrain(Brain):
             target_gardener.zone.centroid.y,
         )
 
-        await self.smart_go_to(approach_target, **CONFIG.GO_TO_PROFILES["plant_pickup"])
+        await self.smart_go_to(
+            approach_target, **CONFIG.GO_TO_PROFILES["plant_pickup"], timeout=8
+        )
 
         final_target: Point = Point(
             200 - 12.75, self.rolling_basis.odometrie.y
         )  # To make sure to be orthogonal to the wall, use a relative y
 
         await self.smart_go_to(
-            final_target,
-            **CONFIG.GO_TO_PROFILES["slow_and_precise"],
+            final_target, **CONFIG.GO_TO_PROFILES["slow_and_precise"], timeout=5
         )
 
         await self.deploy_god_hand()
@@ -378,7 +380,7 @@ class MainBrain(Brain):
         # Step back
         await self.smart_go_to(
             Point(-CONFIG.ARENA_CONFIG["robot_buffer"], 0),
-            timeout=10,
+            timeout=5,
             forward=False,
             relative=True,
             **CONFIG.GO_TO_PROFILES["plant_pickup"],
