@@ -345,7 +345,7 @@ class MainBrain(Brain):
             Point(-30, 0),
             timeout=10,
             forward=False,
-            **CONFIG.GO_TO_PROFILES["fast"],
+            **CONFIG.GO_TO_PROFILES["plant_pickup"],
             relative=True,
         )
 
@@ -377,7 +377,7 @@ class MainBrain(Brain):
             timeout=10,
             forward=False,
             relative=True,
-            **CONFIG.GO_TO_PROFILES["fast"],
+            **CONFIG.GO_TO_PROFILES["plant_pickup"],
         )
 
         target_gardener.drop_plants(5)
