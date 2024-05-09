@@ -286,6 +286,17 @@
           "action_error_auth": 20,
           "traj_precision": 50
         },
+        "garden_approach": {
+          "max_speed": 160,
+          "correction_trajectory_speed": 0,
+          "acceleration_start_speed": 160,
+          "acceleration_distance": 0,
+          "deceleration_end_speed": 160,
+          "deceleration_distance": 0,
+          "next_position_delay": 100,
+          "action_error_auth": 20,
+          "traj_precision": 20
+        },
         "fast": {
           "max_speed": 180,
           "correction_trajectory_speed": 0,

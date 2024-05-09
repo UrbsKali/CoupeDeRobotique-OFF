@@ -362,7 +362,7 @@ class MainBrain(Brain):
         )
 
         await self.smart_go_to(
-            approach_target, **CONFIG.GO_TO_PROFILES["plant_pickup"], timeout=8
+            approach_target, **CONFIG.GO_TO_PROFILES["garden_approach"], timeout=8
         )
 
         final_target: Point = Point(
