@@ -1,107 +1,64 @@
 #include <speed_driver.h>
 #include <Arduino.h>
+#include <math.h>
 
 // Speed driver generic class
 void Speed_Driver::compute_acceleration_profile(Rolling_Basis_Params *rolling_basis_params, long end_ticks)
 {
     this->end_ticks = end_ticks;
 
-    // Compute acceleration profile
-    if (this->acceleration_params.gamma == -1.0f)
+    // Compute acceleration profile if not already done and distance is not 0
+    if (this->acceleration_params.distance != 0.0f && (this->acceleration_params.a == -1.0f || this->acceleration_params.b == -1.0f || this->acceleration_params.c == -1.0f))
     {
-        byte y_delta = this->max_speed - this->acceleration_params.offset;
-        float distance_to_max_speed_ticks = (this->acceleration_params.distance * rolling_basis_params->encoder_resolution) / rolling_basis_params->wheel_perimeter;
-        if(distance_to_max_speed_ticks == 0.0f)
-            this->acceleration_params.gamma = 0.0f;
-        else
-            this->acceleration_params.gamma = (float)y_delta / distance_to_max_speed_ticks;
+        this->acceleration_params.a = this->acceleration_params.offset / this->max_speed;
+        this->acceleration_params.b = this->acceleration_params.distance / 2;
+        this->acceleration_params.c = logf(((1 - this->acceleration_params.a) / this->acceleration_params.p) - 1.0f) / this->acceleration_params.b;
     }
 
     // Compute deceleration profile
-    if (this->deceleration_params.gamma == -1.0f)
+    if (this->deceleration_params.distance != 0.0f && (this->deceleration_params.a == -1.0f || this->deceleration_params.b == -1.0f || this->deceleration_params.c == -1.0f))
     {
-        byte y_delta = this->max_speed - this->deceleration_params.offset;
-        float distance_to_speed_down_ticks = this->end_ticks - (this->deceleration_params.distance * rolling_basis_params->encoder_resolution) / rolling_basis_params->wheel_perimeter;
-        if(distance_to_speed_down_ticks == 0.0f)
-            this->deceleration_params.gamma = 0.0f;
-        else
-            this->deceleration_params.gamma = (float)y_delta / distance_to_speed_down_ticks;
+        this->deceleration_params.a = this->deceleration_params.offset / this->max_speed;
+        this->deceleration_params.b = this->deceleration_params.distance / 2;
+        this->deceleration_params.c = logf(((1 - this->deceleration_params.a) / this->deceleration_params.p) - 1.0f) / this->deceleration_params.b;
     }
 }
 
 byte Speed_Driver::compute_local_speed(long ticks)
 {
-    // Calculation of speed change points (acceleration -> plateau -> deceleration)
-    long start_ceiling_ticks = (this->max_speed - this->acceleration_params.offset) / this->acceleration_params.gamma;
-    long end_ceiling_ticks = ((this->max_speed - this->deceleration_params.offset) / this->deceleration_params.gamma) + this->end_ticks;
+    // Compute ticks to do
+    long delta_ticks = this->end_ticks - ticks;
 
-    byte speed = 0;
+    // Compute speed with acceleration and deceleration curves
+    byte acceleration_speed = this->max_speed;
+    if (this->acceleration_params.distance != 0.0f)
+        acceleration_speed = (byte)constrain(this->max_speed * (1.0f - this->acceleration_params.a) * ((1.0f / (1.0f + expf(-this->acceleration_params.c * (ticks - this->acceleration_params.b))))) + this->acceleration_params.a, this->acceleration_params.offset, this->max_speed);
 
-    // Check if there is a ceiling
-    if (start_ceiling_ticks < end_ceiling_ticks)
-    {
-        // We are in the acceleration phase
-        if (ticks < start_ceiling_ticks)
-            speed = (byte)(this->acceleration_params.gamma * ticks + this->acceleration_params.offset);
+    byte deceleration_speed = this->max_speed;
+    if (this->deceleration_params.distance != 0.0f)
+        deceleration_speed = (byte)constrain(this->max_speed * (1.0f - this->deceleration_params.a) * ((1.0f / (1.0f + expf(-this->deceleration_params.c * (delta_ticks - this->deceleration_params.b))))) + this->deceleration_params.a, this->deceleration_params.offset, this->max_speed);
 
-        // We are in the plateau phase
-        else if (ticks < end_ceiling_ticks)
-            speed = this->max_speed;
-
-        // We are in the deceleration phase
-        else
-            speed = (byte)(this->deceleration_params.gamma * (ticks - this->end_ticks) + this->deceleration_params.offset);
-    }
-    // No ceiling
-    else
-    {
-        // Calculate the intersection point between the acceleration and deceleration trajectories
-        long intersection_ticks = (this->deceleration_params.offset - this->acceleration_params.offset - (this->deceleration_params.gamma * this->end_ticks)) / (this->acceleration_params.gamma - this->deceleration_params.gamma);
-
-        // phase acceleration
-        if (ticks < intersection_ticks)
-            speed = (byte)(this->acceleration_params.gamma * ticks + this->acceleration_params.offset);
-
-        // phase deceleration
-        else
-            speed = (byte)(this->deceleration_params.gamma * (ticks - this->end_ticks) + this->deceleration_params.offset);
-    }
-
-    // Reduce speed is the next move is a correction
-    if (this->next_move_correction && this->correction_speed != 0)
-    {
-        this->next_move_correction = false;
-        return this->correction_speed;
-    }
-    return speed;
-}
-
-// Speed driver from gamma
-Speed_Driver_From_Gamma::Speed_Driver_From_Gamma(byte max_speed, byte correction_speed, Profil_params acceleration, Profil_params deceleration)
-{
-    this->max_speed = max_speed;
-    this->correction_speed = correction_speed;
-
-    // Acceleration params
-    this->acceleration_params.offset = acceleration.offset;
-    this->acceleration_params.gamma = acceleration.gamma;
-
-    // Deceleration params
-    this->deceleration_params.offset = deceleration.offset;
-    this->deceleration_params.gamma = deceleration.gamma;
+    // Keep min vale between both curves values
+    if (acceleration_speed < deceleration_speed)
+        return acceleration_speed;
+    return deceleration_speed;
 }
 
 // Speed driver from distance
-Speed_Driver_From_Distance::Speed_Driver_From_Distance(byte max_speed, byte correction_speed, Profil_params acceleration, Profil_params deceleration)
+Speed_Driver_From_Distance::Speed_Driver_From_Distance(byte max_speed, byte correction_speed, float acceleration_offset, float acceleration_distance, float deceleration_offset, float deceleration_distance)
 {
     this->max_speed = max_speed;
     this->correction_speed = correction_speed;
 
     // Acceleration params
-    this->acceleration_params.offset = acceleration.offset;
-    this->acceleration_params.distance = acceleration.distance;
+    this->acceleration_params.offset = acceleration_offset;
+    this->acceleration_params.distance = acceleration_distance;
+    // Fix sigmoid power
+    this->acceleration_params.p = 0.05f;
 
     // Deceleration params
-    this->deceleration_params.offset = deceleration.offset;
-    this->deceleration_params.distance = deceleration.distance;
+    this->deceleration_params.offset = deceleration_offset;
+    this->deceleration_params.distance = deceleration_distance;
+    // Fix sigmoid power
+    this->deceleration_params.p = 0.05f;
 }

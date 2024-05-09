@@ -12,7 +12,7 @@
 #define L_Ki 0.0
 #define L_Kd 0.4
 
-#define R_Kp 30.0
+#define R_Kp 15.0
 #define R_Ki 0.0
 #define R_Kd 0.4
 
@@ -88,17 +88,6 @@ void get_orientation(byte *msg, byte size)
       get_orientation_msg->traj_precision,
   };
 
-  Profil_params acceleration {
-    get_orientation_msg->acceleration_start_speed,
-    -1.0f,
-    get_orientation_msg->acceleration_distance
-  };
-
-  Profil_params deceleration {
-    get_orientation_msg->deceleration_end_speed,
-    -1.0f,
-    get_orientation_msg->deceleration_distance
-  };
   Direction dir = get_orientation_msg->forward ? forward : backward;
   Get_Orientation *new_action = new Get_Orientation(
     get_orientation_msg->x,
@@ -107,8 +96,10 @@ void get_orientation(byte *msg, byte size)
     new Speed_Driver_From_Distance(
       get_orientation_msg->max_speed,
       get_orientation_msg->correction_trajectory_speed,
-      acceleration,
-      deceleration
+      get_orientation_msg->acceleration_start_speed,
+      get_orientation_msg->acceleration_distance,
+      get_orientation_msg->deceleration_end_speed,
+      get_orientation_msg->deceleration_distance
     ),
     &params
   );
@@ -129,26 +120,16 @@ void go_to(byte *msg, byte size)
       go_to_msg->traj_precision,
   };
 
-  Profil_params acceleration {
-    go_to_msg->acceleration_start_speed,
-    -1.0f,
-    go_to_msg->acceleration_distance
-  };
-
-  Profil_params deceleration {
-    go_to_msg->deceleration_end_speed,
-    -1.0f,
-    go_to_msg->deceleration_distance
-  };
-
   Go_To *new_action = new Go_To(
     target_point, 
     go_to_msg->forward ? forward : backward,
     Speed_Driver_From_Distance(
       go_to_msg->max_speed,
       go_to_msg->correction_trajectory_speed,
-      acceleration,
-      deceleration
+      go_to_msg->acceleration_start_speed,
+      go_to_msg->acceleration_distance,
+      go_to_msg->deceleration_end_speed,
+      go_to_msg->deceleration_distance
     ),
     params
   );

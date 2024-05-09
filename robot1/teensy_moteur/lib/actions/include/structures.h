@@ -4,6 +4,7 @@ typedef enum
     in_progress,
     finished
 } Action_state;
+
 typedef enum
 {
     forward = 1,
@@ -22,7 +23,6 @@ struct Precision_Params
     unsigned int error_precision;
     unsigned int trajectory_precision;
 };
-
 
 struct Rolling_Basis_Params
 {
@@ -89,6 +89,10 @@ public:
 struct Profil_params
 {
     byte offset;
-    float gamma; // Gamma is the slope of the affine line representing the acceleration profile
     float distance;
+
+    float a; // Propotionnal offset
+    float p; // Variation strenght
+    float b; // Center to 0
+    float c; // Slope
 };
