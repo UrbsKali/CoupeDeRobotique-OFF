@@ -360,9 +360,11 @@ class MainBrain(Brain):
             target_gardener.zone.centroid.y,
         )
 
-        await self.smart_go_to(approach_target, **CONFIG.GO_TO_PROFILES["fast"])
+        await self.smart_go_to(approach_target, **CONFIG.GO_TO_PROFILES["plant_pickup"])
 
-        final_target: Point = Point(200 - 12.75, target_gardener.zone.centroid.y)
+        final_target: Point = Point(
+            200 - 12.75, self.rolling_basis.odometrie.y
+        )  # To make sure to be orthogonal to the wall, use a relative y
 
         await self.smart_go_to(
             final_target,
