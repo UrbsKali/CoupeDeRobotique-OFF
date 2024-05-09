@@ -22,6 +22,26 @@ from controllers import RollingBasis, Actuators
 from sensors import Lidar
 
 
+@dataclass
+class Objective:
+    task: str  # objective type ("pickup","drop_to_zone","drop_to_gardener")
+    target_index: int  # index of the target
+    time_estimate: float = -1.0  # time estimate (won't try if it's too late)
+    raise_elevator_after: bool = (
+        False  # For pickups, whether to start raising the elevator after
+    )
+
+    def __str__(self):
+        return (
+            f"{self.task}, at {self.target_index}, estimated time: {self.time_estimate}"
+            + (
+                ""
+                if not self.raise_elevator_after
+                else ", then raising elevator for next objective"
+            )
+        )
+
+
 class MainBrain(Brain):
     """
     This brain is the main controller of ROB (robot1).
@@ -114,6 +134,8 @@ class MainBrain(Brain):
         await self.close_god_hand()
         await self.undeploy_right_solar_panel()
         await self.undeploy_left_solar_panel()
+        await self.actuators.elevator_intermediate()
+        await self.vertical_god_hand()
 
     @Brain.task(process=False, run_on_start=False)
     async def wait_for_trigger(self):
@@ -413,74 +435,58 @@ class MainBrain(Brain):
 
         asyncio.create_task(self.actuators.elevator_bottom())
 
+    async def engage_objective(self, objective: Objective):
+        match objective.task:
+            case "pickup":
+                self.logger.log(
+                    f"Going to pickup zone {objective.target_index}",
+                    LogLevels.INFO,
+                    self.leds,
+                )
+
+                await self.go_and_pickup(
+                    self.arena.pickup_zones[objective.target_index]
+                )
+
+                if objective.raise_elevator_after:
+                    asyncio.create_task(self.actuators.elevator_top())
+                else:
+                    asyncio.create_task(self.undeploy_god_hand())
+
+            case "drop_to_zone":
+                self.logger.log(
+                    f"Going to drop zone {objective.target_index}",
+                    LogLevels.INFO,
+                    self.leds,
+                )
+
+                await self.go_and_drop_to_zone(
+                    self.arena.drop_zones[objective.target_index]
+                )
+                self.score_estimate += 3
+
+            case "drop_to_gardener":
+                self.logger.log(
+                    f"Going to gardener {objective.target_index}",
+                    LogLevels.INFO,
+                    self.leds,
+                )
+
+                await self.go_and_drop_to_gardener(
+                    self.arena.gardeners[objective.target_index]
+                )
+                self.score_estimate += 12
+
+            case _:
+                raise Exception("Unknown objective type")
+
     @Brain.task(process=False, run_on_start=False, timeout=60)
     async def plant_stage(self):
         start_stage_time = Utils.get_ts()
         in_yellow_team = self.team == "y"
 
-        @dataclass
-        class Objective:
-            task: str  # objective type ("pickup","drop_to_zone","drop_to_gardener")
-            target_index: int  # index of the target
-            time_estimate: float = -1.0  # time estimate (won't try if it's too late)
-            raise_elevator_after: bool = (
-                False  # For pickups, whether to start raising the elevator after
-            )
-
-            def __str__(self):
-                return (
-                    f"{self.task}, at {self.target_index}, estimated time: {self.time_estimate}"
-                    + (
-                        ""
-                        if not self.raise_elevator_after
-                        else ", then raising elevator for next objective"
-                    )
-                )
-
-        async def engage_objective(objective: Objective):
-            match objective.task:
-                case "pickup":
-                    self.logger.log(
-                        f"Going to pickup zone {objective.target_index}",
-                        LogLevels.INFO,
-                        self.leds,
-                    )
-
-                    await self.go_and_pickup(
-                        self.arena.pickup_zones[objective.target_index]
-                    )
-
-                    if objective.raise_elevator_after:
-                        asyncio.create_task(self.actuators.elevator_top())
-                    else:
-                        asyncio.create_task(self.undeploy_god_hand())
-
-                case "drop_to_zone":
-                    self.logger.log(
-                        f"Going to drop zone {objective.target_index}",
-                        LogLevels.INFO,
-                        self.leds,
-                    )
-
-                    await self.go_and_drop_to_zone(
-                        self.arena.drop_zones[objective.target_index]
-                    )
-                    self.score_estimate += 3
-
-                case "drop_to_gardener":
-                    self.logger.log(
-                        f"Going to gardener {objective.target_index}",
-                        LogLevels.INFO,
-                        self.leds,
-                    )
-
-                    await self.go_and_drop_to_gardener(
-                        self.arena.gardeners[objective.target_index]
-                    )
-                    self.score_estimate += 12
-
-                case _:
-                    raise Exception("Unknown objective type")
+        await self.deploy_god_hand()
+        asyncio.create_task(self.actuators.elevator_bottom())
 
         objectives: list[Objective] = [
             Objective("pickup", 0 if in_yellow_team else 4, 8.0),  # First zone
@@ -510,7 +516,7 @@ class MainBrain(Brain):
 
             else:
                 self.logger.log("Engaging objective", LogLevels.INFO)
-                await engage_objective(current_objective)
+                await self.engage_objective(current_objective)
 
     @Brain.task(process=False, run_on_start=False, timeout=30)
     async def solar_panels_stage(self) -> None:
