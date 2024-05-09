@@ -370,7 +370,7 @@
         "top_steps": 400,
         "intermediate_steps": 283,
         "bottom_steps": 0,
-        "speed": 4000
+        "speed": 3000
       },
       "minimum_delay": 0.05
     },
