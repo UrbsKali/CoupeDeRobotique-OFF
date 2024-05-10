@@ -494,7 +494,7 @@ class MainBrain(Brain):
             case _:
                 raise Exception("Unknown objective type")
 
-    @Brain.task(process=False, run_on_start=False, timeout=60)
+    @Brain.task(process=False, run_on_start=False, timeout=50)
     async def plant_stage(self):
         start_stage_time = Utils.get_ts()
         in_yellow_team = self.team == "y"
