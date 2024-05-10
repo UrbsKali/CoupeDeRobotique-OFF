@@ -557,7 +557,7 @@ class MainBrain(Brain):
             await asyncio.sleep(0.05)
             for i, y in enumerate(remaining_solar_panels_y):
                 if abs(self.rolling_basis.odometrie.y - y) < 13.0:
-                    self.arena.solar_panels_y.pop(i)
+                    remaining_solar_panels_y.pop(i)
                     await self.deploy_team_solar_panel()
                     break
 
