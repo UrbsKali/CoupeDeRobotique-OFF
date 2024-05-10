@@ -332,7 +332,7 @@ class MainBrain(Brain):
 
     async def god_hand_timer(self, time_to_close: float):
         await asyncio.sleep(time_to_close)
-        self.close_god_hand()
+        await self.close_god_hand()
 
     @Logger
     async def go_and_pickup(
