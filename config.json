@@ -267,9 +267,9 @@
         "slow_and_precise": {
           "max_speed": 150,
           "correction_trajectory_speed": 0,
-          "acceleration_start_speed": 110,
+          "acceleration_start_speed": 150,
           "acceleration_distance": 10,
-          "deceleration_end_speed": 110,
+          "deceleration_end_speed": 130,
           "deceleration_distance": 30,
           "next_position_delay": 100,
           "action_error_auth": 20,
