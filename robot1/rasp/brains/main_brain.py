@@ -200,7 +200,9 @@ class MainBrain(Brain):
         # No matter what, kill rolling_basis ans everything else in 90s
         asyncio.create_task(self.time_bomb(90))
 
-        await self.setup_teams()
+        asyncio.create_task(self.setup_teams())
+
+        await asyncio.sleep(0.5)
 
         # Solar panels stage
         self.logger.log("Starting solar panels stage...", LogLevels.INFO, self.leds)
