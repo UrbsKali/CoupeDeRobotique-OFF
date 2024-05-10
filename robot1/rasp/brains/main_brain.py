@@ -251,7 +251,7 @@ class MainBrain(Brain):
                     distance * math.sin(angle),
                 ),
                 relative=True,
-                **CONFIG.GO_TO_PROFILES["fast"],
+                **CONFIG.GO_TO_PROFILES["plant_approach"],
                 timeout=5,
             )
         ) == 1:
@@ -261,7 +261,7 @@ class MainBrain(Brain):
                     0,
                 ),
                 relative=True,
-                **CONFIG.GO_TO_PROFILES["fast"],
+                **CONFIG.GO_TO_PROFILES["plant_approach"],
                 timeout=2,
             )
 
@@ -273,7 +273,7 @@ class MainBrain(Brain):
             self.rolling_basis.stop_and_clear_queue()
             await self.smart_go_to(
                 target,
-                **CONFIG.GO_TO_PROFILES["fast"],
+                **CONFIG.GO_TO_PROFILES["plant_approach"],
             )
 
     def show_team_led(self):
@@ -386,7 +386,7 @@ class MainBrain(Brain):
         await self.smart_go_to(
             position=target,
             timeout=15,
-            **CONFIG.GO_TO_PROFILES["fast"],
+            **CONFIG.GO_TO_PROFILES["plant_approach"],
         )
 
         # Drop plants
