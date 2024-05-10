@@ -80,7 +80,7 @@ class Pipou(Teensy):
         Send a vromm command to the Teensy.
         """
         msg = (
-            Command.VROUM
+            Command.VROOM
             + struct.pack("<H", speed)
             + struct.pack("<?", direction)            
         )

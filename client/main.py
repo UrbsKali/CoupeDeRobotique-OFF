@@ -22,11 +22,12 @@ def thread_send_data(data):
 
 async def send_data(data):
     import websockets as ws
+    dat = '{ "msg":' + data + ', "type" : "eval", "sender" : "urbai"}'
 
     try:
-        async with ws.connect(f"ws://rc.local:8080/cmd", open_timeout=0.1) as websocket:
-            await websocket.send(data, timeout=0.1)
-            print(f"Data sent: {data}")
+        async with ws.connect(f"ws://rc.local:8080/cmd?sender=urbai", open_timeout=0.1) as websocket:
+            await websocket.send(dat, timeout=0.1)
+            print(f"Data sent: {dat}")
     except Exception as e:
         print(f"Error while sending data: {e}")
 
