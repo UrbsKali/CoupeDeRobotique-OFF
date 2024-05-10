@@ -358,9 +358,9 @@ class MainBrain(Brain):
         pickup_target = self.arena.compute_go_to_destination(
             start_point=self.rolling_basis.odometrie,
             zone=target_pickup_zone.zone,
-            delta=-5,
+            delta=-7,
         )
-        asyncio.create_task(self.god_hand_timer(1.5))  # Close while moving
+        asyncio.create_task(self.god_hand_timer(2))  # Close while moving
         await self.smart_go_to(
             position=pickup_target,
             timeout=3,
