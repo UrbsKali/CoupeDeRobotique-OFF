@@ -527,7 +527,7 @@ class MainBrain(Brain):
     async def solar_panels_stage(self) -> None:
         asyncio.create_task(self.control_solar_panels())
         go_to_result = await self.rolling_basis.go_to_and_wait(
-            Point(190 if self.team == "y" else 110, 0),
+            Point(0, 190 if self.team == "y" else 110),
             timeout=15.0,
             **CONFIG.GO_TO_PROFILES["slow_and_precise"],
         )
