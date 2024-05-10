@@ -53,7 +53,7 @@ if __name__ == "__main__":
     ws_server.add_route_handler(CONFIG.WS_CMD_ROUTE, ws_cmd)
 
     # Robot
-    pipou = Pipou()
+    pipou = Pipou(logger=logger_rolling_basis)
 
     # Brain
     #leds.set_is_ready()
