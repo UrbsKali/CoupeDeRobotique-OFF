@@ -563,7 +563,9 @@ class MainBrain(Brain):
             for i, y in enumerate(remaining_solar_panels_y):
                 if abs(self.rolling_basis.odometrie.y - y) < 13.0:
                     remaining_solar_panels_y.pop(i)
-                    await self.deploy_team_solar_panel()
+                    await self.deploy_team_solar_panel(
+                        len(remaining_solar_panels_y) > 3
+                    )
                     break
 
     @Brain.task(process=False, run_on_start=not CONFIG.ZOMBIE_MODE, refresh_rate=2)

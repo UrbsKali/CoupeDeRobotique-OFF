@@ -17,12 +17,18 @@ from controllers import RollingBasis, Actuators
 
 
 @Logger
-async def deploy_right_solar_panel(self, override_angle: float | None = None):
+async def deploy_right_solar_panel(
+    self, small: bool = False, override_angle: float | None = None
+):
     await asyncio.sleep(CONFIG.MINIMUM_DELAY)
     servo = CONFIG.SOLAR_PANEL_RIGHT
     await self.actuators.update_servo(
         pin=servo["pin"],
-        angle=servo["deploy_angle"] if override_angle is None else override_angle,
+        angle=(
+            (servo["undeploy_angle"] if not small else servo["small_deploy_angle"])
+            if override_angle is None
+            else override_angle
+        ),
         detach=True,
         detach_delay=CONFIG.SOLAR_PANEL_DETACH_DELAY,
     )
@@ -41,12 +47,18 @@ async def undeploy_right_solar_panel(self, override_angle: float | None = None):
 
 
 @Logger
-async def deploy_left_solar_panel(self, override_angle: float | None = None):
+async def deploy_left_solar_panel(
+    self, small: bool = False, override_angle: float | None = None
+):
     await asyncio.sleep(CONFIG.MINIMUM_DELAY)
     servo = CONFIG.SOLAR_PANEL_LEFT
     await self.actuators.update_servo(
         pin=servo["pin"],
-        angle=servo["deploy_angle"] if override_angle is None else override_angle,
+        angle=(
+            (servo["undeploy_angle"] if not small else servo["small_deploy_angle"])
+            if override_angle is None
+            else override_angle
+        ),
         detach=True,
         detach_delay=CONFIG.SOLAR_PANEL_DETACH_DELAY,
     )
@@ -65,11 +77,13 @@ async def undeploy_left_solar_panel(self, override_angle: float | None = None):
 
 
 @Logger
-async def deploy_team_solar_panel(self, override_angle: float | None = None):
+async def deploy_team_solar_panel(
+    self, small: bool = False, override_angle: float | None = None
+):
     if self.team == "y":
-        await self.deploy_left_solar_panel(override_angle)
+        await self.deploy_left_solar_panel(small, override_angle)
     else:
-        await self.deploy_right_solar_panel(override_angle)
+        await self.deploy_right_solar_panel(small, override_angle)
 
 
 @Logger
