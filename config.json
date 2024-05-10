@@ -292,10 +292,10 @@
           "acceleration_start_speed": 110,
           "acceleration_distance": 0,
           "deceleration_end_speed": 80,
-          "deceleration_distance": 10,
+          "deceleration_distance": 20,
           "next_position_delay": 100,
           "action_error_auth": 80,
-          "traj_precision": 40
+          "traj_precision": 20
         },
         "garden_approach": {
           "max_speed": 190,

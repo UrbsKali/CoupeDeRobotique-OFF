@@ -552,6 +552,12 @@ class MainBrain(Brain):
             all_solar_panels_y.sort()
             self.score_estimate += all_solar_panels_y.index(current_y) * 5
 
+        self.rolling_basis.go_to_and_wait(
+            Point(-20, 0),
+            timeout=5.0,
+            **CONFIG.GO_TO_PROFILES["slow_and_precise"],
+        )
+
     @Brain.task(process=False, run_on_start=False, timeout=30)
     async def control_solar_panels(self, solar_panel_timeout: float = 25.0) -> None:
 
