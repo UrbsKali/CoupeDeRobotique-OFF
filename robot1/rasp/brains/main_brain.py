@@ -489,7 +489,12 @@ class MainBrain(Brain):
         in_yellow_team = self.team == "y"
 
         await self.deploy_god_hand()
-        asyncio.create_task(self.actuators.elevator_bottom())
+
+        async def delayed_elevator():
+            await asyncio.sleep(2)
+            await self.actuators.elevator_bottom()
+
+        asyncio.create_task(delayed_elevator())
 
         objectives: list[Objective] = [
             Objective("pickup", 0 if in_yellow_team else 4, 8.0),  # First zone
