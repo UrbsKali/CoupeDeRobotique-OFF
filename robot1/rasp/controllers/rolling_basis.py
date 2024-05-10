@@ -1,7 +1,7 @@
 from config_loader import CONFIG
 
 # Import from common
-from teensy_comms import Teensy, calc_center
+from teensy_comms import Teensy
 from logger import Logger, LogLevels
 from utils import Utils
 
