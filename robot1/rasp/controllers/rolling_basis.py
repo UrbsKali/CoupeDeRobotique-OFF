@@ -19,6 +19,7 @@ class Command(Enum):
     ROTATE = b"\x02"
     L_MOTOR = b"\x03"
     R_MOTOR = b"\x04"
+    STOP = b"\x05"
     INVALID = b"\xFF"
 
 
@@ -86,12 +87,13 @@ class Pipou(Teensy):
         )
         self.send_bytes(msg)
         
-    def rotate(self, direction: bool):
+    def rotate(self, speed: int, direction: bool):
         """
         Send a rotate command to the Teensy.
         """
         msg = (
             Command.ROTATE
+            + struct.pack("<H", speed)
             + struct.pack("<?", direction)            
         )
         self.send_bytes(msg)
@@ -116,4 +118,11 @@ class Pipou(Teensy):
             + struct.pack("<H", speed)
             + struct.pack("<?", direction)            
         )
+        self.send_bytes(msg)
+        
+    def stop(self):
+        """
+        Send a stop command to the Teensy.
+        """
+        msg = Command.STOP
         self.send_bytes(msg)

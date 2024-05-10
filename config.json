@@ -15,7 +15,7 @@
   "computer": {
     "ws": {
       "sender_name": "computer",
-      "hostname": "0.0.0.0",
+      "hostname": "rc.local",
       "ping_pong_interval": 1
     }
   },

@@ -32,7 +32,7 @@ def format_path(path: str) -> str:
 
 class CONFIG:
     # TO CONFIG !
-    RELATIVE_ROOT_PATH = os.path.join("..", "..")
+    RELATIVE_ROOT_PATH = os.path.join("..")
     SPECIFIC_CONFIG_KEY = "computer"
     GENERAL_CONFIG_KEY = "general"
 
