@@ -25,7 +25,7 @@ async def deploy_right_solar_panel(
     await self.actuators.update_servo(
         pin=servo["pin"],
         angle=(
-            (servo["undeploy_angle"] if not small else servo["small_deploy_angle"])
+            (servo["deploy_angle"] if not small else servo["small_deploy_angle"])
             if override_angle is None
             else override_angle
         ),
@@ -55,7 +55,7 @@ async def deploy_left_solar_panel(
     await self.actuators.update_servo(
         pin=servo["pin"],
         angle=(
-            (servo["undeploy_angle"] if not small else servo["small_deploy_angle"])
+            (servo["deploy_angle"] if not small else servo["small_deploy_angle"])
             if override_angle is None
             else override_angle
         ),
