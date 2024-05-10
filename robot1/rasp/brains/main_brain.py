@@ -501,8 +501,8 @@ class MainBrain(Brain):
 
         await self.deploy_god_hand()
 
-        async def delayed_elevator():
-            await asyncio.sleep(2)
+        async def delayed_elevator(time_to_drop: float = 4):
+            await asyncio.sleep(time_to_drop)
             await self.actuators.elevator_bottom()
 
         asyncio.create_task(delayed_elevator())
