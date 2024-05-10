@@ -21,5 +21,5 @@ public:
     // Methods
     void init();
     void set_motor(int8_t dir, byte pwmVal);
-    void vroom(byte speed, int8_t direction);
+    void vroum(uint16_t speed, bool direction);
 };

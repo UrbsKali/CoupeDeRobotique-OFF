@@ -29,7 +29,7 @@ void Rolling_Basis::rotate(uint16_t speed, bool direction)
     this->left_motor->vroum(speed, !direction);
 }
 
-void Rolling_Basis::vroom(uint16_t speed, bool direction)
+void Rolling_Basis::vroum(uint16_t speed, bool direction)
 {
     this->right_motor->vroum(speed, direction);
     this->left_motor->vroum(speed, direction);

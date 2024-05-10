@@ -3,6 +3,9 @@ import multiprocessing
 from pynput.keyboard import Key, Listener
 import time
 
+power_l = 100
+power_r = 100
+
 power = 100
 
 def send_data_to_robot(data):
@@ -34,6 +37,9 @@ def on_press(key):
     else:
         return
 
+    power_r = 200 if Key.shift in current_key else 100
+    power_l = 200 if Key.shift in current_key else 100
+    power = 255 if Key.shift in current_key else 100
     match key:
         case Key.esc:
             return False
@@ -45,16 +51,27 @@ def on_press(key):
             send_data_to_robot(f"self.robot.rotate({power}, True)")
         case Key.right:
             send_data_to_robot(f"self.robot.rotate({power}, False)")
-        case Key.shift:
-            power = 255
-        case 'a':
+        case 'o':
             send_data_to_robot(f"self.robot.l_motor({power}, True)")
-        case 'z':
+        case 'p':
             send_data_to_robot(f"self.robot.r_motor({power}, True)")
-        case 'q':
+        case 'l':
             send_data_to_robot(f"self.robot.l_motor({power}, False)")
-        case 's':
+        case 'm':
             send_data_to_robot(f"self.robot.r_motor({power}, False)")
+        
+        case 'z':
+            send_data_to_robot(f"self.robot.l_motor({power_l}, True)")
+            send_data_to_robot(f"self.robot.r_motor({power_r}, True)")
+        case 'q':
+            send_data_to_robot(f"self.robot.l_motor({power_l}, True)")
+            send_data_to_robot(f"self.robot.r_motor({power_r+50}, True)")
+        case 's':
+            send_data_to_robot(f"self.robot.l_motor({power_l}, False)")
+            send_data_to_robot(f"self.robot.r_motor({power_r}, False)")
+        case 'd':
+            send_data_to_robot(f"self.robot.l_motor({power_l+50}, True)")
+            send_data_to_robot(f"self.robot.r_motor({power_r}, True)")
             
 
 def on_release(key):
@@ -64,6 +81,8 @@ def on_release(key):
         case Key.esc:
             return False
         case Key.shift:
+            power_l = 100
+            power_r = 100
             power = 100
         case _:
             send_data_to_robot("self.robot.stop()")

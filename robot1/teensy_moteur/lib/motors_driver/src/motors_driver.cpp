@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include <util/atomic.h>
 
-Motor::Motor(byte pin_forward, byte pin_backward, byte pin_pwm, byte pin_enca, byte pin_encb, float kp, float kd, float ki, float correction_factor = 1.0, byte threshold_pwm_value=0)
+Motor::Motor(byte pin_forward, byte pin_backward, byte pin_pwm, float correction_factor = 1.0, byte threshold_pwm_value=0)
 {   
     this->pin_forward = pin_forward;
     this->pin_backward = pin_backward;

@@ -3,7 +3,7 @@
 #include <rolling_basis.h>
 #include <util/atomic.h>
 #include <messages.h>
-#include <com.h>
+
 
 #define RIGHT_MOTOR_POWER_FACTOR 1.0
 #define LEFT_MOTOR_POWER_FACTOR 1.0
@@ -24,10 +24,10 @@ Rolling_Basis *rolling_basis_ptr = new Rolling_Basis();
 /* Strat part */
 Com *com;
 
-void vroom(byte *msg, byte size)
+void vroum(byte *msg, byte size)
 {
-  msg_VROUM *vroom = (msg_VROUM *)msg;
-  rolling_basis_ptr->vroom(vroom->speed, vroom->direction);
+  msg_VROUM *vroum = (msg_VROUM *)msg;
+  rolling_basis_ptr->vroum(vroum->speed, vroum->direction);
 }
 
 void rotate(byte *msg, byte size)
@@ -48,6 +48,10 @@ void r_motor(byte *msg, byte size)
   rolling_basis_ptr->r_motor(r_motor->speed, r_motor->direction);
 }
 
+void stop(byte *msf, byte size){
+   rolling_basis_ptr->shutdown_motor();
+}
+
 void (*functions[256])(byte *msg, byte size);
 
 extern void handle_callback(Com *com);
@@ -57,11 +61,11 @@ void setup()
   com = new Com(&Serial, 115200);
 
   // only the messages received by the teensy are listed here
-  functions[VROUM] = &vroom;
+  functions[VROUM] = &vroum;
   functions[ROTATE] = &rotate;
   functions[L_MOTOR_CONTROL] = &l_motor;
   functions[R_MOTOR_CONTROL] = &r_motor;
-  functions[STOP] = &rolling_basis_ptr->shutdown_motor;
+  functions[STOP] = &stop;
 
   Serial.begin(115200);
 

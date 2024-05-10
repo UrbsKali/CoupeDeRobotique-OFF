@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <complex_action.h>
+#include <motors_driver.h>
 
 class Rolling_Basis
 {
@@ -15,7 +15,7 @@ public:
 
     // Actions
     void rotate(uint16_t speed, bool direction);
-    void vroom(uint16_t speed, bool direction);
+    void vroum(uint16_t speed, bool direction);
     void l_motor(uint16_t speed, bool direction);
     void r_motor(uint16_t speed, bool direction);
     void shutdown_motor();
