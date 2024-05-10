@@ -558,7 +558,7 @@ class MainBrain(Brain):
         start_time = Utils.get_ts()
         remaining_solar_panels_y = self.arena.solar_panels_y[:]
 
-        await self.deploy_team_solar_panel(len(remaining_solar_panels_y) > 3)
+        await self.deploy_team_solar_panel(small=True)
 
         while Utils.time_since(start_time) < solar_panel_timeout:
             await asyncio.sleep(0.05)
@@ -572,7 +572,7 @@ class MainBrain(Brain):
 
                     remaining_solar_panels_y.pop(i)
                     await self.deploy_team_solar_panel(
-                        len(remaining_solar_panels_y) > 3
+                        small=(len(remaining_solar_panels_y) > 3)
                     )
                     break
 
