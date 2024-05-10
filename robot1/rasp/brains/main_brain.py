@@ -547,7 +547,7 @@ class MainBrain(Brain):
                 CONFIG.START_INFO_BY_TEAM[self.team]["start_x"],
                 185 if self.team == "y" else 105,
             ),
-            timeout=20.0,
+            timeout=30.0,
             **CONFIG.GO_TO_PROFILES["slow_and_precise"],
         )
 
