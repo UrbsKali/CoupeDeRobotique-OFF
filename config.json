@@ -357,13 +357,13 @@
         "detach_delay": 200,
         "right": {
           "pin": 9,
-          "deploy_angle": 100,
+          "deploy_angle": 80,
           "undeploy_angle": 12
         },
         "left": {
           "pin": 8,
           "deploy_angle": 0,
-          "undeploy_angle": 82
+          "undeploy_angle": 62
         }
       },
       "elevator": {
