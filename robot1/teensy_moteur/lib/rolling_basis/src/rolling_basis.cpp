@@ -21,6 +21,30 @@ void Rolling_Basis::init_motors()
     this->left_motor->init();
 }
 
+
+// Actions
+void Rolling_Basis::rotate(uint16_t speed, bool direction)
+{
+    this->right_motor->vroum(speed, direction);
+    this->left_motor->vroum(speed, !direction);
+}
+
+void Rolling_Basis::vroom(uint16_t speed, bool direction)
+{
+    this->right_motor->vroum(speed, direction);
+    this->left_motor->vroum(speed, direction);
+}
+
+void Rolling_Basis::l_motor(uint16_t speed, bool direction)
+{
+    this->left_motor->vroum(speed, direction);
+}
+
+void Rolling_Basis::r_motor(uint16_t speed, bool direction)
+{
+    this->right_motor->vroum(speed, direction);
+}
+
 void Rolling_Basis::shutdown_motor()
 {
     this->right_motor->set_motor(1, 0);

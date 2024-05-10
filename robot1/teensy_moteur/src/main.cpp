@@ -24,18 +24,44 @@ Rolling_Basis *rolling_basis_ptr = new Rolling_Basis();
 /* Strat part */
 Com *com;
 
+void vroom(byte *msg, byte size)
+{
+  msg_VROUM *vroom = (msg_VROUM *)msg;
+  rolling_basis_ptr->vroom(vroom->speed, vroom->direction);
+}
+
+void rotate(byte *msg, byte size)
+{
+  msg_ROTATE *rotate = (msg_ROTATE *)msg;
+  rolling_basis_ptr->rotate(rotate->speed, rotate->direction);
+}
+
+void l_motor(byte *msg, byte size)
+{
+  msg_L_MOTOR *l_motor = (msg_L_MOTOR *)msg;
+  rolling_basis_ptr->l_motor(l_motor->speed, l_motor->direction);
+}
+
+void r_motor(byte *msg, byte size)
+{
+  msg_R_MOTOR *r_motor = (msg_R_MOTOR *)msg;
+  rolling_basis_ptr->r_motor(r_motor->speed, r_motor->direction);
+}
+
 void (*functions[256])(byte *msg, byte size);
 
 extern void handle_callback(Com *com);
-
-void handle();
 
 void setup()
 {
   com = new Com(&Serial, 115200);
 
   // only the messages received by the teensy are listed here
-  // functions[GO_TO] = &go_to,
+  functions[VROUM] = &vroom;
+  functions[ROTATE] = &rotate;
+  functions[L_MOTOR_CONTROL] = &l_motor;
+  functions[R_MOTOR_CONTROL] = &r_motor;
+  functions[STOP] = &rolling_basis_ptr->shutdown_motor;
 
   Serial.begin(115200);
 
@@ -48,10 +74,9 @@ void setup()
   rolling_basis_ptr->init_left_motor(L_IN1, L_IN2, L_PWM, LEFT_MOTOR_POWER_FACTOR, 0);
   rolling_basis_ptr->init_motors();
 
-
   // Init motors handle timer
-  //Timer1.initialize(10000);
-  //Timer1.attachInterrupt(handle);
+  // Timer1.initialize(10000);
+  // Timer1.attachInterrupt(handle);
 }
 
 void loop()
@@ -60,28 +85,27 @@ void loop()
   handle_callback(com);
 }
 
-
 /*
- This code was distroyed by Urbain 
-          _____                    _____                    _____                    _____                    _____          
-         /\    \                  /\    \                  /\    \                  /\    \                  /\    \         
-        /::\____\                /::\    \                /::\    \                /::\    \                /::\    \        
-       /:::/    /               /::::\    \              /::::\    \              /::::\    \               \:::\    \       
-      /:::/    /               /::::::\    \            /::::::\    \            /::::::\    \               \:::\    \      
-     /:::/    /               /:::/\:::\    \          /:::/\:::\    \          /:::/\:::\    \               \:::\    \     
-    /:::/    /               /:::/__\:::\    \        /:::/__\:::\    \        /:::/__\:::\    \               \:::\    \    
-   /:::/    /               /::::\   \:::\    \      /::::\   \:::\    \      /::::\   \:::\    \              /::::\    \   
-  /:::/    /      _____    /::::::\   \:::\    \    /::::::\   \:::\    \    /::::::\   \:::\    \    ____    /::::::\    \  
- /:::/____/      /\    \  /:::/\:::\   \:::\____\  /:::/\:::\   \:::\ ___\  /:::/\:::\   \:::\    \  /\   \  /:::/\:::\    \ 
+ This code was distroyed by Urbain
+          _____                    _____                    _____                    _____                    _____
+         /\    \                  /\    \                  /\    \                  /\    \                  /\    \
+        /::\____\                /::\    \                /::\    \                /::\    \                /::\    \
+       /:::/    /               /::::\    \              /::::\    \              /::::\    \               \:::\    \
+      /:::/    /               /::::::\    \            /::::::\    \            /::::::\    \               \:::\    \
+     /:::/    /               /:::/\:::\    \          /:::/\:::\    \          /:::/\:::\    \               \:::\    \
+    /:::/    /               /:::/__\:::\    \        /:::/__\:::\    \        /:::/__\:::\    \               \:::\    \
+   /:::/    /               /::::\   \:::\    \      /::::\   \:::\    \      /::::\   \:::\    \              /::::\    \
+  /:::/    /      _____    /::::::\   \:::\    \    /::::::\   \:::\    \    /::::::\   \:::\    \    ____    /::::::\    \
+ /:::/____/      /\    \  /:::/\:::\   \:::\____\  /:::/\:::\   \:::\ ___\  /:::/\:::\   \:::\    \  /\   \  /:::/\:::\    \
 |:::|    /      /::\____\/:::/  \:::\   \:::|    |/:::/__\:::\   \:::|    |/:::/  \:::\   \:::\____\/::\   \/:::/  \:::\____\
 |:::|____\     /:::/    /\::/   |::::\  /:::|____|\:::\   \:::\  /:::|____|\::/    \:::\  /:::/    /\:::\  /:::/    \::/    /
- \:::\    \   /:::/    /  \/____|:::::\/:::/    /  \:::\   \:::\/:::/    /  \/____/ \:::\/:::/    /  \:::\/:::/    / \/____/ 
-  \:::\    \ /:::/    /         |:::::::::/    /    \:::\   \::::::/    /            \::::::/    /    \::::::/    /          
-   \:::\    /:::/    /          |::|\::::/    /      \:::\   \::::/    /              \::::/    /      \::::/____/           
-    \:::\__/:::/    /           |::| \::/____/        \:::\  /:::/    /               /:::/    /        \:::\    \           
-     \::::::::/    /            |::|  ~|               \:::\/:::/    /               /:::/    /          \:::\    \          
-      \::::::/    /             |::|   |                \::::::/    /               /:::/    /            \:::\    \         
-       \::::/    /              \::|   |                 \::::/    /               /:::/    /              \:::\____\        
-        \::/____/                \:|   |                  \::/____/                \::/    /                \::/    /        
-         ~~                       \|___|                   ~~                       \/____/                  \/____/         
+ \:::\    \   /:::/    /  \/____|:::::\/:::/    /  \:::\   \:::\/:::/    /  \/____/ \:::\/:::/    /  \:::\/:::/    / \/____/
+  \:::\    \ /:::/    /         |:::::::::/    /    \:::\   \::::::/    /            \::::::/    /    \::::::/    /
+   \:::\    /:::/    /          |::|\::::/    /      \:::\   \::::/    /              \::::/    /      \::::/____/
+    \:::\__/:::/    /           |::| \::/____/        \:::\  /:::/    /               /:::/    /        \:::\    \
+     \::::::::/    /            |::|  ~|               \:::\/:::/    /               /:::/    /          \:::\    \
+      \::::::/    /             |::|   |                \::::::/    /               /:::/    /            \:::\    \
+       \::::/    /              \::|   |                 \::::/    /               /:::/    /              \:::\____\
+        \::/____/                \:|   |                  \::/____/                \::/    /                \::/    /
+         ~~                       \|___|                   ~~                       \/____/                  \/____/
 */

@@ -40,10 +40,16 @@ void Motor::set_motor(int8_t dir, byte pwmVal)
 }
 
 
-void Motor::vroum(byte speed, int8_t direction){
+void Motor::vroum(uint16_t speed, bool direction){
     float power = fabs(speed * this->correction_factor);
     // Increase power (to overcome friction)
     power += this->threshold_pwm_value;
 
-    set_motor(direction, speed);
+    if (power > 255)
+        power = 255;
+
+    if (direction)
+        this->set_motor(1, power);
+    else
+        this->set_motor(-1, power);
 }

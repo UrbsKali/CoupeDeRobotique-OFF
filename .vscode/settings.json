@@ -27,6 +27,7 @@
         "vector": "cpp",
         "algorithm": "cpp",
         "complex": "cpp",
-        "cstddef": "cpp"
+        "cstddef": "cpp",
+        "xutility": "cpp"
     }
 }

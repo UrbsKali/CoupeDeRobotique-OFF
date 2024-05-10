@@ -7,7 +7,6 @@ from config_loader import CONFIG
 from brain import Brain
 
 from WS_comms import WSmsg, WServerRouteManager
-from geometry import OrientedPoint, Point
 from logger import Logger, LogLevels
 
 
@@ -15,7 +14,7 @@ from logger import Logger, LogLevels
 # ...
 
 
-@Brain.task(process=False, run_on_start=CONFIG.ZOMBIE_MODE, refresh_rate=0.5)
+@Brain.task(process=False, run_on_start=CONFIG.ZOMBIE_MODE, refresh_rate=0.016)
 async def zombie_mode(self):
     """
     executes requests received by the server. Use Postman to send request to the server

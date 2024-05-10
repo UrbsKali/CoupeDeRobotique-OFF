@@ -13,5 +13,10 @@ public:
     void init_left_motor(byte pwm, byte in2, byte in1, float correction_factor, byte threshold_pwm_value);
     void init_motors();
 
+    // Actions
+    void rotate(uint16_t speed, bool direction);
+    void vroom(uint16_t speed, bool direction);
+    void l_motor(uint16_t speed, bool direction);
+    void r_motor(uint16_t speed, bool direction);
     void shutdown_motor();
 };
