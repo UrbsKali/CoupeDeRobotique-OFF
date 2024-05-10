@@ -491,11 +491,13 @@ class MainBrain(Brain):
 
         objectives: list[Objective] = [
             Objective("pickup", 0 if in_yellow_team else 4, 8.0),  # First zone
-            Objective("drop_to_zone", 2 if in_yellow_team else 5, 15.0),  # First drop
+            Objective("drop_to_zone", 2 if in_yellow_team else 5, 10.0),  # First drop
             Objective(
                 "pickup", 1 if in_yellow_team else 3, 12.0, raise_elevator_after=True
             ),  # etc
-            Objective("drop_to_gardener", 2 if in_yellow_team else 5, 15.0),
+            Objective("drop_to_gardener", 2 if in_yellow_team else 5, 10.0),
+            Objective("pickup", 2, 8.0),
+            Objective("drop_to_zone", 4 if in_yellow_team else 1, 10.0),
         ]
 
         for current_objective in objectives:
@@ -523,42 +525,39 @@ class MainBrain(Brain):
     async def solar_panels_stage(self) -> None:
         asyncio.create_task(self.control_solar_panels())
         go_to_result = await self.rolling_basis.go_to_and_wait(
-            Point(
-                80 - CONFIG.START_INFO_BY_TEAM["y"]["start_y"], 0
-            ),  # Using "y" because it is the one starting from 0, and the movement is relative
-            relative=True,
+            Point(190, 0),
             timeout=15.0,
             **CONFIG.GO_TO_PROFILES["slow_and_precise"],
         )
 
         if go_to_result == 0:
             # Great success!
-            self.score_estimate += 15
-        elif go_to_result == 1:
-            # Timed out
-            self.score_estimate += 5
+            self.score_estimate += 30
         else:
-            # ACS triggered
-            self.score_estimate += 10
+            all_solar_panels_y = self.arena.solar_panels_y[:]
+            current_y = (
+                self.rolling_basis.odometrie.y
+            )  # Copied to avoid changing it between operations
+            all_solar_panels_y.append(current_y)
+            all_solar_panels_y.sort()
+            self.score_estimate += all_solar_panels_y.index(current_y) * 5
 
     @Brain.task(process=False, run_on_start=False, timeout=30)
     async def control_solar_panels(self, solar_panel_timeout: float = 25.0) -> None:
-        solar_panels_y: list[float] = (
-            [27.5, 50, 72.5] if self.team == "y" else [272.5, 250, 227.5]
-        )
 
         start_time = Utils.get_ts()
+        remaining_solar_panels_y = self.arena.solar_panels_y[:]
+
         while Utils.time_since(start_time) < solar_panel_timeout:
             await asyncio.sleep(0.05)
-            for i, y in enumerate(solar_panels_y):
-                if abs(self.rolling_basis.odometrie.y - y) < 11.5:
-                    solar_panels_y.pop(i)
+            for i, y in enumerate(remaining_solar_panels_y):
+                if abs(self.rolling_basis.odometrie.y - y) < 13.0:
+                    self.arena.solar_panels_y.pop(i)
                     await self.deploy_team_solar_panel()
                     break
 
     @Brain.task(process=False, run_on_start=not CONFIG.ZOMBIE_MODE, refresh_rate=2)
     async def update_return_eta(self):
-
         already_there, target = self.compute_return_target()
 
         if already_there:

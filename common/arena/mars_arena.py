@@ -51,6 +51,13 @@ class MarsArena(Arena):
 
         self.start_zone_id = start_zone_id
 
+        solar_panels_distances: list[float] = [27.5, 50, 72.5, 127.5, 150, 172.5]
+        self.solar_panels_y: list[float] = (
+            solar_panels_distances
+            if self.start_zone_id % 2 == 0
+            else [300 - val for val in solar_panels_distances]
+        )
+
         self.drop_zones: list[Plants_zone] = [
             Plants_zone(
                 create_straight_rectangle(Point(45, 0), Point(0, 45))
