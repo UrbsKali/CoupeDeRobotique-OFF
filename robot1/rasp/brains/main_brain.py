@@ -242,6 +242,11 @@ class MainBrain(Brain):
     @Brain.task(process=False, run_on_start=False, timeout=10)
     async def drift(self):
         self.rolling_basis.stop_and_clear_queue()
+        await self.rolling_basis.go_to_and_wait(
+            Point(-15, 0),
+            timeout=5.0,
+            **CONFIG.GO_TO_PROFILES["slow_and_precise"],
+        )
         distance = 5
         angle = (-1 if self.team == "y" else 1) * math.pi / 6
         if (
@@ -557,12 +562,6 @@ class MainBrain(Brain):
             all_solar_panels_y.append(current_y)
             all_solar_panels_y.sort()
             self.score_estimate += all_solar_panels_y.index(current_y) * 5
-
-        await self.rolling_basis.go_to_and_wait(
-            Point(-20, 0),
-            timeout=5.0,
-            **CONFIG.GO_TO_PROFILES["slow_and_precise"],
-        )
 
     @Brain.task(process=False, run_on_start=False, timeout=30)
     async def control_solar_panels(self, solar_panel_timeout: float = 25.0) -> None:
