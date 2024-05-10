@@ -509,8 +509,8 @@ class MainBrain(Brain):
                 "pickup", 1 if in_yellow_team else 3, 12.0, raise_elevator_after=True
             ),  # etc
             Objective("drop_to_gardener", 2 if in_yellow_team else 5, 10.0),
-            Objective("pickup", 2, 8.0),
-            Objective("drop_to_zone", 4 if in_yellow_team else 1, 10.0),
+            # Objective("pickup", 2, 8.0),
+            # Objective("drop_to_zone", 4 if in_yellow_team else 1, 10.0),
         ]
 
         for current_objective in objectives:
