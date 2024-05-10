@@ -54,11 +54,11 @@ Speed_Driver_From_Distance::Speed_Driver_From_Distance(byte max_speed, byte corr
     this->acceleration_params.offset = acceleration_offset;
     this->acceleration_params.distance = acceleration_distance;
     // Fix sigmoid power
-    this->acceleration_params.p = 0.001f;
+    this->acceleration_params.p = 0.01f;
 
     // Deceleration params
     this->deceleration_params.offset = deceleration_offset;
     this->deceleration_params.distance = deceleration_distance;
     // Fix sigmoid power
-    this->deceleration_params.p = 0.001f;
+    this->deceleration_params.p = 0.01f;
 }
