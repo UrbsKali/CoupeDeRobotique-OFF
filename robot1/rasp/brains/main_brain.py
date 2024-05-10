@@ -236,6 +236,7 @@ class MainBrain(Brain):
 
     async def time_bomb(self, time_until_forced_endgame):
         await asyncio.sleep(time_until_forced_endgame)
+        self.logger.log("Bombing rolling basis", LogLevels.WARNING)
         await self.endgame()
 
     @Brain.task(process=False, run_on_start=False, timeout=10)
