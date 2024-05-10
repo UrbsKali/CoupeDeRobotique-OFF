@@ -330,6 +330,10 @@ class MainBrain(Brain):
         finally:
             await self.kill_rolling_basis()
 
+    async def god_hand_timer(self, time_to_close: float):
+        await asyncio.sleep(time_to_close)
+        self.close_god_hand()
+
     @Logger
     async def go_and_pickup(
         self,
@@ -356,9 +360,10 @@ class MainBrain(Brain):
             zone=target_pickup_zone.zone,
             delta=-5,
         )
+        asyncio.create_task(self.god_hand_timer(1.5))  # Close while moving
         await self.smart_go_to(
             position=pickup_target,
-            timeout=5,
+            timeout=3,
             **CONFIG.GO_TO_PROFILES["plant_pickup"],
         )
 
