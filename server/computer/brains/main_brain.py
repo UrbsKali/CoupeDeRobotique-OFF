@@ -23,35 +23,11 @@ class MainBrain(Brain):
         self,
         logger: Logger,
         ws_cmd: WServerRouteManager,
-        ws_pami: WServerRouteManager,
-        ws_lidar: WServerRouteManager,
-        ws_odometer: WServerRouteManager,
-        ws_camera: WServerRouteManager,
-        arena: MarsArena,
         config,
     ) -> None:
-        # Camera data
-        self.arucos = []
-        self.green_objects = []
-
-        # ROB data
-        self.rob_pos: OrientedPoint | None = None
-        self.lidar_points: list[Point] | None = None
 
         # Init the brain
         super().__init__(logger, self)
-
-    """
-        Secondary routines
-    """
-
-    """ Subprocess routines """
-
-    from brains.sensors_brain import camera_capture
-
-    """ Main process routines """
-
-    from brains.com_brain import pami_com, lidar_com, odometer_com, camera_com
 
     """
         Tasks
