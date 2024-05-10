@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from shapely import Geometry, Point
 
 
 class Utils:
@@ -19,22 +18,3 @@ class Utils:
     def time_since(ts: float) -> float:
         return Utils.get_ts() - ts
 
-    @staticmethod
-    def geom_to_str(geom: Geometry):
-        r = ""
-        if isinstance(geom, Point):
-            r = str((round(geom.x), round(geom.y)))
-
-        else:
-            try:
-                r = (
-                    "["
-                    + ", ".join(
-                        [Utils.geom_to_str(smaller_geom) for smaller_geom in geom.geoms]
-                    )
-                    + "]"
-                )
-            except:
-                r = str(geom)
-
-        return r

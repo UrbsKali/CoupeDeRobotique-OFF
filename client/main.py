@@ -40,6 +40,11 @@ def on_press(key):
     power_r = 200 if Key.shift in current_key else 100
     power_l = 200 if Key.shift in current_key else 100
     power = 255 if Key.shift in current_key else 100
+    
+    dir = [0,0]
+    
+        
+    
     match key:
         case Key.esc:
             return False
