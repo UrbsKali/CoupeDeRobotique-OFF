@@ -80,7 +80,7 @@ class Pipou(Teensy):
         Send a vromm command to the Teensy.
         """
         msg = (
-            Command.VROOM
+            b"\x00"
             + struct.pack("<H", speed)
             + struct.pack("<?", direction)            
         )
@@ -91,7 +91,7 @@ class Pipou(Teensy):
         Send a rotate command to the Teensy.
         """
         msg = (
-            Command.ROTATE
+            b"\x01"
             + struct.pack("<H", speed)
             + struct.pack("<?", direction)            
         )
@@ -102,7 +102,7 @@ class Pipou(Teensy):
         Control the left motor of the robot.
         """
         msg = (
-            Command.L_MOTOR
+            b"\x02"
             + struct.pack("<H", speed)
             + struct.pack("<?", direction)            
         )
@@ -113,7 +113,7 @@ class Pipou(Teensy):
         Control the right motor of the robot.
         """
         msg = (
-            Command.R_MOTOR
+            b"\x03"
             + struct.pack("<H", speed)
             + struct.pack("<?", direction)            
         )
@@ -123,5 +123,5 @@ class Pipou(Teensy):
         """
         Send a stop command to the Teensy.
         """
-        msg = Command.STOP
+        msg = b"\x04"
         self.send_bytes(msg)
