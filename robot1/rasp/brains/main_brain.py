@@ -561,7 +561,8 @@ class MainBrain(Brain):
         while Utils.time_since(start_time) < solar_panel_timeout:
             await asyncio.sleep(0.05)
             for i, y in enumerate(remaining_solar_panels_y):
-                if abs(self.rolling_basis.odometrie.y - y) < 13.0:
+                if 0 < self.rolling_basis.odometrie.y - y < 15.0:
+
                     remaining_solar_panels_y.pop(i)
                     await self.deploy_team_solar_panel(
                         len(remaining_solar_panels_y) > 3
