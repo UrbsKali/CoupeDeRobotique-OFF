@@ -3,7 +3,7 @@ from Client import Client, ControlMode
 
 
 async def main():
-    client = Client( control_mod = ControlMode.Manual, dummy_ws=True)
+    client = Client( control_mod = ControlMode.Manual, dummy_ws=False)
     await client.start()
     await asyncio.sleep(5)
     client.stop()
